@@ -83,8 +83,12 @@ def Del_DB():
     finally:
         conn.close()
 
-Initialize('root','PASSWD')
-# Insert_User(uid=uuid.uuid4().int,uname="\"ADMINS\"",passwd="\"ROOTS\"",fname="\" \"",lname="\" \"",age=0,gender="\" \"",mob=0,email="\" \"",dob = "\"20-1-12\"")
-print(Retrive_Users())
-# Del_DB()
+
+    
+
+if __name__ == "__main__":
+    Initialize('root','ABCD1234!@')
+    # Insert_User(uid=uuid.uuid4().int,uname="\"ADMINS\"",passwd="\"ROOTS\"",fname="\" \"",lname="\" \"",age=0,gender="\" \"",mob=0,email="\" \"",dob = "\"20-1-12\"")
+    print(Retrive_Users())
+    # Del_DB()
     

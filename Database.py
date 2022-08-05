@@ -59,8 +59,8 @@ def Retrive_Users():
         cur.execute("USE M_DB;")
         cur.execute("SELECT * FROM U_login;")
         res = cur.fetchall();        
-    except Exception as e:
-        print(e)
+    except mysql.connector.errors as err:
+        print(err.msg)
         return None
     finally:
         conn.close()
@@ -80,13 +80,11 @@ def Del_DB():
         conn.commit()      
     except Exception as e:
         print(e)
-        return None
     finally:
         conn.close()
-        return res
 
-Initialize('root','PASSWORD')
-# Insert_User(uid=uuid.uuid4().int,uname="\"admin\"",passwd="\"admin\"",fname="\" \"",lname="\" \"",age=0,gender="\" \"",mob=0,email="\" \"",dob = "\"20-1-12\"")
+Initialize('root','PASSWD')
+# Insert_User(uid=uuid.uuid4().int,uname="\"ADMINS\"",passwd="\"ROOTS\"",fname="\" \"",lname="\" \"",age=0,gender="\" \"",mob=0,email="\" \"",dob = "\"20-1-12\"")
 print(Retrive_Users())
 # Del_DB()
     

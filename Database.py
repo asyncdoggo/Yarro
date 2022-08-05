@@ -85,7 +85,7 @@ def Del_DB():
         conn.close()
         return res
 
-Initialize('root','ABCD1234!@')
+Initialize('root','PASSWORD')
 # Insert_User(uid=uuid.uuid4().int,uname="\"admin\"",passwd="\"admin\"",fname="\" \"",lname="\" \"",age=0,gender="\" \"",mob=0,email="\" \"",dob = "\"20-1-12\"")
 print(Retrive_Users())
 # Del_DB()

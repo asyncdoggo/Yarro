@@ -14,23 +14,23 @@ $(document).ready(function () {
                 contentType: "application/json",
                 dataType: 'json',
                 success: function (err, req, resp) {
-                    rmsg = JSON.parse(resp["responseText"]);
-                    if (rmsg["status"] == "success") {
-                        $("#success").text("Registration successful");
-                        $("#return").attr("hidden", false);
-                        $("#error").text("");
+                    msg = JSON.parse(resp["responseText"]);
+                    if (msg["status"] == "success") {
+                        localStorage.setItem("key", msg["key"]);
+                        localStorage.setItem("uname", msg["uname"])
+                        send_form("/",{"subject":"gotoreg2","uname":msg["uname"],"key":msg["key"]})
                     }
-                    else if (rmsg["status"] == "alreadyuser") {
+                    else if (msg["status"] == "alreadyuser") {
                         $("#error").text("User already exists");
                     }
-                    else if (rmsg["status"] == "alreadyemail") {
+                    else if (msg["status"] == "alreadyemail") {
                         $("#error").text("Email already exists");
                     }
-                    else if (rmsg["status"] == "faliure") {
+                    else if (msg["status"] == "faliure") {
                         $("#error").text("An unknown error occured");
                     }
                     else {
-                        $("#error").text(rmsg["status"]);
+                        $("#error").text(msg["status"]);
                     }
                 }
             });
@@ -39,9 +39,27 @@ $(document).ready(function () {
         else {
             $("#error").text("passwords do not match");
         }
+    })
+});
 
-        $("#return").click(function () {
-            window.location.href = "/";
-        })
-    });
-})
+function send_form(action, params) {
+    var form = document.createElement('form');
+    form.setAttribute('method', 'post');
+    form.setAttribute('action', action);
+
+    for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+        }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+

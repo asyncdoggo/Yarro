@@ -8,32 +8,32 @@ $(document).ready(function () {
     })
 
 
-// TODO: Autologin
-//    try {
-//        var key = localStorage.getItem("key");
-//        var uname = localStorage.getItem("uname");
-//
-//        if (key.length) {
-//            msg_data = {"subject":"login","uname":uname,"key":key}
-//
-//            $.ajax({
-//                type: 'POST',
-//                url: "/",
-//                data: JSON.stringify(msg_data),
-//                contentType: "application/json",
-//                dataType: 'json',
-//                success: function (err, req, resp) {
-//                msg = JSON.parse(resp["responseText"]);
-//                if (msg["status"] == "success") {
-//                    localStorage.setItem("key", msg["key"]);
-//                    send_form("/interface", { "key": msg["key"], "uname": uname });
-//                }
-//                }
-//            });
-//        }
-//    }
-//    catch (e) {
-//    }
+
+    try {
+        var key = localStorage.getItem("key");
+        var uname = localStorage.getItem("uname");
+
+        if (key.length) {
+            msg_data = {"subject":"login","uname":uname,"key":key}
+
+            $.ajax({
+                type: 'POST',
+                url: "/",
+                data: JSON.stringify(msg_data),
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (err, req, resp) {
+                msg = JSON.parse(resp["responseText"]);
+                if (msg["status"] == "success") {
+                    localStorage.setItem("key", msg["key"]);
+                    //TODO GOTO MAINPAGE
+                }
+                }
+            });
+        }
+    }
+    catch (e) {
+    }
 
     $('#login_form').on('submit', function (e) {
         e.preventDefault();

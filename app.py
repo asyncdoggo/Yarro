@@ -34,11 +34,11 @@ def root():
         if data["subject"] == "login":
             return login(data)
 
-        if data["subject"] == "gotoreg2":
-            return flask.render_template("reg2.html")
-
         if data["subject"] == "reg2_data":
             return update(data)
+
+        if data["subject"] == "resetpass":
+            return reset(data)
 
 
 @app.route("/register")
@@ -99,6 +99,17 @@ def register(data):
         return {"status": "failure"}
 
 
+def reset(data):
+    username = data["uname"]
+    oldpass = data["oldpass"]
+    newpass = data["newpass"]
+
+    res = db.check(username, oldpass)
+    if res:
+        db.resetpasswd(username, newpass)
+        # TODO resetpasswd
+
+
 def update(data):
     uname = data["uname"]
     if data["key"] == str(keys[uname]):
@@ -108,8 +119,10 @@ def update(data):
         gender = data["gender"]
         mob = data["mob"]
         dob = data["dob"]
-        if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob,uname=uname):
+        if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uname=uname):
             return {"status": "success"}
+        else:
+            return {"status": "failure"}
     else:
         return {"status": "failure"}
 

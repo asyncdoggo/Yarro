@@ -47,7 +47,7 @@ def insert_user(**kwargs):
         cur = conn.cursor()
         cur.execute("USE M_DB;")
         cur.execute(
-            f"""INSERT INTO User (User_Id, UserName, Passwd,email,DOB) VALUES ("{kwargs['uid']}", "{kwargs['uname']}", "{kwargs['passwd']}", "{kwargs['email']}", {kwargs['dob']}); """
+            f"""INSERT INTO User (User_Id, UserName, Passwd,email) VALUES ("{kwargs['uid']}", "{kwargs['uname']}", "{kwargs['passwd']}", "{kwargs['email']}"); """
         )
         conn.commit()
         return True
@@ -65,7 +65,7 @@ def update(**kwargs):
         cur.execute("USE M_DB;")
         cur.execute(
             f"""update User set FirstName="{kwargs["fname"]}", LastName="{kwargs["lname"]}", Age="{kwargs["age"]}",
-            Gender="{kwargs["gender"]}", Mobile_No={kwargs["mob"]},DOB="{kwargs["dob"]}"
+            Gender="{kwargs["gender"]}", Mobile_No={kwargs["mob"]},DOB={kwargs["dob"]}
             WHERE UserName="{kwargs["uname"]}";
             """
         )

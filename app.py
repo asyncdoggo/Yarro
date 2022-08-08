@@ -1,5 +1,5 @@
 import uuid
-
+from datetime import date 
 import flask
 import random
 import Database as db
@@ -125,6 +125,28 @@ def update(data):
             return {"status": "failure"}
     else:
         return {"status": "failure"}
+
+
+def get_y(dob:str) -> int:
+    _y = dob[:4]
+    _m = dob[5:7]
+    _d = dob[8:]
+
+    cur = str(date.today())
+    c_y = cur[:4]
+    c_m = cur[5:7]
+    c_d = cur[8:]
+    
+    dif_y = int(c_y) - int(_y)
+    dif_m = int(c_m) - int(_m)
+    dif_d = int(c_d) - int(_d)
+
+    if dif_m < 0:
+        dif_y -= 1
+    elif dif_m == 0 and dif_d < 0:
+        dif_y -=1
+
+    return dif_y
 
 
 app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False)

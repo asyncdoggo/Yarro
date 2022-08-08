@@ -126,6 +126,17 @@ def delete():
 
 
 def resetpasswd(username, newpass):
+    global User_Sql, Password_Sql
+    conn = connector(User_Sql, Password_Sql)
+    try:
+        cur = conn.cursor()
+        cur.execute("USE M_DB;")
+        cur.execute(f"UPDATE User set Passwd = {newpass} WHERE UserName = {username};")
+        conn.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
     return None
 
 

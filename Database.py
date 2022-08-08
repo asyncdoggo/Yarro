@@ -133,13 +133,16 @@ def resetpasswd(username, newpass):
         cur.execute("USE M_DB;")
         cur.execute(f"UPDATE User SET Passwd = {newpass} WHERE UserName = {username};")
         conn.commit()
+        return True
     except Exception as e:
         print(e)
     finally:
         conn.close()
-    return None
+    
 
 
 if __name__ == "__main__":
+    initialize("root","ABCD1234!@")
+    resetpasswd("eqweq","wqqw")
     pass
-    # delete()
+    

@@ -106,8 +106,13 @@ def reset(data):
 
     res = db.check(username, oldpass)
     if res:
-        db.resetpasswd(username, newpass)
-        # TODO resetpasswd
+        if db.resetpasswd(username, newpass):
+            return {"status":"success"}
+        else:
+            return {"status":"nouser"}
+    else:
+        return {"status":"badpass"}
+
 
 
 def update(data):
@@ -115,10 +120,19 @@ def update(data):
     if data["key"] == str(keys[uname]):
         fname = data["fname"]
         lname = data["lname"]
-        age = data["age"]
         gender = data["gender"]
         mob = data["mob"]
         dob = data["dob"]
+
+        if not dob:
+            dob = "NULL"
+            age = 0
+        else:
+            age = get_y(dob)
+
+        if not mob:
+            mob = 0
+
         if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uname=uname):
             return {"status": "success"}
         else:

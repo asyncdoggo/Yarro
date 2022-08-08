@@ -47,7 +47,7 @@ def insert_user(**kwargs):
         cur = conn.cursor()
         cur.execute("USE M_DB;")
         cur.execute(
-            f"""INSERT INTO User (User_Id, UserName, Passwd,email) VALUES ("{kwargs['uid']}", "{kwargs['uname']}", "{kwargs['passwd']}", "{kwargs['email']}"); """
+            f"""INSERT INTO User (User_Id, UserName, Passwd,email,DOB) VALUES ("{kwargs['uid']}", "{kwargs['uname']}", "{kwargs['passwd']}", "{kwargs['email']}", {kwargs['dob']}); """
         )
         conn.commit()
         return True
@@ -131,7 +131,7 @@ def resetpasswd(username, newpass):
     try:
         cur = conn.cursor()
         cur.execute("USE M_DB;")
-        cur.execute(f"UPDATE User set Passwd = {newpass} WHERE UserName = {username};")
+        cur.execute(f"UPDATE User SET Passwd = {newpass} WHERE UserName = {username};")
         conn.commit()
     except Exception as e:
         print(e)
@@ -141,6 +141,5 @@ def resetpasswd(username, newpass):
 
 
 if __name__ == "__main__":
-    initialize('root', 'root')
     pass
     # delete()

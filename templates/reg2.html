@@ -1,27 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>B-Itter</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/reg2.css">
+  <title></title>
 </head>
+
 <body>
-    <form id="reg2_form">
-            <label for="fname">First Name:</label><br>
-            <input type="text" id="fname" name="fname"><br>
-            <label for="lname">Last Name:</label><br>
-            <input type="text" id="lname" name="lname"><br>
-            <label for="age">age:</label><br>
-            <input type="number" id="age" name="age"><br>
-            <label for="gender">gender:</label><br>
-            <input type="text" id="gender" name="gender"><br>
-            <label for="mob">Mobile Number:</label><br>
-            <input type="number" id="mob" name="mob"><br>
-            <label for="dob">password:</label><br>
-            <input type="date" id="dob" name="dob"><br>
-            <input type="submit" value="continue">
-          </form>
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
+  <main>
+    <div class="up_container">
+      <h2>Personal information</h2>
+
+      <form id="reg2_form">
+
+        <!-- first_name -->
+        <div class="box box1">
+          <input type="text" name="fname" id="fname" placeholder="First Name">
+        </div>
+
+        <!-- last_name -->
+        <div class="box box2">
+          <input type="text" name="lname" id="lname" placeholder="Last Name">
+        </div>
+
+        <div class="box box3">
+          <input type="text" name="gender" id="gender" placeholder="gender">
+        </div>
+
+        <!-- birth_date -->
+        <div class="box box4">
+          <input type="date" name="dob" id="dob">
+        </div>
+
+        <!-- phone number -->
+        <div class="box box5">
+          <input type="tel" name="mob" maxlength="10" id="mob" placeholder="Enter Phone Number">
+        </div>
+
+        <div class="box box6">
+          <input type="submit" value="Continue">
+        </div>
+
+      </form>
+    </div>
+  </main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
     <script src="/static/js/jquery.serializejson.js"></script>
 	  <script src="/static/js/reg2.js"> </script>
 </body>
+
 </html>

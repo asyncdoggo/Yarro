@@ -16,6 +16,7 @@ $(document).ready(function () {
             success: function (err, req, resp) {
                 msg = JSON.parse(resp["responseText"]);
                 if (msg["status"] == "success") {
+                console.log("success");
                   // TODO GOTO MAINPAGE
                 }
                 else if (msg["status"] == "failure") {

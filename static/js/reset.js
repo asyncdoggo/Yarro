@@ -20,8 +20,7 @@ $(document).ready(function () {
                     if (msg["status"] == "success") {
                         $("#success").attr("hidden", false);
                         $("#hbutton").attr("hidden", false);
-                        $("#error").text("");
-                        $("#success").text("Reset Successful");
+                        $("#error").text("Reset Successful");
 
                     }
                     else if (msg["status"] == "nouser") {

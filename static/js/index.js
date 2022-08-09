@@ -39,6 +39,7 @@ $(document).ready(function () {
         e.preventDefault();
         var data = $("#login_form").serializeJSON();
         data["subject"] = "login";
+        console.log(data);
 
         $.ajax({
             type: 'POST',
@@ -55,11 +56,8 @@ $(document).ready(function () {
                     localStorage.setItem("key", msg["key"]);
                     //send_form("/interface", { "uname": msg["uname"], "key": msg["key"] });
                 }
-                else if (msg["status"] == "nouser") {
-                    $("#error").text("Username does not exists");
-                }
                 else if (msg["status"] == "badpasswd") {
-                    $("#error").text("password is wrong");
+                    $("#error").text("Username or password is wrong");
                 }
             }
         });

@@ -1,23 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>web</title>
-  </head>
-    <body>
-      <div class="container">
-		<form id="login_form">
-            <label for="uname">username:</label><br>
-            <input type="text" id="uname" name="uname"><br>
-            <label for="passwd">password:</label><br>
-            <input type="password" id="passwd" name="passwd"><br>
-            <input type="submit" value="login">
-          </form>
-          <button id="register">Register</button>
-          <button id="resetpass">Reset password</button>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/css/index.css" />
+  <title>Document</title>
+</head>
+
+<body>
+  <header>
+    <nav></nav>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <form id="login_form">
+
+        <div class="box">
+          <h2>Welcome to B-itter</h2>
+          <div class="box1 ">
+            <img src="" alt="" />
+          </div>
+
+          <!-- username -->
+          <div class="box2 cont">
+            <input type="text" placeholder="username"  name="uname" id="uname" required>
+          </div>
+
+          <!-- password -->
+          <div class="box3 cont">
+            <input type="password" placeholder="password" name="passwd" id="passwd" required>
+          </div>
+
+          <!-- login button  -->
+          <div class="box4 cont">
+            <input type="submit" value="Log In">
+          </div>
           <p id="error"></p>
-      </div>
-	  <script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
-    <script src="/static/js/jquery.serializejson.js"></script>
+          </div>
+          </form>
+
+          <div class="box5">
+            <p><a href="/reset">Reset password</a></p>
+          </div>
+          <!-- <hr style="border: 0; clear:both; display:block; width: 24%; background-color:black; height: 1px; ">  -->
+
+          <div class="box6">
+            <p>New to B-itter? <a href="/register">Sign up</a> </p>
+          </div>
+
+
+
+    </div>
+
+  </main>
+
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
+      <script src="/static/js/jquery.serializejson.js"></script>
 	  <script src="/static/js/index.js"> </script>
-  </body>
+</body>
+
 </html>

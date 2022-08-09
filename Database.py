@@ -1,8 +1,6 @@
 import mysql.connector
 import mysql.connector.errors
 
-import uuid
-
 User_Sql = None
 Password_Sql = None
 

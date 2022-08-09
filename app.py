@@ -1,5 +1,5 @@
 import uuid
-from datetime import date 
+from datetime import date
 import flask
 import random
 import Database as db
@@ -30,9 +30,6 @@ def root():
 
         if data["subject"] == "register":
             return register(data)
-
-        if data["subject"] == "login":
-            return login(data)
 
         if data["subject"] == "reg2_data":
             return update(data)
@@ -89,14 +86,14 @@ def register(data):
     res = [item for t in res for item in t]
 
     if username in res:
-        return {"status": "username already exists"}
+        return {"status": "alreadyuser"}
     uid = uuid.uuid4().hex
     if db.insert_user(uid=uid, uname=username, passwd=password, email=email):
         data = login({"uname": username, "passwd": password})
         key = data["key"]
         return {"status": "success", "uname": username, "key": key}
     else:
-        return {"status": "failure"}
+        return {"status": "alreadyemail"}
 
 
 def reset(data):
@@ -107,12 +104,11 @@ def reset(data):
     res = db.check(username, oldpass)
     if res:
         if db.resetpasswd(username, newpass):
-            return {"status":"success"}
+            return {"status": "success"}
         else:
-            return {"status":"nouser"}
+            return {"status": "nouser"}
     else:
-        return {"status":"badpass"}
-
+        return {"status": "badpass"}
 
 
 def update(data):
@@ -141,7 +137,7 @@ def update(data):
         return {"status": "failure"}
 
 
-def get_y(dob:str) -> int:
+def get_y(dob: str) -> int:
     _y = dob[:4]
     _m = dob[5:7]
     _d = dob[8:]
@@ -150,7 +146,7 @@ def get_y(dob:str) -> int:
     c_y = cur[:4]
     c_m = cur[5:7]
     c_d = cur[8:]
-    
+
     dif_y = int(c_y) - int(_y)
     dif_m = int(c_m) - int(_m)
     dif_d = int(c_d) - int(_d)
@@ -158,7 +154,7 @@ def get_y(dob:str) -> int:
     if dif_m < 0:
         dif_y -= 1
     elif dif_m == 0 and dif_d < 0:
-        dif_y -=1
+        dif_y -= 1
 
     return dif_y
 

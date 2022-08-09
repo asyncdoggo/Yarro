@@ -129,7 +129,7 @@ def resetpasswd(username, newpass):
     try:
         cur = conn.cursor()
         cur.execute("USE M_DB;")
-        cur.execute(f"UPDATE User SET Passwd = {newpass} WHERE UserName = {username};")
+        cur.execute(f"""UPDATE User SET Passwd = "{newpass}" WHERE UserName = "{username}";""")
         conn.commit()
         return True
     except Exception as e:

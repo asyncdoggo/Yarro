@@ -33,7 +33,7 @@ main
   align-items: center;
   justify-content: center;
   width: 45vw;
-  height: 55vh;
+  height: 60vh;
   margin: 10.8vw 4vh;
   border-radius: 1.8vw;
   background-color: #ffffff;
@@ -49,7 +49,8 @@ main
 input[type=text],
 [type=password],
 [type=date],
-[type=email]
+[type=email],
+[type=tel]
 {
   width: 100%;
   height: 100%;

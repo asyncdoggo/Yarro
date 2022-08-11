@@ -121,7 +121,7 @@ def update(data):
         dob = data["dob"]
 
         if not dob:
-            dob = "NULL"
+            dob = "0000-00-00"
             age = 0
         else:
             age = get_y(dob)

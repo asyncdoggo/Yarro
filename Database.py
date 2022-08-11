@@ -45,7 +45,8 @@ def insert_user(**kwargs):
         cur = conn.cursor()
         cur.execute("USE M_DB;")
         cur.execute(
-            f"""INSERT INTO User (User_Id, UserName, Passwd,email) VALUES ("{kwargs['uid']}", "{kwargs['uname']}", "{kwargs['passwd']}", "{kwargs['email']}"); """
+            f"INSERT INTO User (User_Id, UserName, Passwd,email) VALUES (%s,%s,%s,%s);",
+            (kwargs['uid'], kwargs['uname'], kwargs['passwd'], kwargs['email'])
         )
         conn.commit()
         return True
@@ -62,10 +63,9 @@ def update(**kwargs):
         cur = conn.cursor()
         cur.execute("USE M_DB;")
         cur.execute(
-            f"""update User set FirstName="{kwargs["fname"]}", LastName="{kwargs["lname"]}", Age="{kwargs["age"]}",
-            Gender="{kwargs["gender"]}", Mobile_No={kwargs["mob"]},DOB={kwargs["dob"]}
-            WHERE UserName="{kwargs["uname"]}";
-            """
+            f"update User set FirstName=%s,LastName=%s,Age=%s,Gender=%s,Mobile_No=%s,DOB=%s WHERE UserName=%s;",
+            (kwargs["fname"], kwargs["lname"], kwargs["age"], kwargs["gender"], kwargs["mob"], kwargs["dob"],
+             kwargs["uname"])
         )
         conn.commit()
         return True
@@ -97,7 +97,7 @@ def check(username, password):
     try:
         cur = conn.cursor()
         cur.execute("USE M_DB;")
-        cur.execute(f"SELECT * from U_Login where UserName=\"{username}\" and Passwd=\"{password}\"")
+        cur.execute(f"SELECT * from U_Login where UserName=%s and Passwd=%s", (username, password))
         res = cur.fetchall()
         return True if res else False
     except Exception as e:
@@ -129,18 +129,16 @@ def resetpasswd(username, newpass):
     try:
         cur = conn.cursor()
         cur.execute("USE M_DB;")
-        cur.execute(f"""UPDATE User SET Passwd = "{newpass}" WHERE UserName = "{username}";""")
+        cur.execute(f"UPDATE User SET Passwd = %s WHERE UserName = %s;", (username, newpass))
         conn.commit()
         return True
     except Exception as e:
         print(e)
     finally:
         conn.close()
-    
 
 
 if __name__ == "__main__":
-    initialize("root","ABCD1234!@")
-    resetpasswd("eqweq","wqqw")
+    initialize("root", "root")
+    delete()
     pass
-    

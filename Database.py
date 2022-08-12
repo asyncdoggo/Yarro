@@ -25,8 +25,10 @@ def initialize(user: str, password: str):
         cur.execute(
             "CREATE TABLE IF NOT EXISTS User(User_Id varchar(35) PRIMARY KEY NOT NULL,UserName varchar(20) UNIQUE, "
             "Passwd varchar(200), Email varchar(100) UNIQUE);")
-        cur.execute("CREATE TABLE IF NOT EXISTS Detail (u_id varchar(35), FirstName varchar(50), LastName varchar(50), Age int, Gender varchar(10), "
-            "Mobile_No int, DOB date, FOREIGN KEY(u_id) REFERENCES User(User_Id) ON UPDATE CASCADE ON DELETE CASCADE);")
+        cur.execute(
+            "CREATE TABLE IF NOT EXISTS Detail (u_id varchar(35), FirstName varchar(50), LastName varchar(50), "
+            "Age int, Gender varchar(10), Mobile_No int, DOB date, FOREIGN KEY(u_id) REFERENCES User(User_Id) ON "
+            "UPDATE CASCADE ON DELETE CASCADE);")
         cur.execute(
             "CREATE TABLE IF NOT EXISTS Post(Post_Id int PRIMARY KEY NOT NULL, U_ID varchar(50) NOT NULL, "
             "content text NOT NULL, L_count int, comment_Count int, FOREIGN KEY(U_ID) REFERENCES User(User_Id) ON "
@@ -65,7 +67,7 @@ def update(**kwargs):
         cur.execute(
             f"update Detail set FirstName=%s,LastName=%s,Age=%s,Gender=%s,Mobile_No=%s,DOB=%s WHERE u_id=%s;",
             (kwargs["fname"], kwargs["lname"], kwargs["age"], kwargs["gender"], kwargs["mob"], kwargs["dob"],
-             kwargs["uname"])
+             kwargs["uid"])
         )
         conn.commit()
         return True
@@ -76,9 +78,8 @@ def update(**kwargs):
 
 
 def retrieve_users():
-
     global User_Sql, Password_Sql
-    res, di = None,{}
+    res, di = None, {}
     conn = connector(User_Sql, Password_Sql)
     try:
         cur = conn.cursor()
@@ -87,7 +88,7 @@ def retrieve_users():
         res = cur.fetchall()
         di = {}
         for i in res:
-            di[i[0]]=i[1]         
+            di[i[0]] = i[1]
     except mysql.connector.errors as err:
         print(err.msg)
     finally:
@@ -143,16 +144,7 @@ def resetpasswd(username, newpass):
         conn.close()
 
 
-
 if __name__ == "__main__":
-    initialize("root", "ABCD1234!@")
-    # delete()
-    insert_user(uid = "w",uname="U", passwd = "2", email="wq")
-    insert_user(uid = "Q",uname="u", passwd = "2", email="dw1")
-    print("Check 1 : ", check("U","2"))
-    print("Check 2 : ", check("u","2"))
-    res = retrieve_users()
-    print(res)
-
-    # delete()
+    initialize("root", "root")
+    delete()
     pass

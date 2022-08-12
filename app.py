@@ -79,7 +79,7 @@ def register(data):
     username = data["uname"]
     password = data["passwd1"]
     email = data["email"]
-    if (len(username) < 5 or " " in username) and (len(password) < 5 or " " in password):
+    if (len(username) < 5 or " " in username) or (len(password) < 5 or " " in password):
         return {"status": "username and password should be between 5 to 20 characters without spaces"}
 
     res1 = db.retrieve_users()
@@ -129,7 +129,9 @@ def update(data):
         if not mob:
             mob = 0
 
-        if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uname=uname):
+        res = db.retrieve_users()
+
+        if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[uname]):
             return {"status": "success"}
         else:
             return {"status": "failure"}
@@ -137,19 +139,18 @@ def update(data):
         return {"status": "failure"}
 
 
-
-def get_y(dob:str) -> int:
+def get_y(dob: str) -> int:
     _y, _m, _d = dob[:4], dob[5:7], dob[8:]
 
     cur = str(date.today())
     c_y, c_m, c_d = cur[:4], cur[5:7], cur[8:]
 
     dif_y, dif_m, dif_d = int(c_y) - int(_y), int(c_m) - int(_m), int(c_d) - int(_d)
-    
+
     if dif_m < 0:
         dif_y -= 1
     elif dif_m == 0 and dif_d < 0:
-        dif_y -=1
+        dif_y -= 1
 
     return dif_y
 

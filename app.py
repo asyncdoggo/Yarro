@@ -10,6 +10,7 @@ keys = {}
 
 db.initialize("root", "root")
 
+# TODO: Logout on key change
 
 @app.route("/", methods=["POST", "GET"])
 def root():

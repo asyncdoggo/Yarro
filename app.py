@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import date
 import flask
@@ -10,7 +11,10 @@ keys = {}
 
 db.initialize("root", "root")
 
-# TODO: Logout on key change
+regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+
+# TODO: Logout data: send_form("/logout",{"subject":"logout","key":getkeyfromstorage,"uname":"getunamefromstorage"})
 
 @app.route("/", methods=["POST", "GET"])
 def root():
@@ -49,6 +53,18 @@ def render_reset():
     return flask.render_template("reset.html")
 
 
+@app.route("/logout", methods=["POST"])
+def logout():
+    data = flask.request.form
+    print(data)
+    if data["subject"] == "keyerror":
+        return flask.render_template("index.html", error="You have been logged out due to other device logging in")
+    elif data["subject"] == "logout":
+        return flask.render_template("index.html")
+    else:
+        return {"subject": "error"}
+
+
 def login(data):
     username = ''
     try:
@@ -80,6 +96,10 @@ def register(data):
     username = data["uname"]
     password = data["passwd1"]
     email = data["email"]
+
+    if not re.search(regex, email):
+        return {"status": "Invalid Email"}
+
     if (len(username) < 5 or " " in username) or (len(password) < 5 or " " in password):
         return {"status": "username and password should be between 5 to 20 characters without spaces"}
 
@@ -137,22 +157,18 @@ def update(data):
         else:
             return {"status": "failure"}
     else:
-        return {"status": "failure"}
+        return {"status": "badkey"}
 
 
 def get_y(dob: str) -> int:
     _y, _m, _d = dob[:4], dob[5:7], dob[8:]
-
     cur = str(date.today())
     c_y, c_m, c_d = cur[:4], cur[5:7], cur[8:]
-
     dif_y, dif_m, dif_d = int(c_y) - int(_y), int(c_m) - int(_m), int(c_d) - int(_d)
-
     if dif_m < 0:
         dif_y -= 1
     elif dif_m == 0 and dif_d < 0:
         dif_y -= 1
-
     return dif_y
 
 

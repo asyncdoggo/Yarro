@@ -19,8 +19,8 @@ $(document).ready(function () {
                 console.log("success");
                   // TODO GOTO MAINPAGE
                 }
-                else if (msg["status"] == "failure") {
-                    $("#error").text("An unknown error occured");
+                else if (msg["status"] == "badkey") {
+                send_form("/logout",{"subject":"keyerror"})
                 }
                 else {
                     $("#error").text(msg["status"]);

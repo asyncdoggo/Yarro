@@ -4,6 +4,7 @@ from datetime import date
 import flask
 import random
 import Database as db
+import send_mail
 
 app = flask.Flask(__name__)
 
@@ -39,8 +40,8 @@ def root():
         if data["subject"] == "reg2_data":
             return update(data)
 
-        if data["subject"] == "resetpass":
-            return reset(data)
+        if data["subject"] == "forgotpass":
+            return forgotpass(data)
 
 
 @app.route("/register")
@@ -48,9 +49,9 @@ def render_reg():
     return flask.render_template("register.html")
 
 
-@app.route("/reset")
-def render_reset():
-    return flask.render_template("reset.html")
+@app.route("/forgotpass")
+def render_forgot_pass():
+    return flask.render_template("forgotpass.html")
 
 
 @app.route("/logout", methods=["POST"])
@@ -117,19 +118,22 @@ def register(data):
         return {"status": "alreadyemail"}
 
 
-def reset(data):
-    username = data["uname"]
-    oldpass = data["oldpass"]
-    newpass = data["newpass"]
+def send_email(email, password):
+    try:
+        send_mail.send_mail(email, password)
+    except Exception as e:
+        print(e)
+    pass
 
-    res = db.check(username, oldpass)
-    if res:
-        if db.resetpasswd(username, newpass):
-            return {"status": "success"}
-        else:
-            return {"status": "nouser"}
+
+def forgotpass(data):
+    email = data["email"]
+    p = db.getemail(email)
+    if p:
+        send_email(email, p)
+        return {"status": "success"}
     else:
-        return {"status": "badpass"}
+        return {"status": "noemail"}
 
 
 def update(data):

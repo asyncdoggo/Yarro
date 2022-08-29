@@ -1,11 +1,9 @@
 $(document).ready(function () {
-    $('#resetpass').on('submit', function (e) {
-        e.preventDefault();
-        var data = $("#resetpass").serializeJSON();
-        data["subject"] = "resetpass";
+        $("#resetButton").click(function() {
 
-        if (data["newpass"] == data["newpass2"]) {
+            var email = $("#email").val();
 
+            data = {"subject":"forgotpass","email":email}
             $.ajax({
                 type: 'POST',
                 url: "/",
@@ -18,33 +16,20 @@ $(document).ready(function () {
 
 
                     if (msg["status"] == "success") {
-                        $("#success").attr("hidden", false);
-                        $("#hbutton").attr("hidden", false);
-                        $("#error").text("Reset Successful");
-
+                        $("#error").text("Email sent Successful");
                     }
-                    else if (msg["status"] == "nouser") {
-                        $("#error").text("Username does not exists");
-                        $("#success").text("");
-                    }
-                    else if (msg["status"] == "badpass") {
-                        $("#error").text("password is wrong");
+                    else if (msg["status"] == "noemail") {
+                        $("#error").text("Email does not exists");
                     }
                     else {
                         $("#error").text(msg["status"]);
                     }
+
                 }
-            });
-        }
-        else {
-            $("#error").text("New password does not match");
-        }
-    })
+            })            
+        })
 })
 
-$("#hbutton").click(function () {
-    window.location.href = "/";
-})
 
 function send_form(action, params) {
     var form = document.createElement('form');

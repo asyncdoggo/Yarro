@@ -54,8 +54,7 @@ form
 
 }
 
-input[type=password],
-[type=text]
+input[type=text]
 {
   width: 100%;
   height: 40%;
@@ -64,7 +63,7 @@ input[type=password],
   border: 0.5px solid #04AA6D;
 }
 
-input[type=submit]
+button
 {
   border: 0px solid;
   width: 20vw;

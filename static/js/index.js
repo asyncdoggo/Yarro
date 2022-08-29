@@ -4,7 +4,7 @@ $(document).ready(function () {
     })
 
     $("#resetpass").click(function () {
-        window.location.href = "/reset"
+        window.location.href = "/forgotpass"
     })
 
 

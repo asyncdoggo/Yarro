@@ -129,6 +129,25 @@ def delete():
         conn.close()
 
 
+def getemail(email):
+    global User_Sql, Password_Sql
+    conn = connector(User_Sql, Password_Sql)
+    try:
+        cur = conn.cursor()
+        cur.execute("USE M_DB;")
+        cur.execute(f"select Passwd from User where Email = %s", (email,))
+        res = cur.fetchall()
+        if res:
+            return res[0][0]
+        else:
+            return False
+
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
+
+
 def resetpasswd(username, newpass):
     global User_Sql, Password_Sql
     conn = connector(User_Sql, Password_Sql)
@@ -146,5 +165,6 @@ def resetpasswd(username, newpass):
 
 if __name__ == "__main__":
     initialize("root", "root")
-    delete()
+    getemail("ayushdehpande81@gmail.com")
+    # delete()
     pass

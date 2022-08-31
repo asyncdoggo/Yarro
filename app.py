@@ -1,3 +1,4 @@
+import os.path
 import re
 import uuid
 from datetime import date
@@ -15,7 +16,7 @@ db.initialize("root", "root")
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 
-# TODO: Logout data: send_form("/logout",{"subject":"logout","key":getkeyfromstorage,"uname":"getunamefromstorage"})
+# TODO: Logout data: send_form("/logout",{"subject":"logout","key":ge tkeyfromstorage,"uname":"getunamefromstorage"})
 
 @app.route("/", methods=["POST", "GET"])
 def root():
@@ -42,6 +43,9 @@ def root():
 
         if data["subject"] == "forgotpass":
             return forgotpass(data)
+
+        if data["subject"] == "getpost":
+            return get_post(data)
 
 
 @app.route("/register")
@@ -76,6 +80,7 @@ def login(data):
         if res:
             key = random.randint(10000000, 99999999)
             keys[username] = key
+
             resp = {"status": "success", "uname": username, "key": key}
             return resp
         else:
@@ -91,6 +96,20 @@ def login(data):
                 return {"status": "none"}
         except KeyError:
             return {"status": "none"}
+
+
+def get_post(data):
+    pass
+    users = ["abc" for _ in range(5)]
+    posts = ["aaa" for _ in range(5)]
+    return {"status": "success", "users": users, "posts": posts}
+
+
+@app.route("/images/<path:path>")
+def get_image(path):
+    if not os.path.exists(f"static/images/{path}"):
+        path = "default.png"
+    return flask.send_from_directory("static/images", path)
 
 
 def register(data):
@@ -113,6 +132,7 @@ def register(data):
     if db.insert_user(uid=uid, uname=username, passwd=password, email=email):
         data = login({"uname": username, "passwd": password})
         key = data["key"]
+        img = data["image"]
         return {"status": "success", "uname": username, "key": key}
     else:
         return {"status": "alreadyemail"}

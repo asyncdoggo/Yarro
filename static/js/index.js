@@ -39,7 +39,6 @@ $(document).ready(function () {
         e.preventDefault();
         var data = $("#login_form").serializeJSON();
         data["subject"] = "login";
-        console.log(data);
 
         $.ajax({
             type: 'POST',
@@ -55,6 +54,8 @@ $(document).ready(function () {
                     localStorage.setItem("uname", msg["uname"]);
                     localStorage.setItem("key", msg["key"]);
                     //send_form("/interface", { "uname": msg["uname"], "key": msg["key"] });
+                    console.log("success");
+
                 }
                 else if (msg["status"] == "badpasswd") {
                     $("#error").text("Username or password is wrong");

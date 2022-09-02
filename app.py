@@ -11,7 +11,7 @@ app = flask.Flask(__name__)
 
 keys = {}
 
-db.initialize("root", "root")
+db.initialize("root", "ABCD1234!@")
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -27,7 +27,7 @@ def root():
             sub = flask.request.form["subject"]
             if sub == "gotoreg2":
                 return flask.render_template("reg2.html")
-        except KeyError:
+        except KeyError as e:
             pass
 
         data = flask.request.get_json()
@@ -132,7 +132,6 @@ def register(data):
     if db.insert_user(uid=uid, uname=username, passwd=password, email=email):
         data = login({"uname": username, "passwd": password})
         key = data["key"]
-        img = data["image"]
         return {"status": "success", "uname": username, "key": key}
     else:
         return {"status": "alreadyemail"}

@@ -1,11 +1,9 @@
-# TODO: Add with for all connections
-
 import mysql.connector
 import mysql.connector.errors
 
 User_Sql = None
 Password_Sql = None
-Max_Post = 6
+
 
 def connector(user: str, password: str):
     global User_Sql, Password_Sql
@@ -19,7 +17,7 @@ def connector(user: str, password: str):
 
 
 def initialize(user: str, password: str):
-    with  connector(user, password) as conn:
+    with connector(user, password) as conn:
         try:
             cur = conn.cursor()
             cur.execute("CREATE DATABASE IF NOT EXISTS M_DB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_cs;")
@@ -42,7 +40,6 @@ def initialize(user: str, password: str):
             return False
 
 
-
 def insert_user(**kwargs):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
@@ -54,7 +51,7 @@ def insert_user(**kwargs):
                 (kwargs['uid'], kwargs['uname'], kwargs['passwd'], kwargs['email'])
             )
             conn.commit()
-            return True            
+            return True
         except mysql.connector.Error as err:
             print(err.msg)
             return False
@@ -69,12 +66,13 @@ def update(**kwargs):
             cur.execute(
                 f"update Detail set FirstName=%s,LastName=%s,Age=%s,Gender=%s,Mobile_No=%s,DOB=%s WHERE u_id=%s;",
                 (kwargs["fname"], kwargs["lname"], kwargs["age"], kwargs["gender"], kwargs["mob"], kwargs["dob"],
-                kwargs["uid"])
+                 kwargs["uid"])
             )
             conn.commit()
             return True
         except mysql.connector.Error as err:
             print(err.msg)
+
 
 def retrieve_users():
     global User_Sql, Password_Sql
@@ -111,18 +109,19 @@ def check(username, password):
 
 def delete():
     global User_Sql, Password_Sql
-    with connector(User_Sql, Password_Sql) as conn:
-        try:
-            cur = conn.cursor()
-            cur.execute("USE M_DB;")
-            cur.execute("DROP TABLE IF EXISTS Detail;")
-            cur.execute("DROP TABLE IF EXISTS Post;")
-            cur.execute("DROP TABLE IF EXISTS User;")
-            cur.execute("DROP DATABASE IF EXISTS M_DB;")
-            conn.commit()
-        except Exception as e:
-            print(e)
-    
+    conn = connector(User_Sql, Password_Sql)
+    try:
+        cur = conn.cursor()
+        cur.execute("USE M_DB;")
+        cur.execute("DROP TABLE IF EXISTS Detail;")
+        cur.execute("DROP TABLE IF EXISTS Post;")
+        cur.execute("DROP TABLE IF EXISTS User;")
+        cur.execute("DROP DATABASE IF EXISTS M_DB;")
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(e)
+
 
 def getemail(email):
     global User_Sql, Password_Sql
@@ -139,7 +138,8 @@ def getemail(email):
 
         except Exception as e:
             print(e)
-   
+
+
 def resetpasswd(username, newpass):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
@@ -151,7 +151,7 @@ def resetpasswd(username, newpass):
             return True
         except Exception as e:
             print(e)
-    
+
 
 def insert_posts(U_id, cont):
     global User_Sql, Password_Sql
@@ -159,7 +159,8 @@ def insert_posts(U_id, cont):
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute(f"INSERT INTO Post(User_Id, content, L_Count, Comment_Count) VALUES (%s, %s, %s, %s);",(U_id, cont,0,0))
+            cur.execute(f"INSERT INTO Post(User_Id, content, L_Count, Comment_Count) VALUES (%s, %s, %s, %s);",
+                        (U_id, cont, 0, 0))
             conn.commit()
             return True
         except Exception as e:
@@ -167,45 +168,49 @@ def insert_posts(U_id, cont):
             return False
 
 
-def retrive_posts():
+def retrieve_posts():
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute("select Post.*,User.UserName from User, Post ORDER BY Post.Post_Id DESC LIMIT %s;",[Max_Post])
+            cur.execute("select Post.*,User.UserName from User, Post WHERE User.User_Id = Post.User_Id ORDER BY "
+                        "Post.Post_Id DESC LIMIT 30")
             res = cur.fetchall()
+            res.reverse()
             ans = {}
             for i in res:
-                ans[i[0]]={"uid":i[1],"content":i[2],"lc":i[3],"cc":i[4],"uname":i[5]}        
+                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "cc": i[4], "uname": i[5]}
             return ans
         except Exception as e:
             print(e)
 
-def update_post(pid, l_count = False, c_count = False):
+
+def update_post(pid, l_count=False, c_count=False):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
             if l_count:
-                cur.execute("SELECT L_Count FROM Post WHERE Post_Id = %s;",(pid,))
+                cur.execute("SELECT L_Count FROM Post WHERE Post_Id = %s;", (pid,))
                 res = cur.fetchall()[0][0]
                 res += 1
-                cur.execute("UPDATE Post SET L_Count = %s WHERE Post_Id = %s;",(res,pid))
+                cur.execute("UPDATE Post SET L_Count = %s WHERE Post_Id = %s;", (res, pid))
 
             if c_count:
-                cur.execute("SELECT Comment_Count FROM Post WHERE Post_Id = %s;",(pid,))
+                cur.execute("SELECT Comment_Count FROM Post WHERE Post_Id = %s;", (pid,))
                 res = cur.fetchall()[0][0]
                 res += 1
-                cur.execute("UPDATE Post SET Comment_Count = %s WHERE Post_Id = %s;",(res,pid))
+                cur.execute("UPDATE Post SET Comment_Count = %s WHERE Post_Id = %s;", (res, pid))
             conn.commit()
-            return True            
+            return True
         except Exception as e:
             print(e)
             return False
 
 
 if __name__ == "__main__":
-    initialize("root", "")    
+    initialize("root", "root")
+    # delete()
     pass

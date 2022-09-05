@@ -11,7 +11,7 @@ app = flask.Flask(__name__)
 
 keys = {}
 
-db.initialize("root", "ABCD1234!@")
+db.initialize("root", "root")
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -47,6 +47,15 @@ def root():
         if data["subject"] == "getpost":
             return get_post(data)
 
+        if data["subject"] == "sendpost":
+            return send_post(data)
+
+        if data["subject"] == "updatelc":
+            return updatelc(data)
+
+        if data["subject"] == "logout":
+            return logout(data)
+
 
 @app.route("/register")
 def render_reg():
@@ -59,7 +68,7 @@ def render_forgot_pass():
 
 
 @app.route("/logout", methods=["POST"])
-def logout():
+def render_logout():
     data = flask.request.form
     print(data)
     if data["subject"] == "keyerror":
@@ -91,6 +100,7 @@ def login(data):
         try:
             if str(keys[username]) == key:
                 key = random.randint(10000000, 99999999)
+                keys[username] = key
                 return {"status": "success", "key": key, "uname": username}
             else:
                 return {"status": "none"}
@@ -98,11 +108,27 @@ def login(data):
             return {"status": "none"}
 
 
+def logout(data):
+    uname = data["uname"]
+    key = data["key"]
+    if str(keys[uname]) == key:
+        del keys[uname]
+        return {"status": "success"}
+    else:
+        return {"status": "error"}
+
+
 def get_post(data):
-    pass
-    users = ["abc" for _ in range(5)]
-    posts = ["aaa" for _ in range(5)]
-    return {"status": "success", "users": users, "posts": posts}
+    try:
+        uname = data["uname"]
+        key = data["key"]
+        if key == str(keys[uname]):
+            res = db.retrieve_posts()
+            return {"status": "success", "data": res}
+        else:
+            return {"status": "logout"}
+    except KeyError as e:
+        return {"status": "keyerror"}
 
 
 @app.route("/images/<path:path>")
@@ -145,6 +171,27 @@ def send_email(email, password):
     pass
 
 
+def updatelc(data):
+    uname = data["uname"]
+    key = data["key"]
+    pid = data["pid"]
+
+    res = db.update_post(pid=pid, l_count=True)
+    return {"status": "success" if res else "failure"}
+
+
+def send_post(data):
+    key = data["key"]
+    uname = data["uname"]
+    if key == str(keys[uname]):
+        users = db.retrieve_users()
+        uid = users[uname]
+        res = db.insert_posts(U_id=uid, cont=data["content"])
+        return {"status": "success"} if res else {"status": "failure"}
+    else:
+        return {"status": "keyerror"}
+
+
 def forgotpass(data):
     email = data["email"]
     p = db.getemail(email)
@@ -156,31 +203,34 @@ def forgotpass(data):
 
 
 def update(data):
-    uname = data["uname"]
-    if data["key"] == str(keys[uname]):
-        fname = data["fname"]
-        lname = data["lname"]
-        gender = data["gender"]
-        mob = data["mob"]
-        dob = data["dob"]
+    try:
+        uname = data["uname"]
+        if data["key"] == str(keys[uname]):
+            fname = data["fname"]
+            lname = data["lname"]
+            gender = data["gender"]
+            mob = data["mob"]
+            dob = data["dob"]
 
-        if not dob:
-            dob = "0000-00-00"
-            age = 0
+            if not dob:
+                dob = "0000-00-00"
+                age = 0
+            else:
+                age = get_y(dob)
+
+            if not mob:
+                mob = 0
+
+            res = db.retrieve_users()
+
+            if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[uname]):
+                return {"status": "success"}
+            else:
+                return {"status": "failure"}
         else:
-            age = get_y(dob)
-
-        if not mob:
-            mob = 0
-
-        res = db.retrieve_users()
-
-        if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[uname]):
-            return {"status": "success"}
-        else:
-            return {"status": "failure"}
-    else:
-        return {"status": "badkey"}
+            return {"status": "badkey"}
+    except KeyError as e:
+        return {"status": "keyerror"}
 
 
 def get_y(dob: str) -> int:

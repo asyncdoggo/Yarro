@@ -1,3 +1,4 @@
+from ast import Pass
 import mysql.connector
 import mysql.connector.errors
 
@@ -209,8 +210,24 @@ def update_post(pid, l_count=False, c_count=False):
             print(e)
             return False
 
+def getuserdetials(uname):
+    global User_Sql, Password_Sql
+    with connector(User_Sql,Password_Sql) as conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("USE M_DB;")
+            cur.execute("SELECT FirstName, LastName, Age, Gender, Mobile_No, DOB FROM Detail WHERE u_id = (SELECT User_Id FROM User WHERE UserName = %s);",(uname,))
+            res = cur.fetchall()
+            ans = {}
+            for i in res:
+                ans[uname]={"fname":i[0],"lname":i[1],"age":i[2],"gender":i[3],"mob":i[4],"dob":i[5]}
+            return ans
+        except Exception as e:
+            print(e)
+            return False
+
 
 if __name__ == "__main__":
-    initialize("root", "root")
+    initialize("root", "root")        
     # delete()
     pass

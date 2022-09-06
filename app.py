@@ -38,7 +38,7 @@ def root():
         if data["subject"] == "register":
             return register(data)
 
-        if data["subject"] == "reg2_data":
+        if data["subject"] == "udetails":
             return update(data)
 
         if data["subject"] == "forgotpass":
@@ -55,6 +55,9 @@ def root():
 
         if data["subject"] == "logout":
             return logout(data)
+
+        if data["subject"] == "getudetails":
+            return getdetails(data)
 
 
 @app.route("/register")
@@ -77,6 +80,15 @@ def render_logout():
         return flask.render_template("index.html")
     else:
         return {"subject": "error"}
+
+
+@app.route("/sendimage",methods = ["POST"])
+def sendImage():
+    file = flask.request.files["image"]
+    filename = file.filename
+    file.save(os.path.join('static/images/',filename))
+    return {"status":"success"}
+
 
 
 def login(data):
@@ -190,6 +202,11 @@ def send_post(data):
         return {"status": "success"} if res else {"status": "failure"}
     else:
         return {"status": "keyerror"}
+
+def getdetails(data):
+    uname = data["uname"]
+    key = data["key"]
+    ret = db.getdetails(uname)
 
 
 def forgotpass(data):

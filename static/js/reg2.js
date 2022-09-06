@@ -3,7 +3,7 @@ $(document).ready(function () {
         e.preventDefault();
         var senddata = $("#reg2_form").serializeJSON();
 
-        senddata["subject"] = "reg2_data";
+        senddata["subject"] = "udetails";
         senddata["key"] = localStorage.getItem("key")
         senddata["uname"] = localStorage.getItem("uname")
 

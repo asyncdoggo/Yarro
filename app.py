@@ -82,13 +82,12 @@ def render_logout():
         return {"subject": "error"}
 
 
-@app.route("/sendimage",methods = ["POST"])
-def sendImage():
+@app.route("/sendimage", methods=["POST"])
+def sendimage():
     file = flask.request.files["image"]
     filename = file.filename
-    file.save(os.path.join('static/images/',filename))
-    return {"status":"success"}
-
+    file.save(os.path.join('static/images/', filename))
+    return {"status": "success"}
 
 
 def login(data):
@@ -203,10 +202,14 @@ def send_post(data):
     else:
         return {"status": "keyerror"}
 
+
 def getdetails(data):
     uname = data["uname"]
-    key = data["key"]
-    ret = db.getdetails(uname)
+    if data["key"] == str(keys[uname]):
+        ret = db.getuserdetials(uname)
+        return {"status": "success", "data": ret}
+    else:
+        return {"status": "keyerror"}
 
 
 def forgotpass(data):

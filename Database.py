@@ -1,4 +1,3 @@
-from ast import Pass
 import mysql.connector
 import mysql.connector.errors
 
@@ -38,7 +37,6 @@ def initialize(user: str, password: str):
             return True
         except mysql.connector.Error as err:
             print(err)
-            return False
 
 
 def insert_user(**kwargs):
@@ -51,11 +49,13 @@ def insert_user(**kwargs):
                 f"INSERT INTO User (User_Id, UserName, Passwd, email) VALUES (%s,%s,%s,%s);",
                 (kwargs['uid'], kwargs['uname'], kwargs['passwd'], kwargs['email'])
             )
+            cur.execute(
+                f"INSERT INTO Detail values (%s,null,null,null,null,null,null)", (kwargs["uid"],)
+            )
             conn.commit()
             return True
         except mysql.connector.Error as err:
             print(err.msg)
-            return False
 
 
 def update(**kwargs):
@@ -103,7 +103,7 @@ def check(username, password):
             cur.execute("USE M_DB;")
             cur.execute(f"SELECT * from User where UserName=%s and Passwd=%s", (username, password))
             res = cur.fetchall()
-            return True if res else False
+            return True if res else None
         except Exception as e:
             print(repr(e))
 
@@ -134,8 +134,6 @@ def getemail(email):
             res = cur.fetchall()
             if res:
                 return res[0][0]
-            else:
-                return False
 
         except Exception as e:
             print(e)
@@ -166,7 +164,6 @@ def insert_posts(U_id, cont):
             return True
         except Exception as e:
             print(e)
-            return False
 
 
 def retrieve_posts():
@@ -208,26 +205,28 @@ def update_post(pid, l_count=False, c_count=False):
             return True
         except Exception as e:
             print(e)
-            return False
+
 
 def getuserdetials(uname):
     global User_Sql, Password_Sql
-    with connector(User_Sql,Password_Sql) as conn:
+    with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute("SELECT FirstName, LastName, Age, Gender, Mobile_No, DOB FROM Detail WHERE u_id = (SELECT User_Id FROM User WHERE UserName = %s);",(uname,))
-            res = cur.fetchall()
-            ans = {}
-            for i in res:
-                ans[uname]={"fname":i[0],"lname":i[1],"age":i[2],"gender":i[3],"mob":i[4],"dob":i[5]}
+            cur.execute(
+                "SELECT FirstName, LastName, Age, Gender, Mobile_No, DOB FROM Detail WHERE u_id = (SELECT User_Id "
+                "FROM User WHERE UserName = %s);",
+                (uname,))
+            res = cur.fetchall()[0]
+            ans = {"fname": res[0], "lname": res[1], "age": res[2], "gender": res[3], "mob": res[4], "dob": str(res[5])}
+
             return ans
         except Exception as e:
             print(e)
-            return False
 
 
 if __name__ == "__main__":
-    initialize("root", "root")        
+    initialize("root", "root")
     # delete()
+    print(getuserdetials("cat"))
     pass

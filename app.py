@@ -133,8 +133,9 @@ def get_post(data):
     try:
         uname = data["uname"]
         key = data["key"]
+        u = db.retrieve_users()
         if key == str(keys[uname]):
-            res = db.retrieve_posts()
+            res = db.retrieve_posts(u[uname])
             return {"status": "success", "data": res}
         else:
             return {"status": "logout"}
@@ -187,7 +188,9 @@ def updatelc(data):
     key = data["key"]
     pid = data["pid"]
 
-    res = db.update_post(pid=pid, l_count=True)
+    usr = db.retrieve_users()
+
+    res = db.update_post(pid=pid, uid=usr[uname])
     return {"status": "success" if res else "failure"}
 
 
@@ -242,9 +245,11 @@ def update(data):
                 mob = 0
 
             res = db.retrieve_users()
-
-            if db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[uname]):
+            u = db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[uname])
+            if u:
                 return {"status": "success"}
+            elif u == "mob":
+                return {"status":"mob"}
             else:
                 return {"status": "failure"}
         else:

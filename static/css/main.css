@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-body{
+body {
   /* background: ; */
 }
 
@@ -154,11 +154,10 @@ nav span {
   margin: 0 1%;
   border: 0.5px solid;
   border-radius: 20vmax;
-  padding:0.5vmax 1vmax;
+  padding: 0.5vmax 1vmax;
 }
 
-.user_profile img
-{
+.user_profile img {
   border: 1px solid gray;
   border-radius: 20vmax;
   margin: 0 0.5%;
@@ -166,17 +165,17 @@ nav span {
 
 .post_article {
   width: 10%;
-  padding:0.5vmax 1vmax;
+  padding: 0.5vmax 1vmax;
   border: 0.5px solid;
   border-radius: 20vmax;
 }
 
-.post_section
-{
+.post_section {
   border: 1px solid #F5F5F5;
   border-radius: 0.5vmax;
   background: #F5F5F5;
   padding: 1%;
+  margin-bottom: 5vh;
 }
 
 .like_comment_buttons {
@@ -188,7 +187,7 @@ nav span {
 .like_comment_buttons button {
   background: #ffffff;
   border: 0px;
-  margin:  1%;
+  margin: 1%;
 }
 
 /*<----------------------------------------main end-------------------------------------------------------->*/

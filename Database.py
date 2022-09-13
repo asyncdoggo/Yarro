@@ -1,3 +1,4 @@
+from poplib import POP3_SSL
 import mysql.connector
 import mysql.connector.errors
 
@@ -27,12 +28,15 @@ def initialize(user: str, password: str):
                 "Passwd varchar(200), Email varchar(100) UNIQUE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Detail (u_id varchar(35), FirstName varchar(50), LastName varchar(50), "
-                "Age int, Gender varchar(10), Mobile_No int, DOB date, FOREIGN KEY(u_id) REFERENCES User(User_Id) ON "
+                "Age int, Gender varchar(10), Mobile_No varchar(10), DOB date, FOREIGN KEY(u_id) REFERENCES User(User_Id) ON "
                 "UPDATE CASCADE ON DELETE CASCADE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Post(Post_Id int PRIMARY KEY NOT NULL AUTO_INCREMENT, User_Id varchar(35), "
-                "content text NOT NULL, L_Count int, Comment_Count int, FOREIGN KEY(User_Id) REFERENCES User(User_Id) ON "
+                "content text NOT NULL, L_Count int, FOREIGN KEY(User_Id) REFERENCES User(User_Id) ON "
                 "DELETE CASCADE ON UPDATE CASCADE);")
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS Likes(User_Id varchar(35) NOT NULL, Post_Id int NOT NULL);"
+            )
             conn.commit()
             return True
         except mysql.connector.Error as err:
@@ -60,6 +64,10 @@ def insert_user(**kwargs):
 
 def update(**kwargs):
     global User_Sql, Password_Sql
+
+    if len(str(kwargs["mob"])) != 10:
+        return "mob"
+    
     with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
@@ -117,6 +125,7 @@ def delete():
         cur.execute("DROP TABLE IF EXISTS Detail;")
         cur.execute("DROP TABLE IF EXISTS Post;")
         cur.execute("DROP TABLE IF EXISTS User;")
+        cur.execute("DROP TABLE IF NOT EXISTS Likes;")
         cur.execute("DROP DATABASE IF EXISTS M_DB;")
         conn.commit()
         conn.close()
@@ -130,10 +139,10 @@ def getemail(email):
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute(f"select Passwd from User where Email = %s", (email,))
+            cur.execute(f"select UserName, Passwd from User where Email = %s", (email,))
             res = cur.fetchall()
             if res:
-                return res[0][0]
+                return {"uname":res[0][0], "passwd":res[0][1]}
 
         except Exception as e:
             print(e)
@@ -158,8 +167,8 @@ def insert_posts(U_id, cont):
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute(f"INSERT INTO Post(User_Id, content, L_Count, Comment_Count) VALUES (%s, %s, %s, %s);",
-                        (U_id, cont, 0, 0))
+            cur.execute(f"INSERT INTO Post(User_Id, content, L_Count) VALUES (%s, %s, %s);",
+                        (U_id, cont, 0))
             conn.commit()
             return True
         except Exception as e:
@@ -176,36 +185,41 @@ def retrieve_posts():
                         "Post.Post_Id DESC LIMIT 30")
             res = cur.fetchall()
             res.reverse()
+            cur.execute("SELECT * FROM Likes;")
+            res1 = cur.fetchall()
+
             ans = {}
             for i in res:
-                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "cc": i[4], "uname": i[5]}
+                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "uname": i[4],"islike":1 if (i[0],i[1]) in res1 else 0}
+               
+
             return ans
         except Exception as e:
             print(e)
 
-
-def update_post(pid, l_count=False, c_count=False):
+def update_post(uid, pid):
     global User_Sql, Password_Sql
-    with connector(User_Sql, Password_Sql) as conn:
+    with connector(User_Sql,Password_Sql) as conn:
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            if l_count:
-                cur.execute("SELECT L_Count FROM Post WHERE Post_Id = %s;", (pid,))
-                res = cur.fetchall()[0][0]
-                res += 1
-                cur.execute("UPDATE Post SET L_Count = %s WHERE Post_Id = %s;", (res, pid))
 
-            if c_count:
-                cur.execute("SELECT Comment_Count FROM Post WHERE Post_Id = %s;", (pid,))
-                res = cur.fetchall()[0][0]
-                res += 1
-                cur.execute("UPDATE Post SET Comment_Count = %s WHERE Post_Id = %s;", (res, pid))
+            cur.execute("SELECT count(User_Id) FROM Likes WHERE User_Id = %s AND Post_Id = %s",(uid,pid))
+            res = cur.fetchall()
+
+            if not res[0][0]:#User has liked the post
+                cur.execute("INSERT INTO Likes(User_Id, Post_Id) VALUES (%s,%s)",(uid,pid))
+                # Update like count
+                cur.execute("UPDATE Post SET L_Count = L_Count + 1 WHERE Post_Id = %s;", (pid,))
+            else:#User has unliked the post
+                cur.execute("DELETE FROM Likes WHERE User_Id = %s AND Post_Id = %s",(uid,pid))
+                #Update the like count
+                cur.execute("UPDATE Post SET L_Count = L_Count - 1 WHERE Post_Id = %s;", (pid,))
+
             conn.commit()
-            return True
+
         except Exception as e:
             print(e)
-
 
 def getuserdetials(uname):
     global User_Sql, Password_Sql
@@ -218,7 +232,7 @@ def getuserdetials(uname):
                 "FROM User WHERE UserName = %s);",
                 (uname,))
             res = cur.fetchall()[0]
-            ans = {"fname": res[0], "lname": res[1], "age": res[2], "gender": res[3], "mob": res[4], "dob": str(res[5])}
+            ans = {"fname": res[0], "lname": res[1], "age": res[2], "gender": res[3], "mob": res[4], "dob":"0000-00-00" if not res[5] else str(res[5])}
 
             return ans
         except Exception as e:
@@ -226,7 +240,10 @@ def getuserdetials(uname):
 
 
 if __name__ == "__main__":
-    initialize("root", "root")
+    initialize("root", "ABCD1234!@")
+    # insert_posts("39548c013f1742a4ab21a0f21797baad","TEST MESSAGE")
+    update_post("39548c013f1742a4ab21a0f21797baad","4")
+    
     # delete()
-    print(getuserdetials("cat"))
+    # print(getuserdetials("cat"))
     pass

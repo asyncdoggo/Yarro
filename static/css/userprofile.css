@@ -1,0 +1,44 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid;
+  width: 40%;
+  height: 70vh;
+  margin: 5vh 30vw;
+  
+}
+
+.user_profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.profile input {
+  margin: 1%;
+  padding: 1%;
+  width: 30vw;
+  height: 5vh;
+  border: 0.5px solid #04AA6D;
+  border-radius: 0.2rem;
+}
+
+.profile button{
+  width: 30vw;
+  height: 5vh;
+  margin: 3%;
+  border: 1px solid #04AA6D;
+  border-radius: 0.2rem;
+  background: #04AA6D;
+  color: #FFFFFF;
+}

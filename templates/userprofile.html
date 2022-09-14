@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../static/css/main.css">
+  <link rel="stylesheet" href="../static/css/userprofile.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <header>
+    <nav>
+      <div class="logo">
+        <!-- <img src="" alt="">-->
+        <h2>B-itter</h2>
+      </div>
+
+      <div class="navbar-tabs">
+        <ul>
+          <li> <a href="#"> <span class="material-icons">
+                home
+              </span></a>
+            <span>Home</span>
+          </li>
+          <li> <a href="#"> <span class="material-icons">
+                add_box
+              </span> </a>
+            <span>Post</span>
+          </li>
+          <li> <a href="#"> <span class="material-icons">
+                chat_bubble
+              </span></a>
+            <span>Chat</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="dropdown">
+        <button class="dropbtn"> <span class="material-icons">
+            person_outline
+          </span> </button>
+        <div class="dropdown-content">
+          <a href="#" id="profile" onclick="dropDownOnclick(this)">Profile</a>
+          <a href="#" id="logout" onclick="dropDownOnclick(this)">Logout</a>
+        </div>
+      </div>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <div class="profile">
+
+      <div class="user_profile" style="margin:0.5% 0;">
+        <img src="../images/userprofile.png" alt="" id="user_image" width="40vw">
+        <p id="user_name" style="margin:0 1%; font-weight:550;">Samarth B</p>
+      </div>
+      
+      <div class="inputags">
+        <p>Username</p>
+        <input type="text" id="username" placeholder="sammy429">
+      </div>
+      
+      <div class="inputags">
+        <p>Firstname</p>
+        <input type="text" id="firstname" placeholder="xyz">
+      </div>
+      
+      <div class="inputags">
+        <p>Lastname</p>
+        <input type="text" id="lastname" placeholder="abc">
+      </div>
+      
+      <div class="inputags">
+        <p>Gender</p>
+        <input type="text" id="gender" placeholder="male/female">
+      </div>
+      
+      <div class="inputags">
+        <p>Mobile Number</p>
+        <input type="tel" id="mobile" placeholder="1234567890">
+      </div>
+      
+      <button>Save</button>
+    </div>
+  </main>
+</body>
+
+</html>

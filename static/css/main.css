@@ -4,9 +4,7 @@
   box-sizing: border-box;
 }
 
-body {
-  /* background: ; */
-}
+
 
 /*<----------------------------------------navbar start---------------------------------------------------->*/
 
@@ -42,7 +40,12 @@ nav span {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 1rem 1.2rem;
+  margin: 1rem 1.2rem;  
+}
+
+.navbar-tabs ul li a{
+  background: #ffffff ;
+  color: #04AA6D;
 }
 
 .profile ul li {
@@ -72,7 +75,7 @@ nav span {
 /*<----------------------------------------navbar end------------------------------------------------------>*/
 /* Dropdown Button */
 .dropbtn {
-  background-color: #551A8B;
+  background-color: #04AA6D;
   color: white;
   padding: 10px;
   font-size: 5px;

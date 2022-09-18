@@ -25,8 +25,9 @@ $(document).ready(function () {
                 success: function (err, req, resp) {
                 msg = JSON.parse(resp["responseText"]);
                 if (msg["status"] == "success") {
+                    localStorage.setItem("uname", msg["uname"]);
                     localStorage.setItem("key", msg["key"]);
-                    //TODO GOTO MAINPAGE
+                    send_form("/",{"subject":"mainpage"})
                 }
                 }
             });
@@ -53,7 +54,7 @@ $(document).ready(function () {
                 if (msg["status"] == "success") {
                     localStorage.setItem("uname", msg["uname"]);
                     localStorage.setItem("key", msg["key"]);
-                    //send_form("/interface", { "uname": msg["uname"], "key": msg["key"] });
+                    send_form("/",{"subject":"mainpage"})
                     console.log("success");
 
                 }

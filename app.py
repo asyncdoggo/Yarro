@@ -16,8 +16,6 @@ db.initialize("root", "root")
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 
-# TODO: Logout data: send_form("/logout",{"subject":"logout","key":ge tkeyfromstorage,"uname":"getunamefromstorage"})
-
 @app.route("/", methods=["POST", "GET"])
 def root():
     if flask.request.method == "GET":
@@ -27,6 +25,9 @@ def root():
             sub = flask.request.form["subject"]
             if sub == "gotoreg2":
                 return flask.render_template("reg2.html")
+            if sub == "mainpage":
+                return flask.render_template("main.html")
+
         except KeyError as e:
             pass
 
@@ -73,7 +74,6 @@ def render_forgot_pass():
 @app.route("/logout", methods=["POST"])
 def render_logout():
     data = flask.request.form
-    print(data)
     if data["subject"] == "keyerror":
         return flask.render_template("index.html", error="You have been logged out due to other device logging in")
     elif data["subject"] == "logout":
@@ -249,7 +249,7 @@ def update(data):
             if u:
                 return {"status": "success"}
             elif u == "mob":
-                return {"status":"mob"}
+                return {"status": "mob"}
             else:
                 return {"status": "failure"}
         else:

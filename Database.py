@@ -1,6 +1,4 @@
-from poplib import POP3_SSL
 import mysql.connector
-import mysql.connector.errors
 
 User_Sql = None
 Password_Sql = None
@@ -28,8 +26,8 @@ def initialize(user: str, password: str):
                 "Passwd varchar(200), Email varchar(100) UNIQUE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Detail (u_id varchar(35), FirstName varchar(50), LastName varchar(50), "
-                "Age int, Gender varchar(10), Mobile_No varchar(10), DOB date, FOREIGN KEY(u_id) REFERENCES User(User_Id) ON "
-                "UPDATE CASCADE ON DELETE CASCADE);")
+                "Age int, Gender varchar(10), Mobile_No varchar(10), DOB date, FOREIGN KEY(u_id) REFERENCES User("
+                "User_Id) ON UPDATE CASCADE ON DELETE CASCADE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Post(Post_Id int PRIMARY KEY NOT NULL AUTO_INCREMENT, User_Id varchar(35), "
                 "content text NOT NULL, L_Count int, FOREIGN KEY(User_Id) REFERENCES User(User_Id) ON "
@@ -65,9 +63,9 @@ def insert_user(**kwargs):
 def update(**kwargs):
     global User_Sql, Password_Sql
 
-    if len(str(kwargs["mob"])) != 10:
+    if len(str(kwargs["mob"])) != 10 or len(str(kwargs["mob"])) != 0:
         return "mob"
-    
+
     with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
@@ -142,7 +140,7 @@ def getemail(email):
             cur.execute(f"select UserName, Passwd from User where Email = %s", (email,))
             res = cur.fetchall()
             if res:
-                return {"uname":res[0][0], "passwd":res[0][1]}
+                return {"uname": res[0][0], "passwd": res[0][1]}
         except Exception as e:
             print(e)
 
@@ -184,37 +182,39 @@ def retrieve_posts(uid):
                         "Post.Post_Id DESC LIMIT 30")
             res = cur.fetchall()
             res.reverse()
-            cur.execute("SELECT * FROM Likes where User_Id = %s;",(uid,))
+            cur.execute("SELECT * FROM Likes where User_Id = %s;", (uid,))
             res1 = cur.fetchall()
             ans = {}
             for i in res:
-                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "uname": i[4],"islike":1 if (uid,i[0]) in res1 else 0}
+                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "uname": i[4],
+                             "islike": 1 if (uid, i[0]) in res1 else 0}
             return ans
         except Exception as e:
             print(e)
 
+
 def update_post(uid, pid):
     global User_Sql, Password_Sql
-    with connector(User_Sql,Password_Sql) as conn:
+    with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
 
-            cur.execute("SELECT count(User_Id) FROM Likes WHERE User_Id = %s AND Post_Id = %s",(uid,pid))
+            cur.execute("SELECT count(User_Id) FROM Likes WHERE User_Id = %s AND Post_Id = %s", (uid, pid))
             res = cur.fetchall()
-            print(res)
-            if not res[0][0]:#User has liked the post
-                cur.execute("INSERT INTO Likes(User_Id, Post_Id) VALUES (%s,%s)",(uid,pid))
+            if not res[0][0]:  # User has liked the post
+                cur.execute("INSERT INTO Likes(User_Id, Post_Id) VALUES (%s,%s)", (uid, pid))
                 # Update like count
                 cur.execute("UPDATE Post SET L_Count = L_Count + 1 WHERE Post_Id = %s;", (pid,))
-            else:#User has unliked the post
-                cur.execute("DELETE FROM Likes WHERE User_Id = %s AND Post_Id = %s",(uid,pid))
-                #Update the like count
+            else:  # User has unliked the post
+                cur.execute("DELETE FROM Likes WHERE User_Id = %s AND Post_Id = %s", (uid, pid))
+                # Update the like count
                 cur.execute("UPDATE Post SET L_Count = L_Count - 1 WHERE Post_Id = %s;", (pid,))
             conn.commit()
             return True
         except Exception as e:
             print(e)
+
 
 def getuserdetials(uname):
     global User_Sql, Password_Sql
@@ -226,7 +226,8 @@ def getuserdetials(uname):
                 "SELECT FirstName, LastName, Age, Gender, Mobile_No, DOB FROM Detail WHERE u_id = (SELECT User_Id "
                 "FROM User WHERE UserName = %s);", (uname,))
             res = cur.fetchall()[0]
-            ans = {"fname": res[0], "lname": res[1], "age": res[2], "gender": res[3], "mob": res[4], "dob":"0000-00-00" if not res[5] else str(res[5])}
+            ans = {"fname": res[0], "lname": res[1], "age": res[2], "gender": res[3], "mob": res[4],
+                   "dob": "0000-00-00" if not res[5] else str(res[5])}
 
             return ans
         except Exception as e:
@@ -235,4 +236,5 @@ def getuserdetials(uname):
 
 if __name__ == "__main__":
     initialize("root", "root")
-    pass
+
+    print(retrieve_posts(""))

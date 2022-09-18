@@ -1,33 +1,33 @@
 $(document).ready(function () {
-        $("#resetButton").click(function() {
+    $("#resetButton").click(function () {
 
-            var email = $("#email").val();
+        var email = $("#email").val();
 
-            data = {"subject":"forgotpass","email":email}
-            $.ajax({
-                type: 'POST',
-                url: "/",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                dataType: 'json',
-                success: function (err, req, resp) {
+        data = { "subject": "forgotpass", "email": email }
+        $.ajax({
+            type: 'POST',
+            url: "/",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (err, req, resp) {
 
-                    msg = JSON.parse(resp["responseText"]);
+                msg = JSON.parse(resp["responseText"]);
 
 
-                    if (msg["status"] == "success") {
-                        $("#error").text("Email sent Successful");
-                    }
-                    else if (msg["status"] == "noemail") {
-                        $("#error").text("Email does not exists");
-                    }
-                    else {
-                        $("#error").text(msg["status"]);
-                    }
-
+                if (msg["status"] == "success") {
+                    $("#error").text("Email sent Successful");
                 }
-            })            
+                else if (msg["status"] == "noemail") {
+                    $("#error").text("Email does not exists");
+                }
+                else {
+                    $("#error").text(msg["status"]);
+                }
+
+            }
         })
+    })
 })
 
 

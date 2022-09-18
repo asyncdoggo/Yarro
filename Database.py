@@ -52,7 +52,7 @@ def insert_user(**kwargs):
                 (kwargs['uid'], kwargs['uname'], kwargs['passwd'], kwargs['email'])
             )
             cur.execute(
-                f"INSERT INTO Detail values (%s,null,null,null,null,null,null)", (kwargs["uid"],)
+                f"INSERT INTO Detail values (%s,'','',0,'','','0000-00-00')", (kwargs["uid"],)
             )
             conn.commit()
             return True
@@ -63,7 +63,7 @@ def insert_user(**kwargs):
 def update(**kwargs):
     global User_Sql, Password_Sql
 
-    if len(str(kwargs["mob"])) != 10 or len(str(kwargs["mob"])) != 0:
+    if len(str(kwargs["mob"])) != 10 and kwargs["mob"] != 0:
         return "mob"
 
     with connector(User_Sql, Password_Sql) as conn:
@@ -236,5 +236,4 @@ def getuserdetials(uname):
 
 if __name__ == "__main__":
     initialize("root", "root")
-
     print(retrieve_posts(""))

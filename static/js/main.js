@@ -6,7 +6,7 @@ let key = localStorage.getItem("key");
 $(document).ready(
     function () {
 
-        $("#u_image").attr("src", `/images/${uname}.png`);
+        $("#u_image").attr("src", `/images/${uname}`);
 
 
         $("#postbtn").click(function () {
@@ -17,7 +17,7 @@ $(document).ready(
                 "subject": "sendpost",
                 "uname": uname,
                 "key": key,
-                "content" : cont
+                "content": cont
             }
 
             $.ajax({
@@ -29,20 +29,28 @@ $(document).ready(
                 success: function (err, req, resp) {
                     let res = JSON.parse(resp["responseText"]);
                     let status = res["status"];
-                    if(status == "success"){
+                    if (status == "success") {
                         document.getElementById("postcont").value = ""
                     }
                 }
             });
         });
 
+        $("#profile").click(function () {
+            send_form("/", { "subject": "profilepage", "uname": uname, "key": key })
+        })
+
+        $("#logout").click(function () {
+            localStorage.setItem("uname","")
+            localStorage.setItem("key","")
+            send_form("/", { "subject": "logout", "uname": uname, "key": key })
+        })
 
 
 
         get_msg();
 
-    }
-)
+    })
 
 let pid;
 let uid;
@@ -55,6 +63,7 @@ let islike;
 async function get_msg() {
 
     while (true) {
+        break
         let msgdata = {
             "subject": "getpost",
             "uname": uname,
@@ -93,7 +102,7 @@ async function get_msg() {
 
                         post = `<div class="post" id="${pid}">
                                     <div class="user_profile" style="margin:0.5% 0;">
-                                        <img src="/images/${user}.png" alt="" width="40vw">
+                                        <img src="/images/${user}" alt="" width="40vw">
                                         <p id="uname" style="margin:0 1%; font-weight:550;">${user}</p>
                                     </div>
                                     <hr>
@@ -143,12 +152,12 @@ function send_form(action, params) {
 
 function onButtonClick(btn) {
     let pid = btn.id
-    
+
     let msgdata = {
-        "subject":"updatelc",
-        "key":key,
-        "uname":uname,
-        "pid":pid
+        "subject": "updatelc",
+        "key": key,
+        "uname": uname,
+        "pid": pid
     }
 
     $.ajax({

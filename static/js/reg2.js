@@ -1,4 +1,9 @@
 $(document).ready(function () {
+
+    let uname = localStorage.getItem("uname")
+    let key = localStorage.getItem("key")
+
+
     $('#reg2_form').on('submit', function (e) {
         e.preventDefault();
         var senddata = $("#reg2_form").serializeJSON();
@@ -16,11 +21,11 @@ $(document).ready(function () {
             success: function (err, req, resp) {
                 msg = JSON.parse(resp["responseText"]);
                 if (msg["status"] == "success") {
-                console.log("success");
-                  // TODO GOTO MAINPAGE
+                    console.log(msg)
+                    send_form("/", { "subject": "mainpage", "uname": uname, "key": key})
                 }
                 else if (msg["status"] == "badkey") {
-                send_form("/logout",{"subject":"keyerror"})
+                    // send_form("/",{"subject":"keyerror"})
                 }
                 else {
                     $("#error").text(msg["status"]);

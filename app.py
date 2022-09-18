@@ -1,3 +1,4 @@
+from distutils.log import error
 import os.path
 import re
 import uuid
@@ -22,11 +23,37 @@ def root():
         return flask.render_template("index.html")
     if flask.request.method == "POST":
         try:
-            sub = flask.request.form["subject"]
+            data = flask.request.form
+            sub = data["subject"]
             if sub == "gotoreg2":
                 return flask.render_template("reg2.html")
+
             if sub == "mainpage":
-                return flask.render_template("main.html")
+                username = data["uname"]
+                key = data["key"]
+                if str(keys[username]) == key:
+                    return flask.render_template("main.html")
+                else:
+                    return flask.render_template("index.html", error="unknown error")
+
+            if sub == "profilepage":
+                username = data["uname"]
+                key = data["key"]
+                if str(keys[username]) == key:
+                    return flask.render_template("userprofile.html")
+                else:
+                    return flask.render_template("index.html", error="unknown error")
+
+            if sub == "logout":
+                username = data["uname"]
+                key = data["key"]
+                if str(keys[username]) == key:
+                    del keys[username]
+                    return flask.render_template("index.html")
+                else:
+                    return flask.render_template("index.html", error="unknown error")
+                
+
 
         except KeyError as e:
             pass
@@ -70,20 +97,10 @@ def render_reg():
 def render_forgot_pass():
     return flask.render_template("forgotpass.html")
 
-
-@app.route("/logout", methods=["POST"])
-def render_logout():
-    data = flask.request.form
-    if data["subject"] == "keyerror":
-        return flask.render_template("index.html", error="You have been logged out due to other device logging in")
-    elif data["subject"] == "logout":
-        return flask.render_template("index.html")
-    else:
-        return {"subject": "error"}
-
-
+#TODO: secure send_image
 @app.route("/sendimage", methods=["POST"])
 def sendimage():
+
     file = flask.request.files["image"]
     filename = file.filename
     file.save(os.path.join('static/images/', filename))
@@ -146,7 +163,7 @@ def get_post(data):
 @app.route("/images/<path:path>")
 def get_image(path):
     if not os.path.exists(f"static/images/{path}"):
-        path = "default.png"
+        path = "default"
     return flask.send_from_directory("static/images", path)
 
 
@@ -246,10 +263,10 @@ def update(data):
 
             res = db.retrieve_users()
             u = db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[uname])
-            if u:
-                return {"status": "success"}
-            elif u == "mob":
+            if u == mob:
                 return {"status": "mob"}
+            elif u:
+                return {"status": "success"}
             else:
                 return {"status": "failure"}
         else:

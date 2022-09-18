@@ -1,3 +1,30 @@
+try {
+    var key = localStorage.getItem("key");
+    var uname = localStorage.getItem("uname");
+
+    if (key.length) {
+        msg_data = {"subject":"login","uname":uname,"key":key}
+
+        $.ajax({
+            type: 'POST',
+            url: "/",
+            data: JSON.stringify(msg_data),
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (err, req, resp) {
+            msg = JSON.parse(resp["responseText"]);
+            if (msg["status"] == "success") {
+                localStorage.setItem("uname", msg["uname"]);
+                localStorage.setItem("key", msg["key"]);
+                send_form("/",{"subject":"mainpage","uname":msg["uname"],"key":msg["key"]})
+            }
+            }
+        });
+    }
+}
+catch (e) {
+}
+
 $(document).ready(function () {
     $("#register").click(function () {
         window.location.href = "/register"
@@ -7,34 +34,6 @@ $(document).ready(function () {
         window.location.href = "/forgotpass"
     })
 
-
-
-    try {
-        var key = localStorage.getItem("key");
-        var uname = localStorage.getItem("uname");
-
-        if (key.length) {
-            msg_data = {"subject":"login","uname":uname,"key":key}
-
-            $.ajax({
-                type: 'POST',
-                url: "/",
-                data: JSON.stringify(msg_data),
-                contentType: "application/json",
-                dataType: 'json',
-                success: function (err, req, resp) {
-                msg = JSON.parse(resp["responseText"]);
-                if (msg["status"] == "success") {
-                    localStorage.setItem("uname", msg["uname"]);
-                    localStorage.setItem("key", msg["key"]);
-                    send_form("/",{"subject":"mainpage"})
-                }
-                }
-            });
-        }
-    }
-    catch (e) {
-    }
 
     $('#login_form').on('submit', function (e) {
         e.preventDefault();
@@ -54,7 +53,7 @@ $(document).ready(function () {
                 if (msg["status"] == "success") {
                     localStorage.setItem("uname", msg["uname"]);
                     localStorage.setItem("key", msg["key"]);
-                    send_form("/",{"subject":"mainpage"})
+                    send_form("/",{"subject":"mainpage","uname":msg["uname"],"key":msg["key"]})
                     console.log("success");
 
                 }

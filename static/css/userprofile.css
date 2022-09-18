@@ -13,7 +13,7 @@
   width: 40%;
   height: 70vh;
   margin: 5vh 30vw;
-  
+
 }
 
 .user_profile {
@@ -33,7 +33,7 @@
   border-radius: 0.2rem;
 }
 
-.profile button{
+.profile input[type=submit] {
   width: 30vw;
   height: 5vh;
   margin: 3%;

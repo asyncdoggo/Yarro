@@ -18,7 +18,7 @@ $(document).ready(function () {
                     if (msg["status"] == "success") {
                         localStorage.setItem("key", msg["key"]);
                         localStorage.setItem("uname", msg["uname"])
-                        send_form("/",{"subject":"gotoreg2","uname":msg["uname"],"key":msg["key"]})
+                        send_form("/",{"subject":"gotoreg2"})
                     }
                     else if (msg["status"] == "alreadyuser") {
                         $("#error").text("User already exists");

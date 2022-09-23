@@ -58,7 +58,6 @@ def root():
             pass
 
         data = flask.request.get_json()
-        print(data)
 
         if data["subject"] == "login":
             return login(data)
@@ -192,14 +191,6 @@ def register(data):
         return {"status": "alreadyemail"}
 
 
-def send_email(email, password):
-    try:
-        send_mail.send_mail(email, password)
-    except Exception as e:
-        print(e)
-    pass
-
-
 def updatelc(data):
     uname = data["uname"]
     key = data["key"]
@@ -236,8 +227,10 @@ def forgotpass(data):
     email = data["email"]
     p = db.getemail(email)
     if p:
-        send_email(email, p)
-        return {"status": "success"}
+        if send_mail.send_mail(email, p):
+            return {"status": "success"}
+        else:
+            return {"status": "noconfig"}
     else:
         return {"status": "noemail"}
 

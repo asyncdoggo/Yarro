@@ -1,4 +1,3 @@
-from distutils.log import error
 import os.path
 import re
 import uuid
@@ -59,6 +58,7 @@ def root():
             pass
 
         data = flask.request.get_json()
+        print(data)
 
         if data["subject"] == "login":
             return login(data)
@@ -287,4 +287,6 @@ def get_y(dob: str) -> int:
     return dif_y
 
 
-app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False) # ,ssl_context='adhoc'
+    

@@ -63,7 +63,6 @@ let islike;
 async function get_msg() {
 
     while (true) {
-        break
         let msgdata = {
             "subject": "getpost",
             "uname": uname,
@@ -100,21 +99,21 @@ async function get_msg() {
                             </span>`
                         }
 
-                        post = `<div class="post" id="${pid}">
+                        post = `
+                        <div class="post" id="${pid}">
                                     <div class="user_profile" style="margin:0.5% 0;">
                                         <img src="/images/${user}" alt="" width="40vw">
                                         <p id="uname" style="margin:0 1%; font-weight:550;">${user}</p>
-                                    </div>
-                                    <hr>
+                                    </div>    
                                     <div>
                                         <p id="content" style="margin:1% 0;">${content}</p>
                                     </div>
-                                    <hr>
                                     <div class="like_comment_buttons">
                                         <button id="${pid}" onClick=onButtonClick(this)>${like}</button>
                                         <p id="like_count">${lc}</p>
                                     </div>
-                                </div>`;
+                                </div>
+                                <hr>`;
 
                         document.getElementById("post_section").innerHTML += post;
 

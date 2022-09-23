@@ -25,6 +25,7 @@ $(document).ready(function () {
             let res = JSON.parse(resp["responseText"]);
             let status = res["status"];
             if (status == "success") {
+                res = res["data"]
                 $("#user_image").attr("src", `/images/${uname}`);
                 $("#fname").val(res["fname"])
                 $("#lname").val(res["lname"])

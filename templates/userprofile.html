@@ -13,96 +13,96 @@
 
 <body>
 
-    <header>
-        <nav>
-            <div class="logo">
-                <!-- <img src="" alt="">-->
-                <h2>B-itter</h2>
-            </div>
+<header>
+    <nav>
+        <div class="logo">
+            <!-- <img src="" alt="">-->
+            <h2>B-itter</h2>
+        </div>
 
-            <div class="navbar-tabs">
-                <ul>
-                    <li> <a href="#"> <span class="material-icons">
+        <div class="navbar-tabs">
+            <ul>
+                <li><a href="#"> <span class="material-icons">
                                 home
                             </span></a>
-                        <span>Home</span>
-                    </li>
-                    <li> <a href="#"> <span class="material-icons">
+                    <span>Home</span>
+                </li>
+                <li><a href="#"> <span class="material-icons">
                                 add_box
                             </span> </a>
-                        <span>Post</span>
-                    </li>
-                    <li> <a href="#"> <span class="material-icons">
+                    <span>Post</span>
+                </li>
+                <li><a href="#"> <span class="material-icons">
                                 chat_bubble
                             </span></a>
-                        <span>Chat</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="dropdown">
-                <button class="dropbtn"> <span class="material-icons">
-                        person_outline
-                    </span> </button>
-                <div class="dropdown-content">
-                    <a href="" id="profile">Profile</a>
-                    <a href="" id="logout">Logout</a>
-                </div>
-            </div>
+                    <span>Chat</span>
+                </li>
             </ul>
-        </nav>
-    </header>
-
-    <main>
-      
-
-            <div class="profile">
-
-                <div class="user_profile" style="margin:0.5% 0;">
-                    <img src="" alt="" id="user_image" width="100vw">
-                    <form id="image_form" method="POST" enctype="multipart/form-data" action="/sendimage">
-                        <label for="image_upload" style="color: purple;">change profile pciture</label>
-                        <input type="file" id="image_upload" name="image" accept="image/*" style="opacity: 0;">
-                    </form>
-                    <p id="username" style="margin:0 1%; font-weight:550;"></p>
-                </div>
-                <form id="save_form">
-
-                <div class="inputags">
-                    <p>Firstname</p>
-                    <input type="text" id="fname" name="fname" placeholder="first name">
-                </div>
-
-                <div class="inputags">
-                    <p>Lastname</p>
-                    <input type="text" id="lname" name="lname" placeholder="last name">
-                </div>
-
-                <div class="inputags">
-                    <p>Gender</p>
-                    <input type="text" id="gender" name="gender" placeholder="gender">
-                </div>
-
-                <div class="inputags">
-                    <p>Mobile Number</p>
-                    <input type="tel" id="mob" name="mob" placeholder="Mobile">
-                </div>
-
-                <div class="inputags">
-                    <p>Date of birth</p>
-                    <input type="date" id="dob" name="dob" placeholder="DOB">
-                </div>
-
-                <input type="submit" value="Save"></button>
-            </div>
-        </form>
-        <p id="errortext"></p>
         </div>
-    </main>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
-    <script src="/static/js/jquery.serializejson.js"></script>
-    <script src="/static/js/profile.js"> </script>
+        <div class="dropdown">
+            <button class="dropbtn"> <span class="material-icons">
+                        person_outline
+                    </span></button>
+            <div class="dropdown-content">
+                <a href="" id="profile">Profile</a>
+                <a href="" id="logout">Logout</a>
+            </div>
+        </div>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+
+    <div class="profile">
+
+        <div class="user_profile" style="margin:0.5% 0;">
+            <img src="" alt="" id="user_image" width="100vw">
+            <form id="image_form" method="POST" enctype="multipart/form-data" action="/sendimage">
+                <label for="image_upload" style="color: purple;">change profile pciture</label>
+                <input type="file" id="image_upload" name="image" accept="image/*" style="opacity: 0;">
+            </form>
+            <p id="username" style="margin:0 1%; font-weight:550;"></p>
+        </div>
+        <form id="save_form">
+
+            <div class="inputags">
+                <p>Firstname</p>
+                <input type="text" id="fname" name="fname" placeholder="first name">
+            </div>
+
+            <div class="inputags">
+                <p>Lastname</p>
+                <input type="text" id="lname" name="lname" placeholder="last name">
+            </div>
+
+            <div class="inputags">
+                <p>Gender</p>
+                <input type="text" id="gender" name="gender" placeholder="gender">
+            </div>
+
+            <div class="inputags">
+                <p>Mobile Number</p>
+                <input type="tel" id="mob" name="mob" placeholder="Mobile">
+            </div>
+
+            <div class="inputags">
+                <p>Date of birth</p>
+                <input type="date" id="dob" name="dob" placeholder="DOB">
+            </div>
+
+            <input type="submit" value="Save"></button>
+    </div>
+    </form>
+    <p id="errortext"></p>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/static/js/jquery.serializejson.js"></script>
+<script src="/static/js/profile.js"></script>
 </body>
 
 </html>

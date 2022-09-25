@@ -67,7 +67,7 @@ $(document).ready(function () {
             var formdata = new FormData()
             formdata.append("image", file, uname)
             formdata.append("uname",uname)
-            formdata.append("key", true)
+            formdata.append("key", key)
 
             $.ajax({
                 type: "POST",
@@ -79,13 +79,19 @@ $(document).ready(function () {
         }
     })
 
-    $("#logout").click(function () {
+
+    document.querySelector("#logout").addEventListener("click",function () {
         localStorage.setItem("uname", "")
         localStorage.setItem("key", "")
         send_form("/", { "subject": "logout", "uname": uname, "key": key })
+        
     })
 
-
+    // $("#logout").click(function () {
+    //     localStorage.setItem("uname", "")
+    //     localStorage.setItem("key", "")
+    //     send_form("/", { "subject": "logout", "uname": uname, "key": key })
+    // })
 });
 
 

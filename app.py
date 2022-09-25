@@ -1,11 +1,12 @@
 import os.path
+import random
 import re
 import uuid
 from datetime import date
+
 import flask
-import random
-import Database as db
-import send_mail
+
+from modules import Database as db, send_mail
 
 app = flask.Flask(__name__)
 
@@ -51,10 +52,8 @@ def root():
                     return flask.render_template("index.html")
                 else:
                     return flask.render_template("index.html", error="unknown error")
-                
 
-
-        except KeyError as e:
+        except KeyError:
             pass
 
         data = flask.request.get_json()
@@ -86,6 +85,9 @@ def root():
         if data["subject"] == "getudetails":
             return getdetails(data)
 
+        if data["subject"] == "resetpass":
+            return passwdreset(data)
+
 
 @app.route("/register")
 def render_reg():
@@ -94,16 +96,33 @@ def render_reg():
 
 @app.route("/forgotpass")
 def render_forgot_pass():
-    return flask.render_template("forgotpass.html")
+    return flask.render_template("forgotpass.html", error="")
 
-#TODO: secure send_image
+
+@app.route("/reset", methods=["POST", "GET"])
+def resetpass():
+    guid = flask.request.args.get("id")
+    uname = flask.request.args.get("uname")
+    if db.check_reset(guid, uname):
+        return flask.render_template("resetpass.html", uname=uname)
+
+    return flask.render_template("forgotpass.html", error="request expired")
+
+
 @app.route("/sendimage", methods=["POST"])
 def sendimage():
-
-    file = flask.request.files["image"]
-    filename = file.filename
-    file.save(os.path.join('static/images/', filename))
-    return {"status": "success"}
+    key = flask.request.form["key"]
+    username = flask.request.form["uname"]
+    try:
+        if str(keys[username]) == key:
+            file = flask.request.files["image"]
+            filename = file.filename
+            file.save(os.path.join('static/images/', filename))
+            return {"status": "success"}
+        else:
+            return {"status": "keyerror"}
+    except KeyError:
+        return {"status": "failure"}
 
 
 def login(data):
@@ -225,9 +244,13 @@ def getdetails(data):
 
 def forgotpass(data):
     email = data["email"]
-    p = db.getemail(email)
-    if p:
-        if send_mail.send_mail(email, p):
+    uname = db.getemail(email)
+    if uname:
+        guid = uuid.uuid4().hex
+        url = flask.url_for("resetpass", id=guid, uname=uname, _external=True)
+
+        if send_mail.send_mail(email, uname, url):
+            db.insert_reset_request(uname, guid)
             return {"status": "success"}
         else:
             return {"status": "noconfig"}
@@ -268,6 +291,15 @@ def update(data):
         return {"status": "keyerror"}
 
 
+def passwdreset(data):
+    username = data["uname"]
+    pass1 = data["pass1"]
+    if db.resetpasswd(username, pass1):
+        return {"status": "success"}
+    else:
+        return {"status": "Unknown Error"}
+
+
 def get_y(dob: str) -> int:
     _y, _m, _d = dob[:4], dob[5:7], dob[8:]
     cur = str(date.today())
@@ -281,5 +313,4 @@ def get_y(dob: str) -> int:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False) # ,ssl_context='adhoc'
-    
+    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False)  # ,ssl_context='adhoc'

@@ -5,9 +5,9 @@ import os
 from email.message import EmailMessage
 
 
-def send_mail(to_email, passwd):
+def send_mail(to_email, uname, url):
     try:
-        f = open('gapw.json')
+        f = open('modules/gapw.json')
 
         data = json.load(f)
         mailaddr = data["email"]
@@ -19,9 +19,11 @@ def send_mail(to_email, passwd):
         context = ssl.create_default_context()
 
         msg = EmailMessage()
-        msg.set_content(f"Your B-itter password is: {passwd}")
+        msg.set_content(
+            f"Biitter account reset request\n Your B-itter account username is {uname} \n To reset your password "
+            f"click this link:\n {url}")
 
-        msg['Subject'] = 'B-itter password'
+        msg['Subject'] = 'B-itter password reset'
         msg['From'] = mailaddr
         msg['To'] = to_email
 
@@ -32,4 +34,3 @@ def send_mail(to_email, passwd):
             return True
     except Exception as e:
         print(e)
-

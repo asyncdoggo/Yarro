@@ -2,5 +2,5 @@
 test.py
 venv
 __pycache__
-gapw.json
+modules/gapw.json
 .vscode

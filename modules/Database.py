@@ -1,7 +1,10 @@
+import argon2.exceptions
 import mysql.connector
+from argon2 import PasswordHasher
 
 User_Sql = None
 Password_Sql = None
+ph = PasswordHasher()
 
 
 def connector(user: str, password: str):
@@ -35,6 +38,10 @@ def initialize(user: str, password: str):
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Likes(User_Id varchar(35) NOT NULL, Post_Id int NOT NULL);"
             )
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS requests(username varchar(35) NOT NULL UNIQUE,guid TEXT NOT NULL, "
+                "tstamp timestamp); "
+            )
             conn.commit()
             return True
         except mysql.connector.Error as err:
@@ -45,11 +52,16 @@ def insert_user(**kwargs):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
         try:
+
+            passwd = kwargs['passwd']
+
+            hashpass = ph.hash(passwd)
+
             cur = conn.cursor()
             cur.execute("USE M_DB;")
             cur.execute(
                 f"INSERT INTO User (User_Id, UserName, Passwd, email) VALUES (%s,%s,%s,%s);",
-                (kwargs['uid'], kwargs['uname'], kwargs['passwd'], kwargs['email'])
+                (kwargs['uid'], kwargs['uname'], hashpass, kwargs['email'])
             )
             cur.execute(
                 f"INSERT INTO Detail values (%s,'','',0,'','','0000-00-00')", (kwargs["uid"],)
@@ -107,9 +119,17 @@ def check(username, password):
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute(f"SELECT * from User where UserName=%s and Passwd=%s", (username, password))
+            cur.execute(f"SELECT Passwd from User where UserName=%s", (username,))
             res = cur.fetchall()
-            return True if res else None
+            if res:
+                try:
+                    pwhash = res[0][0]
+                    ph.verify(pwhash, password)
+                    return True if res else None
+                except argon2.exceptions.VerifyMismatchError as e:
+                    print(e)
+            else:
+                return {"status": "nouser"}
         except Exception as e:
             print(repr(e))
 
@@ -124,6 +144,8 @@ def delete():
         cur.execute("DROP TABLE IF EXISTS Post;")
         cur.execute("DROP TABLE IF EXISTS User;")
         cur.execute("DROP TABLE IF EXISTS Likes;")
+        cur.execute("DROP TABLE IF EXISTS requests;")
+
         cur.execute("DROP DATABASE IF EXISTS M_DB;")
         conn.commit()
         conn.close()
@@ -137,10 +159,10 @@ def getemail(email):
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute(f"select UserName, Passwd from User where Email = %s", (email,))
+            cur.execute(f"select UserName from User where Email = %s", (email,))
             res = cur.fetchall()
             if res:
-                return {"uname": res[0][0], "passwd": res[0][1]}
+                return res[0][0]
         except Exception as e:
             print(e)
 
@@ -149,9 +171,10 @@ def resetpasswd(username, newpass):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
         try:
+            pwhash = ph.hash(newpass)
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute(f"UPDATE User SET Passwd = %s WHERE UserName = %s;", (username, newpass))
+            cur.execute(f"UPDATE User SET Passwd = %s WHERE UserName = %s;", (pwhash, username))
             conn.commit()
             return True
         except Exception as e:
@@ -234,6 +257,43 @@ def getuserdetials(uname):
             print(e)
 
 
+def insert_reset_request(uname, guid):
+    global User_Sql, Password_Sql
+    with connector(User_Sql, Password_Sql) as conn:
+        try:
+            guidhash = ph.hash(guid)
+            cur = conn.cursor()
+            cur.execute("USE M_DB;")
+            cur.execute("INSERT INTO requests values (%s,%s,timestamp(sysdate()))", (uname, guidhash))
+            conn.commit()
+
+        except Exception as e:
+            print(e)
+
+
+def check_reset(guid, uname):
+    global User_Sql, Password_Sql
+    with connector(User_Sql, Password_Sql) as conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("USE M_DB;")
+            cur.execute("SELECT guid FROM requests WHERE username = %s", (uname,))
+            res = cur.fetchall()
+            if res:
+                hashed_id = res[0][0]
+                try:
+                    if ph.verify(hashed_id, guid):
+                        cur.execute("DELETE FROM requests WHERE username = %s", (uname,))
+                        conn.commit()
+                        return True
+                except argon2.exceptions.VerifyMismatchError as e:
+                    print(e)
+            else:
+                return False
+        except:
+            return False
+
+
 if __name__ == "__main__":
     initialize("root", "root")
-    print(retrieve_posts(""))
+    delete()

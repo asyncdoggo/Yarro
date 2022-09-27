@@ -125,11 +125,11 @@ def check(username, password):
                 try:
                     pwhash = res[0][0]
                     ph.verify(pwhash, password)
-                    return True if res else None
+                    return True
                 except argon2.exceptions.VerifyMismatchError as e:
                     print(e)
             else:
-                return {"status": "nouser"}
+                return False
         except Exception as e:
             print(repr(e))
 
@@ -295,5 +295,5 @@ def check_reset(guid, uname):
 
 
 if __name__ == "__main__":
-    initialize("root", "root")
+    initialize("root", "ABCD1234!@")
     delete()

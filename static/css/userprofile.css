@@ -11,10 +11,13 @@
   align-items: center;
   border: 2px solid;
   width: 40%;
-  height: 70vh;
+  height: 80vh;
   margin: 5vh 30vw;
 
+
 }
+
+
 
 .user_profile {
   display: flex;
@@ -24,7 +27,9 @@
   width: 100%;
 }
 
-.profile input {
+.profile input[type=text],
+[type=tel],
+[type=date] {
   margin: 1%;
   padding: 1%;
   width: 30vw;
@@ -33,10 +38,18 @@
   border-radius: 0.2rem;
 }
 
+.profile input[type=file] {
+  width: 0%;
+  height: 0%;
+  opacity: 0;
+  margin: 0%;
+  padding: 0%;
+}
+
 .profile input[type=submit] {
   width: 30vw;
   height: 5vh;
-  margin: 3%;
+  margin-top: 5%;
   border: 1px solid #04AA6D;
   border-radius: 0.2rem;
   background: #04AA6D;

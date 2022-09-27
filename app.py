@@ -12,7 +12,7 @@ app = flask.Flask(__name__)
 
 keys = {}
 
-db.initialize("root", "root")
+db.initialize("root", "ABCD1234!@")
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 

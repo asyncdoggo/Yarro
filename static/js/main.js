@@ -41,8 +41,8 @@ $(document).ready(
         })
 
         $("#logout").click(function () {
-            localStorage.setItem("uname","")
-            localStorage.setItem("key","")
+            localStorage.setItem("uname", "")
+            localStorage.setItem("key", "")
             send_form("/", { "subject": "logout", "uname": uname, "key": key })
         })
 
@@ -122,7 +122,7 @@ async function get_msg() {
             }
         });
 
-        await sleep(3000);
+        await sleep(1000);
     }
 
 }

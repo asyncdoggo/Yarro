@@ -264,7 +264,9 @@ def insert_reset_request(uname, guid):
             guidhash = ph.hash(guid)
             cur = conn.cursor()
             cur.execute("USE M_DB;")
+            cur.execute(f"DROP EVENT IF EXISTS {uname}_reset")
             cur.execute("INSERT INTO requests values (%s,%s,timestamp(sysdate()))", (uname, guidhash))
+            cur.execute(f"CREATE EVENT {uname}_reset ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO DELETE FROM requests where username = %s",(uname,))            
             conn.commit()
 
         except Exception as e:
@@ -284,6 +286,7 @@ def check_reset(guid, uname):
                 try:
                     if ph.verify(hashed_id, guid):
                         cur.execute("DELETE FROM requests WHERE username = %s", (uname,))
+                        cur.execute(f"DROP EVENT IF EXISTS {uname}_reset")
                         conn.commit()
                         return True
                 except argon2.exceptions.VerifyMismatchError as e:

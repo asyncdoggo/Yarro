@@ -1,0 +1,22 @@
+.profile_img {
+    width: 3em;
+    height: 3em;
+}
+
+#uname {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+#content {
+    font-size: 1em;
+}
+
+.main-table {
+    border-spacing: 1em 0em;
+}
+
+.profile_cell {
+    padding-top: 0.7em;
+    vertical-align: top;
+}

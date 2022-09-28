@@ -66,7 +66,7 @@ $(document).ready(function () {
 
             var formdata = new FormData()
             formdata.append("image", file, uname)
-            formdata.append("uname",uname)
+            formdata.append("uname", uname)
             formdata.append("key", key)
 
             $.ajax({
@@ -80,11 +80,16 @@ $(document).ready(function () {
     })
 
 
-    document.querySelector("#logout").addEventListener("click",function () {
+    document.querySelector("#logout").addEventListener("click", function () {
         localStorage.setItem("uname", "")
         localStorage.setItem("key", "")
         send_form("/", { "subject": "logout", "uname": uname, "key": key })
-        
+
+    })
+
+    document.querySelector("#homebtn").addEventListener("click", function () {
+        send_form("/", { "subject": "mainpage", "uname": uname, "key": key })
+
     })
 
     // $("#logout").click(function () {

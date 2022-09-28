@@ -10,33 +10,32 @@
 </head>
 
 <body>
-<main>
+    <main>
 
-    <!-- box section  -->
-    <div class="container">
-        <h3>Reset Password</h3>
+        <!-- box section  -->
+        <div class="container">
+            <h3>Reset Password</h3>
 
-        <div class="box2">
-            <label id="uname">{{uname}}</label>
-        </div>
-        <div class="box2">
-            <label for="newpass1">Enter New password</label>
-            <input type=password id="newpass1" name="newpass1">
-        </div>
-        <div class="box2">
-            <label for="newpass2">Reenter new password</label>
-            <input type=password id="newpass2" name="newpass2">
-        </div>
+            <div class="box">
+                <h4> Username : {{uname}}</h4>
+                <p id=uname hidden>{{uname}}</p>
+            </div>
+            <div class="box2">
+                <input type=password id="newpass1" name="newpass1" placeholder="Enter new password">
+            </div>
+            <div class="box2">
+                <input type=password id="newpass2" name="newpass2" placeholder="Confirm Password">
+            </div>
 
-        <div class="box2">
-            <button id="resetButton">Submit</button>
+            <div class="box2">
+                <button id="resetButton">Submit</button>
+            </div>
+            <p id="error"></p>
         </div>
-        <p id="error"></p>
-    </div>
-</main>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="/static/js/jquery.serializejson.js"></script>
-<script src="/static/js/resetpass.js"></script>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/static/js/jquery.serializejson.js"></script>
+    <script src="/static/js/resetpass.js"></script>
 </body>
 
 </html>

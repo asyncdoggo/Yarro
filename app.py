@@ -12,7 +12,7 @@ app = flask.Flask(__name__)
 
 keys = {}
 
-db.initialize("root", "root")
+db.initialize("root", "ABCD1234!@")
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -313,5 +313,4 @@ def get_y(dob: str) -> int:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False,
-            ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'
+    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'

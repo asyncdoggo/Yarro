@@ -46,6 +46,11 @@ $(document).ready(
             send_form("/", { "subject": "logout", "uname": uname, "key": key })
         })
 
+        document.querySelector("#homebtn").addEventListener("click", function () {
+            send_form("/", { "subject": "mainpage", "uname": uname, "key": key })
+
+        })
+
 
 
         get_msg();
@@ -100,20 +105,30 @@ async function get_msg() {
                         }
 
                         post = `
-                        <div class="post" id="${pid}">
-                                    <div class="user_profile" style="margin:0.5% 0;">
-                                        <img src="/images/${user}" alt="" width="40vw">
-                                        <p id="uname" style="margin:0 1%; font-weight:550;">${user}</p>
-                                    </div>    
-                                    <div>
-                                        <p id="content" style="margin:1% 0;">${content}</p>
-                                    </div>
-                                    <div class="like_comment_buttons">
-                                        <button id="${pid}" onClick=onButtonClick(this)>${like}</button>
-                                        <p id="like_count">${lc}</p>
-                                    </div>
+                                        <div class="post" id="${pid}">
+                    <table class="main-table">
+                        <tr>
+                            <td class="profile_cell">
+                                <div class="user_profile">
+                                    <img src="/images/${user}" class="profile_img">
                                 </div>
-                                <hr>`;
+                            </td>
+                            <td>
+                                <table class="sub-table">
+                                    <tr><p id="uname">${user}</p></tr>
+                                    <tr><p id="content">${content}</p></tr>
+                                    <tr>
+                                        <div class="like_comment_buttons">
+                                            <button id="${pid}" onClick=onButtonClick(this)>${like}</button>
+                                            <p id="like_count">${lc}</p>
+                                        </div>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <hr>`;
 
                         document.getElementById("post_section").innerHTML += post;
 

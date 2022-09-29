@@ -12,7 +12,7 @@ app = flask.Flask(__name__)
 
 keys = {}
 
-db.initialize("root", "ABCD1234!@")
+db.initialize("root", "root")
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -131,12 +131,12 @@ def login(data):
         username = data["uname"]
         passwd = data["passwd"]
 
-        res = db.check(username, passwd)
-        if res:
+        uname = db.check(username, passwd)
+        if uname:
             key = random.randint(10000000, 99999999)
-            keys[username] = key
+            keys[uname] = key
 
-            resp = {"status": "success", "uname": username, "key": key}
+            resp = {"status": "success", "uname": uname, "key": key}
             return resp
         else:
             return {"status": "badpasswd"}

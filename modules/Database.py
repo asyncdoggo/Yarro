@@ -25,7 +25,7 @@ def initialize(user: str, password: str):
             cur.execute("CREATE DATABASE IF NOT EXISTS M_DB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_cs;")
             cur.execute("USE M_DB;")
             cur.execute(
-                "CREATE TABLE IF NOT EXISTS User(User_Id varchar(35) PRIMARY KEY NOT NULL,UserName varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci UNIQUE, "
+                "CREATE TABLE IF NOT EXISTS User(User_Id varchar(35) PRIMARY KEY NOT NULL,UserName varchar(20) UNIQUE, "
                 "Passwd varchar(200), Email varchar(100) UNIQUE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Detail (u_id varchar(35), FirstName varchar(50), LastName varchar(50), "
@@ -39,7 +39,7 @@ def initialize(user: str, password: str):
                 "CREATE TABLE IF NOT EXISTS Likes(User_Id varchar(35) NOT NULL, Post_Id int NOT NULL);"
             )
             cur.execute(
-                "CREATE TABLE IF NOT EXISTS requests(username varchar(35) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL UNIQUE,guid TEXT NOT NULL, "
+                "CREATE TABLE IF NOT EXISTS requests(username varchar(35) NOT NULL UNIQUE,guid TEXT NOT NULL, "
                 "tstamp timestamp); "
             )
             conn.commit()
@@ -119,13 +119,13 @@ def check(username, password):
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute(f"SELECT Passwd from User where UserName=%s", (username,))
+            cur.execute(f"SELECT UserName,Passwd from User where UserName=%s COLLATE utf8mb4_0900_ai_ci", (username,))
             res = cur.fetchall()
             if res:
                 try:
-                    pwhash = res[0][0]
+                    pwhash = res[0][1]
                     ph.verify(pwhash, password)
-                    return True
+                    return res[0][0]
                 except argon2.exceptions.VerifyMismatchError as e:
                     print(e)
             else:

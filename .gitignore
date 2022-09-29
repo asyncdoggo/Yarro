@@ -6,3 +6,8 @@ modules/gapw.json
 .vscode
 certificate.crt
 privateKey.key
+access.log
+error.log
+bitter.db
+index
+temp

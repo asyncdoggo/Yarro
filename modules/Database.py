@@ -210,8 +210,7 @@ def retrieve_posts(uid):
             res1 = cur.fetchall()
             ans = {}
             for i in res:
-                dtime = str(datetime.datetime.strftime(i[4],"%Y-%m-%d %H:%M"))
-                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "datetime":dtime, "uname": i[5],
+                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "datetime":str(i[4]), "uname": i[5],
                              "islike": 1 if (uid, i[0]) in res1 else 0}
             return ans
         except Exception as e:

@@ -313,4 +313,4 @@ def get_y(dob: str) -> int:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'
+    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False) #, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'

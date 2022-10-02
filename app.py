@@ -12,7 +12,7 @@ app = flask.Flask(__name__)
 
 keys = {}
 
-db.initialize("root", "root")
+db.initialize("root","root")
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -151,7 +151,7 @@ def login(data):
             else:
                 return {"status": "none"}
         except KeyError:
-            return {"status": "none"}
+            return {"status": "bad request"}
 
 
 def logout(data):
@@ -175,7 +175,7 @@ def get_post(data):
         else:
             return {"status": "logout"}
     except KeyError as e:
-        return {"status": "keyerror"}
+        return {"status": "logout"}
 
 
 @app.route("/images/<path:path>")
@@ -214,33 +214,42 @@ def updatelc(data):
     uname = data["uname"]
     key = data["key"]
     pid = data["pid"]
-
-    usr = db.retrieve_users()
-
-    res = db.update_post(pid=pid, uid=usr[uname])
-    return {"status": "success" if res else "failure"}
-
+    try:
+        if key == str(keys[uname]):
+            usr = db.retrieve_users()
+            res = db.update_post(pid=pid, uid=usr[uname])
+            return {"status": "success" if res else "failure"}
+        else:
+            return {"status":"logout"}
+    except:
+        return {"status":"logout"}
 
 def send_post(data):
     key = data["key"]
     uname = data["uname"]
-    if key == str(keys[uname]):
-        users = db.retrieve_users()
-        uid = users[uname]
-        res = db.insert_posts(U_id=uid, cont=data["content"])
-        return {"status": "success"} if res else {"status": "failure"}
-    else:
-        return {"status": "keyerror"}
-
+    try:
+        if key == str(keys[uname]):
+            users = db.retrieve_users()
+            uid = users[uname]
+            res = db.insert_posts(u_id=uid, cont=data["content"])
+            return {"status": "success"} if res else {"status": "failure"}
+        else:
+            return {"status": "logout"}
+    except:
+        return {"status": "logout"}
+        
 
 def getdetails(data):
     uname = data["uname"]
-    if data["key"] == str(keys[uname]):
-        ret = db.getuserdetials(uname)
-        return {"status": "success", "data": ret}
-    else:
-        return {"status": "keyerror"}
-
+    try:
+        if data["key"] == str(keys[uname]):
+            ret = db.getuserdetials(uname)
+            return {"status": "success", "data": ret}
+        else:
+            return {"status": "logout"}
+    except:
+        return {"status": "logout"}
+    
 
 def forgotpass(data):
     email = data["email"]
@@ -286,9 +295,9 @@ def update(data):
             else:
                 return {"status": "failure"}
         else:
-            return {"status": "badkey"}
+            return {"status": "logout"}
     except KeyError as e:
-        return {"status": "keyerror"}
+        return {"status": "logout"}
 
 
 def passwdreset(data):
@@ -313,4 +322,4 @@ def get_y(dob: str) -> int:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False) #, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'
+    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False)#, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'

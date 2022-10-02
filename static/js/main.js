@@ -62,8 +62,7 @@ let uid;
 let content;
 let lc;
 let islike;
-
-
+let date;
 
 async function get_msg() {
 
@@ -94,6 +93,10 @@ async function get_msg() {
                         lc = post["lc"];
                         islike = post["islike"];
                         user = post["uname"];
+                        date = post["datetime"]
+                        var d = new Date(`${date} UTC`)
+                        d = d.toLocaleString("en-us");
+
                         var like;
                         if (islike) {
                             like = `<span class="material-icons">thumb_up</span>`
@@ -104,8 +107,7 @@ async function get_msg() {
                             </span>`
                         }
 
-                        post = `
-                                        <div class="post" id="${pid}">
+                        post = `<div class="post" id="${pid}">
                     <table class="main-table">
                         <tr>
                             <td class="profile_cell">
@@ -120,7 +122,7 @@ async function get_msg() {
                                     <tr>
                                         <div class="like_comment_buttons">
                                             <button id="${pid}" onClick=onButtonClick(this)>${like}</button>
-                                            <p id="like_count">${lc}</p>
+                                            <p id="like_count">${lc}</p> &emsp;&emsp; <p>${d}</p>
                                         </div>
                                     </tr>
                                 </table>

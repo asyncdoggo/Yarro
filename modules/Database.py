@@ -1,3 +1,4 @@
+import datetime
 import argon2.exceptions
 import mysql.connector
 from argon2 import PasswordHasher
@@ -33,7 +34,7 @@ def initialize(user: str, password: str):
                 "User_Id) ON UPDATE CASCADE ON DELETE CASCADE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Post(Post_Id int PRIMARY KEY NOT NULL AUTO_INCREMENT, User_Id varchar(35), "
-                "content text NOT NULL, L_Count int, FOREIGN KEY(User_Id) REFERENCES User(User_Id) ON "
+                "content text NOT NULL, L_Count int, tstamp timestamp, FOREIGN KEY(User_Id) REFERENCES User(User_Id) ON "
                 "DELETE CASCADE ON UPDATE CASCADE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Likes(User_Id varchar(35) NOT NULL, Post_Id int NOT NULL);"
@@ -187,8 +188,8 @@ def insert_posts(U_id, cont):
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute("INSERT INTO Post(User_Id, content, L_Count) VALUES (%s, %s, %s);",
-                        (U_id, cont, 0))
+            cur.execute("INSERT INTO Post(User_Id, content, L_Count, tstamp) VALUES (%s, %s, %s, UTC_TIMESTAMP());",
+                        (U_id, cont.strip(), 0))
             conn.commit()
             return True
         except Exception as e:
@@ -202,14 +203,15 @@ def retrieve_posts(uid):
             cur = conn.cursor()
             cur.execute("USE M_DB;")
             cur.execute("select Post.*,User.UserName from User, Post WHERE User.User_Id = Post.User_Id ORDER BY "
-                        "Post.Post_Id DESC LIMIT 30")
+                        "Post.Post_Id LIMIT 30")
             res = cur.fetchall()
             res.reverse()
             cur.execute("SELECT * FROM Likes where User_Id = %s;", (uid,))
             res1 = cur.fetchall()
             ans = {}
             for i in res:
-                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "uname": i[4],
+                dtime = str(datetime.datetime.strftime(i[4],"%Y-%m-%d %H:%M"))
+                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "datetime":dtime, "uname": i[5],
                              "islike": 1 if (uid, i[0]) in res1 else 0}
             return ans
         except Exception as e:
@@ -299,5 +301,5 @@ def check_reset(guid, uname):
 
 
 if __name__ == "__main__":
-    initialize("root", "ABCD1234!@")
-    delete()
+    initialize("root", "root")
+    retrieve_posts("dadba4bce1bf42afb8cb38f150115e3d")

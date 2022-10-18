@@ -51,8 +51,6 @@ $(document).ready(
 
         })
 
-
-
         get_msg();
 
     })
@@ -66,11 +64,11 @@ let date;
 
 async function get_msg() {
 
-    while (true) {
         let msgdata = {
             "subject": "getpost",
             "uname": uname,
-            "key": key
+            "key": key,
+            "self":"false"
         }
 
         $.ajax({
@@ -138,10 +136,6 @@ async function get_msg() {
                 }
             }
         });
-
-        await sleep(1000);
-    }
-
 }
 
 

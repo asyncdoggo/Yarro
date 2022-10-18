@@ -12,7 +12,7 @@ app = flask.Flask(__name__)
 
 keys = {}
 
-db.initialize("root","root")
+db.initialize("root", "root")
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -56,6 +56,7 @@ def root():
         except KeyError:
             pass
 
+        r = flask.request
         data = flask.request.get_json()
 
         if data["subject"] == "login":
@@ -87,6 +88,8 @@ def root():
 
         if data["subject"] == "resetpass":
             return passwdreset(data)
+        if data["subject"] == "getfullname":
+            return getfullname(data)
 
 
 @app.route("/register")
@@ -121,7 +124,8 @@ def sendimage():
             return {"status": "success"}
         else:
             return {"status": "keyerror"}
-    except KeyError:
+    except KeyError as e:
+        print(e)
         return {"status": "failure"}
 
 
@@ -168,13 +172,15 @@ def get_post(data):
     try:
         uname = data["uname"]
         key = data["key"]
+        selfOnly = data["self"]
         u = db.retrieve_users()
         if key == str(keys[uname]):
-            res = db.retrieve_posts(u[uname])
+            res = db.retrieve_posts(u[uname], selfOnly)
             return {"status": "success", "data": res}
         else:
             return {"status": "logout"}
     except KeyError as e:
+        print(e)
         return {"status": "logout"}
 
 
@@ -193,8 +199,8 @@ def register(data):
     if not re.search(regex, email):
         return {"status": "Invalid Email"}
 
-    if (len(username) < 5 or " " in username) or (len(password) < 5 or " " in password):
-        return {"status": "username and password should be between 5 to 20 characters without spaces"}
+    if (30 > len(username) < 5 or " " in username) or (30 > len(password) < 5 or " " in password):
+        return {"status": "username and password should be between 5 to 30 characters without spaces"}
 
     res1 = db.retrieve_users()
     res = res1.keys()
@@ -220,9 +226,10 @@ def updatelc(data):
             res = db.update_post(pid=pid, uid=usr[uname])
             return {"status": "success" if res else "failure"}
         else:
-            return {"status":"logout"}
+            return {"status": "logout"}
     except:
-        return {"status":"logout"}
+        return {"status": "logout"}
+
 
 def send_post(data):
     key = data["key"]
@@ -235,9 +242,23 @@ def send_post(data):
             return {"status": "success"} if res else {"status": "failure"}
         else:
             return {"status": "logout"}
-    except:
+    except Exception as e:
+        print(e)
         return {"status": "logout"}
-        
+
+
+def getfullname(data):
+    uname = data["uname"]
+    try:
+        if data["key"] == str(keys[uname]):
+            ret = db.getfullname(uname)
+            return {"status": "success", "name": ret}
+        else:
+            return {"status": "logout"}
+    except Exception as e:
+        print(e)
+        return {"status": "logout"}
+
 
 def getdetails(data):
     uname = data["uname"]
@@ -249,7 +270,7 @@ def getdetails(data):
             return {"status": "logout"}
     except:
         return {"status": "logout"}
-    
+
 
 def forgotpass(data):
     email = data["email"]
@@ -322,4 +343,5 @@ def get_y(dob: str) -> int:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5005, debug=True, use_reloader=False)#, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'
+    app.run(host="0.0.0.0", port=5005, debug=True,
+            use_reloader=False)#, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'

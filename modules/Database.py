@@ -1,4 +1,5 @@
 import datetime
+from os import curdir
 import argon2.exceptions
 import mysql.connector
 from argon2 import PasswordHasher
@@ -23,10 +24,10 @@ def initialize(user: str, password: str):
     with connector(user, password) as conn:
         try:
             cur = conn.cursor()
-            cur.execute("CREATE DATABASE IF NOT EXISTS M_DB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_as_cs;")
+            cur.execute("CREATE DATABASE IF NOT EXISTS M_DB;")
             cur.execute("USE M_DB;")
             cur.execute(
-                "CREATE TABLE IF NOT EXISTS User(User_Id varchar(35) PRIMARY KEY NOT NULL,UserName varchar(20) UNIQUE, "
+                "CREATE TABLE IF NOT EXISTS User(User_Id varchar(35) PRIMARY KEY NOT NULL,UserName varchar(20) UNIQUE , "
                 "Passwd varchar(200), Email varchar(100) UNIQUE);")
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS Detail (u_id varchar(35), FirstName varchar(50), LastName varchar(50), "
@@ -182,35 +183,41 @@ def resetpasswd(username, newpass):
             print(e)
 
 
-def insert_posts(U_id, cont):
+def insert_posts(u_id, cont):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
             cur.execute("INSERT INTO Post(User_Id, content, L_Count, tstamp) VALUES (%s, %s, %s, UTC_TIMESTAMP());",
-                        (U_id, cont.strip(), 0))
+                        (u_id, cont.strip(), 0))
             conn.commit()
             return True
         except Exception as e:
             print(e)
 
 
-def retrieve_posts(uid):
+def retrieve_posts(uid, selfOnly):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
         try:
             cur = conn.cursor()
             cur.execute("USE M_DB;")
-            cur.execute("select Post.*,User.UserName from User, Post WHERE User.User_Id = Post.User_Id ORDER BY "
-                        "Post.Post_Id LIMIT 30")
+            if selfOnly == "false":
+                cur.execute("select Post.*,User.UserName from User, Post WHERE User.User_Id = Post.User_Id ORDER BY "
+                            "Post.Post_Id DESC LIMIT 30")
+            else:
+                cur.execute(
+                    "select Post.*,User.UserName from User, Post WHERE User.User_Id = Post.User_Id and Post.User_Id = %s ORDER BY "
+                    "Post.Post_Id DESC LIMIT 30", (uid,))
+
             res = cur.fetchall()
-            res.reverse()
+
             cur.execute("SELECT * FROM Likes where User_Id = %s;", (uid,))
             res1 = cur.fetchall()
             ans = {}
             for i in res:
-                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": i[3], "datetime":str(i[4]), "uname": i[5],
+                ans[i[0]] = {"uid": i[1], "content": i[2], "lc": int(i[3]), "datetime": str(i[4]), "uname": i[5],
                              "islike": 1 if (uid, i[0]) in res1 else 0}
             return ans
         except Exception as e:
@@ -230,7 +237,7 @@ def update_post(uid, pid):
                 cur.execute("INSERT INTO Likes(User_Id, Post_Id) VALUES (%s,%s)", (uid, pid))
                 # Update like count
                 cur.execute("UPDATE Post SET L_Count = L_Count + 1 WHERE Post_Id = %s;", (pid,))
-            else:  # User has unliked the post
+            else:  # User has disliked the post
                 cur.execute("DELETE FROM Likes WHERE User_Id = %s AND Post_Id = %s", (uid, pid))
                 # Update the like count
                 cur.execute("UPDATE Post SET L_Count = L_Count - 1 WHERE Post_Id = %s;", (pid,))
@@ -256,6 +263,21 @@ def getuserdetials(uname):
             return ans
         except Exception as e:
             print(e)
+
+
+def getfullname(uname):
+    global User_Sql, Password_Sql
+    with connector(User_Sql, Password_Sql) as conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("USE M_DB;")
+            cur.execute("SELECT CONCAT(FirstName, ' ', LastName) from Detail where u_id = (SELECT User_Id from User "
+                        "where UserName = %s)", (uname,))
+            res = cur.fetchall()
+            return res[0][0]
+        except Exception as e:
+            print(e)
+            return ""
 
 
 def insert_reset_request(uname, guid):
@@ -301,4 +323,4 @@ def check_reset(guid, uname):
 
 if __name__ == "__main__":
     initialize("root", "root")
-    retrieve_posts("dadba4bce1bf42afb8cb38f150115e3d")
+    retrieve_posts("dd0a0c40479d4bd49c989ba5c8567c3b", "true")

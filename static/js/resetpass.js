@@ -1,34 +1,33 @@
-$(document).ready(function () {
-    $("#resetButton").click(function () {
+const uname = document.getElementById("uname").innerHTML
 
-        let newpass1 = $("#newpass1").val();
-        let newpass2 = $("#newpass2").val();
-        let uname = $("#uname").text()
+document.getElementById("resetButton").addEventListener("click", async function () {
 
-        if(newpass1 == newpass2){
-            data = { "subject": "resetpass", "uname": uname,"pass1":newpass1}
-            $.ajax({
-                type: 'POST',
-                url: "/",
-                data: JSON.stringify(data),
-                contentType: "application/json",
-                dataType: 'json',
-                success: function (err, req, resp) {
-                    msg = JSON.parse(resp["responseText"]);
-                    if (msg["status"] == "success") {
-                        $("#error").text("Reset successful");
-                    }
-                    else {
-                        $("#error").text(msg["status"]);
-                    }
+    let newpass1 = document.getElementById("newpass1").value;
+    let newpass2 = document.getElementById("newpass2").value;
 
-                }
-            })
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const id = urlParams.get('id')
+
+
+    if (newpass1 == newpass2) {
+
+        const response = await fetch("/api/reset", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "uname": uname, "id": id, "pass1": newpass1 })
+        }).then((response) => response.json())
+
+        if (response.status == "success") {
+            send_form("/", { "subject": "resetsuccess" })
         }
-        else{
-            $("#error").text("Passwords do not match")
-        }
-    })
+    }
+    else {
+        document.getElementById("error").innerHTML = "Passwords do not match"
+    }
 })
 
 

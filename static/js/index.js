@@ -1,69 +1,30 @@
-try {
-    var key = localStorage.getItem("key");
-    var uname = localStorage.getItem("uname");
+document.getElementById("login_form").addEventListener("submit",async function (e) {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const data = Object.fromEntries(form.entries());
 
-    if (key.length) {
-        msg_data = {"subject":"login","uname":uname,"key":key}
-
-        $.ajax({
-            type: 'POST',
-            url: "/",
-            data: JSON.stringify(msg_data),
-            contentType: "application/json",
-            dataType: 'json',
-            success: function (err, req, resp) {
-            msg = JSON.parse(resp["responseText"]);
-            if (msg["status"] == "success") {
-                localStorage.setItem("uname", msg["uname"]);
-                localStorage.setItem("key", msg["key"]);
-                send_form("/",{"subject":"mainpage","uname":msg["uname"],"key":msg["key"]})
-            }
-            }
-        });
+const response = await fetch("/api/login", {
+    method: 'POST',
+    headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+        "Authorization": "Basic " + btoa(data["uname"]+":"+data["passwd"])
     }
-}
-catch (e) {
-}
+    }).then((response) => response.json())
 
-$(document).ready(function () {
-    $("#register").click(function () {
-        window.location.href = "/register"
-    })
-
-    $("#resetpass").click(function () {
-        window.location.href = "/forgotpass"
-    })
-
-
-    $('#login_form').on('submit', function (e) {
-        e.preventDefault();
-        var data = $("#login_form").serializeJSON();
-        data["subject"] = "login";
-
-        $.ajax({
-            type: 'POST',
-            url: "/",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            dataType: 'json',
-            success: function (err, req, resp) {
-
-                msg = JSON.parse(resp["responseText"]);
-
-                if (msg["status"] == "success") {
-                    localStorage.setItem("uname", msg["uname"]);
-                    localStorage.setItem("key", msg["key"]);
-                    send_form("/",{"subject":"mainpage","uname":msg["uname"],"key":msg["key"]})
-                    console.log("success");
-
-                }
-                else if (msg["status"] == "badpasswd") {
-                    $("#error").text("Username or password is wrong");
-                }
-            }
-        });
-    })
+    let status = response.status;
+    if(status == "success"){
+    let token = response.token
+    let uname = response.uname
+    localStorage.setItem("token", token);
+    localStorage.setItem("uname", uname);
+    send_form("/",{"subject":"home","token":token})
+    }
+    else{
+    document.getElementById("error").innerHTML = "Username or password is wrong";
+    }
 })
+
 
 function send_form(action, params) {
     var form = document.createElement('form');

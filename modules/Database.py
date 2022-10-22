@@ -169,16 +169,21 @@ def getemail(email):
             print(e)
 
 
-def resetpasswd(username, newpass):
+def resetpasswd(username, newpass,r_id):
     global User_Sql, Password_Sql
     with connector(User_Sql, Password_Sql) as conn:
         try:
-            pwhash = ph.hash(newpass)
             cur = conn.cursor()
             cur.execute("USE M_DB;")
+            cur.execute("select guid from requests where username = %s;", (username,))
+            guid = cur.fetchall()[0][0]
+            guidhash = ph.verify(guid,r_id)
+            pwhash = ph.hash(newpass)
             cur.execute(f"UPDATE User SET Passwd = %s WHERE UserName = %s;", (pwhash, username))
+            cur.execute("delete from requests where username=%s",(username,))
             conn.commit()
             return True
+
         except Exception as e:
             print(e)
 
@@ -288,6 +293,7 @@ def insert_reset_request(uname, guid):
             cur = conn.cursor()
             cur.execute("USE M_DB;")
             cur.execute(f"DROP EVENT IF EXISTS {uname}_reset")
+            cur.execute("delete from requests where username=%s",(uname,))
             cur.execute("INSERT INTO requests values (%s,%s,timestamp(sysdate()))", (uname, guidhash))
             cur.execute(f"CREATE EVENT {uname}_reset ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO DELETE FROM "
                         f"requests where username = %s", (uname,))
@@ -309,9 +315,6 @@ def check_reset(guid, uname):
                 hashed_id = res[0][0]
                 try:
                     if ph.verify(hashed_id, guid):
-                        cur.execute("DELETE FROM requests WHERE username = %s", (uname,))
-                        cur.execute(f"DROP EVENT IF EXISTS {uname}_reset")
-                        conn.commit()
                         return True
                 except argon2.exceptions.VerifyMismatchError as e:
                     print(e)

@@ -1,110 +1,89 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
-let key = localStorage.getItem("key");
+let token = localStorage.getItem("token");
 
 
-$(document).ready(function () {
+document.getElementById("username").innerHTML = uname
+get_details()
 
+document.getElementById("save_form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const data = Object.fromEntries(form.entries());
+    
+    const response = await fetch("/api/updatedata", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-tokens': token
+        },
+        body: JSON.stringify(data)
+    }).then((response) => response.json())
 
-
-    let msgdata = {
-        "subject": "getudetails",
-        "uname": uname,
-        "key": key
+    if(response.status = "success"){
+        document.getElementById("errortext").innerHTML = "saved successfully"
     }
-    $("#username").val(uname)
 
+    const file = document.getElementById("image_upload").files[0]
+    if (file != undefined) {
 
-    $.ajax({
-        type: 'POST',
-        url: "/",
-        data: JSON.stringify(msgdata),
-        contentType: "application/json",
-        dataType: 'json',
-        success: function (err, req, resp) {
-            let res = JSON.parse(resp["responseText"]);
-            let status = res["status"];
-            if (status == "success") {
-                res = res["data"]
-                $("#user_image").attr("src", `/images/${uname}`);
-                $("#fname").val(res["fname"])
-                $("#lname").val(res["lname"])
-                $("#gender").val(res["gender"])
-                $("#mob").val(res["mob"])
-                $("#dob").val(res["dob"])
-                // document.getElementById("age").value = res["age"]
-            }
-        }
-    });
+        var formdata = new FormData()
+        formdata.append("image", file, uname)
+        const response = await fetch("/api/sendimage", {
+            method: 'POST',
+            headers: {
+                'x-access-tokens': token
+            },
+            body: formdata
+        }).then((response) => response.json())
+        
+    
+    }
+})
 
+document.getElementById("homebtn").addEventListener("click", function () {
+    send_form("/", { "subject":"home", "token": token })
+})
 
-    $("#save_form").on("submit", function (e) {
-        e.preventDefault();
-        var data = $("#save_form").serializeJSON();
-        data["subject"] = "udetails";
-        data["uname"] = uname;
-        data["key"] = key;
+document.getElementById("logout").addEventListener("click", function (e) {
+    e.preventDefault()
+    localStorage.clear()
+    send_form("/", { "subject":"logout", "token": token })
+})
 
-
-
-        $.ajax({
-            type: 'POST',
-            url: "/",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            dataType: 'json',
-            success: function (err, req, resp) {
-                let res = JSON.parse(resp["responseText"]);
-                $("#errortext").text("saved successfully")
-
-            }
-        });
-
-
-        const file = document.getElementById("image_upload").files[0]
-        if (file != undefined) {
-
-            var formdata = new FormData()
-            formdata.append("image", file, uname)
-            formdata.append("uname", uname)
-            formdata.append("key", key)
-
-            $.ajax({
-                type: "POST",
-                url: "/sendimage",
-                data: formdata,
-                contentType: false,
-                processData: false,
-            })
-        }
-    })
-
-
-    document.querySelector("#logout").addEventListener("click", function () {
-        localStorage.setItem("uname", "")
-        localStorage.setItem("key", "")
-        send_form("/", { "subject": "logout", "uname": uname, "key": key })
-
-    })
-
-    document.querySelector("#homebtn").addEventListener("click", function () {
-        send_form("/", { "subject": "mainpage", "uname": uname, "key": key })
-
-    })
-
-    // $("#logout").click(function () {
-    //     localStorage.setItem("uname", "")
-    //     localStorage.setItem("key", "")
-    //     send_form("/", { "subject": "logout", "uname": uname, "key": key })
-    // })
-});
 
 
 document.getElementById("image_upload").addEventListener("change", function () {
     const file = document.getElementById("image_upload").files[0]
-    $("#user_image").attr("src", URL.createObjectURL(file));
+    document.getElementById("user_image").setAttribute("src", URL.createObjectURL(file));
 });
 
+
+async function get_details() {
+    const response = await fetch("/api/userdetails", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-tokens': token
+        },
+    }).then((response) => response.json())
+    
+    if (response.status == "success") {
+        res = response.data
+        document.getElementById("user_image").setAttribute("src", `/images/${uname}`);
+        document.getElementById("fname").value = res["fname"]
+        document.getElementById("lname").value = res["lname"]
+        document.getElementById("gender").value = res["gender"]
+        document.getElementById("mob").value = res["mob"]
+        document.getElementById("dob").value = res["dob"]
+        // document.getElementById("age").value = res["age"]
+    }
+    else{
+        window.location.href = "/"
+    }
+}
 
 function send_form(action, params) {
     let form = document.createElement('form');

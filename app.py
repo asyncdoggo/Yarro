@@ -1,286 +1,265 @@
-import os.path
-import random
+import datetime
+import os
 import re
 import uuid
-from datetime import date
+from functools import wraps
 
-import flask
+import jwt
+from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
+from jwt import ExpiredSignatureError, DecodeError
 
-from modules import Database as db, send_mail
+from modules import Database as mysql_db, send_mail
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
-keys = {}
-
-db.initialize("root", "root")
-
+app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.getcwd()}\\Users.db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+mysql_db.initialize("root", "root")
+db = SQLAlchemy(app)
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 
-@app.route("/", methods=["POST", "GET"])
-def root():
-    if flask.request.method == "GET":
-        return flask.render_template("index.html")
-    if flask.request.method == "POST":
+class Users(db.Model):
+    id = db.Column(db.String(50), primary_key=True)
+    username = db.Column(db.String(30))
+
+
+def token_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+
+        token = None
+
+        if 'x-access-tokens' in request.headers:
+            token = request.headers['x-access-tokens']
+
+        if not token:
+            return jsonify({'message': 'a valid token is missing'})
+
         try:
-            data = flask.request.form
-            sub = data["subject"]
-            if sub == "gotoreg2":
-                return flask.render_template("reg2.html")
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = Users.query.filter_by(id=data['id']).first()
+        except ExpiredSignatureError:
+            return jsonify({'status': 'expired'})
+        except DecodeError:
+            return jsonify({"status": "invalid"})
 
-            if sub == "mainpage":
-                username = data["uname"]
-                key = data["key"]
-                if str(keys[username]) == key:
-                    return flask.render_template("main.html")
-                else:
-                    return flask.render_template("index.html", error="unknown error")
+        return f(current_user, *args, **kwargs)
 
-            if sub == "profilepage":
-                username = data["uname"]
-                key = data["key"]
-                if str(keys[username]) == key:
-                    return flask.render_template("userprofile.html")
-                else:
-                    return flask.render_template("index.html", error="unknown error")
+    return decorator
 
-            if sub == "logout":
-                username = data["uname"]
-                key = data["key"]
-                if str(keys[username]) == key:
-                    del keys[username]
-                    return flask.render_template("index.html")
-                else:
-                    return flask.render_template("index.html", error="unknown error")
 
+@app.route("/", methods=["GET", "POST"])
+def main():
+    if request.method == "GET":
+        return render_template("index.html")
+    else:
+        try:
+            jsondata = request.form
+            if jsondata["subject"] == "resetsuccess":
+                return render_template("index.html", error="Reset successful")
+
+            data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
+            user = Users.query.filter_by(id=data['id']).first()
+        except ExpiredSignatureError:
+            return jsonify({'message': 'expired'})
+        except DecodeError:
+            return jsonify({"message": "invalid"})
         except KeyError:
-            pass
+            return jsonify({"message": "notoken"})
 
-        r = flask.request
-        data = flask.request.get_json()
-
-        if data["subject"] == "login":
-            return login(data)
-
-        if data["subject"] == "register":
-            return register(data)
-
-        if data["subject"] == "udetails":
-            return update(data)
-
-        if data["subject"] == "forgotpass":
-            return forgotpass(data)
-
-        if data["subject"] == "getpost":
-            return get_post(data)
-
-        if data["subject"] == "sendpost":
-            return send_post(data)
-
-        if data["subject"] == "updatelc":
-            return updatelc(data)
-
-        if data["subject"] == "logout":
-            return logout(data)
-
-        if data["subject"] == "getudetails":
-            return getdetails(data)
-
-        if data["subject"] == "resetpass":
-            return passwdreset(data)
-        if data["subject"] == "getfullname":
-            return getfullname(data)
+        if jsondata["subject"] == "logout":
+            return render_template("index.html")
+        elif jsondata["subject"] == "regsuccess":
+            return render_template("reg2.html")
+        elif jsondata["subject"] == "home":
+            return render_template("main.html")
 
 
 @app.route("/register")
-def render_reg():
-    return flask.render_template("register.html")
+def register_render():
+    return render_template("register.html")
 
 
-@app.route("/forgotpass")
-def render_forgot_pass():
-    return flask.render_template("forgotpass.html", error="")
+@app.route("/password/reset")
+def reset_render():
+    return render_template("forgotpass.html")
 
 
-@app.route("/reset", methods=["POST", "GET"])
-def resetpass():
-    guid = flask.request.args.get("id")
-    uname = flask.request.args.get("uname")
-    if db.check_reset(guid, uname):
-        return flask.render_template("resetpass.html", uname=uname)
+@app.route("/profile", methods=["POST", "GET"])
+def profile():
+    if request.method == "GET":
+        return render_template("userprofile.html")
 
-    return flask.render_template("forgotpass.html", error="request expired")
-
-
-@app.route("/sendimage", methods=["POST"])
-def sendimage():
-    key = flask.request.form["key"]
-    username = flask.request.form["uname"]
     try:
-        if str(keys[username]) == key:
-            file = flask.request.files["image"]
-            filename = file.filename
-            file.save(os.path.join('static/images/', filename))
-            return {"status": "success"}
-        else:
-            return {"status": "keyerror"}
+        jsondata = request.form
+        data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
+        user = Users.query.filter_by(id=data['id']).first()
+    except ExpiredSignatureError:
+        return jsonify({'message': 'expired'})
+    except DecodeError:
+        return jsonify({"message": "invalid"})
+
+    return render_template("userprofile.html")
+
+
+@app.route("/api/sendimage", methods=["POST"])
+@token_required
+def sendimage(user):
+    try:
+        file = request.files["image"]
+        filename = file.filename
+        file.save(os.path.join('static/images/', filename))
+        return {"status": "success"}
     except KeyError as e:
         print(e)
         return {"status": "failure"}
 
 
-def login(data):
-    username = ''
+@app.route("/api/updatedata", methods=["POST"])
+@token_required
+def updatedata(user):
     try:
-        username = data["uname"]
-        passwd = data["passwd"]
-
-        uname = db.check(username, passwd)
-        if uname:
-            key = random.randint(10000000, 99999999)
-            keys[uname] = key
-
-            resp = {"status": "success", "uname": uname, "key": key}
-            return resp
+        data = request.get_json()
+        fname = data["fname"]
+        lname = data["lname"]
+        gender = data["gender"]
+        mob = data["mob"]
+        dob = data["dob"]
+        if not dob:
+            dob = "0000-00-00"
+            age = 0
         else:
-            return {"status": "badpasswd"}
+            age = get_y(dob)
 
-    except KeyError:
-        key = data["key"]
-        try:
-            if str(keys[username]) == key:
-                key = random.randint(10000000, 99999999)
-                keys[username] = key
-                return {"status": "success", "key": key, "uname": username}
-            else:
-                return {"status": "none"}
-        except KeyError:
-            return {"status": "bad request"}
+        if not mob:
+            mob = 0
+        res = mysql_db.retrieve_users()
+        u = mysql_db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[user.username])
+        if u == mob:
+            return {"status": "mob"}
+        elif u:
+            return {"status": "success"}
+        else:
+            return {"status": "failure"}
 
-
-def logout(data):
-    uname = data["uname"]
-    key = data["key"]
-    if str(keys[uname]) == key:
-        del keys[uname]
-        return {"status": "success"}
-    else:
-        return {"status": "error"}
+    except Exception as e:
+        print(repr(e))
+        return {"status": "failure"}
 
 
-def get_post(data):
+@app.route("/api/userdetails", methods=["POST"])
+@token_required
+def userdetails(user):
     try:
-        uname = data["uname"]
-        key = data["key"]
-        selfOnly = data["self"]
-        u = db.retrieve_users()
-        if key == str(keys[uname]):
-            res = db.retrieve_posts(u[uname], selfOnly)
-            return {"status": "success", "data": res}
-        else:
-            return {"status": "logout"}
-    except KeyError as e:
-        print(e)
-        return {"status": "logout"}
+        ret = mysql_db.getuserdetials(user.username)
+        return {"status": "success", "data": ret}
+    except Exception as e:
+        print(repr(e))
+        return jsonify({"subject": "failure"})
 
 
 @app.route("/images/<path:path>")
 def get_image(path):
     if not os.path.exists(f"static/images/{path}"):
         path = "default"
-    return flask.send_from_directory("static/images", path)
+    return send_from_directory("static/images", path)
 
 
-def register(data):
+@app.route("/api/like", methods=["GET", "POST"])
+@token_required
+def update_lc(user):
+    try:
+        data = request.get_json()
+        pid = data["pid"]
+        usr = mysql_db.retrieve_users()
+        res = mysql_db.update_post(pid=pid, uid=usr[user.username])
+        return {"status": "success" if res else "failure"}
+    except Exception as e:
+        print(repr(e))
+        return jsonify({"status": "success"})
+
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = data["email"]
     username = data["uname"]
     password = data["passwd1"]
-    email = data["email"]
 
     if not re.search(regex, email):
-        return {"status": "Invalid Email"}
+        return jsonify({"status": "Invalid Email"})
 
     if (30 > len(username) < 5 or " " in username) or (30 > len(password) < 5 or " " in password):
         return {"status": "username and password should be between 5 to 30 characters without spaces"}
 
-    res1 = db.retrieve_users()
-    res = res1.keys()
-
-    if username in res:
-        return {"status": "alreadyuser"}
     uid = uuid.uuid4().hex
-    if db.insert_user(uid=uid, uname=username, passwd=password, email=email):
-        data = login({"uname": username, "passwd": password})
-        key = data["key"]
-        return {"status": "success", "uname": username, "key": key}
+    if mysql_db.insert_user(uid=uid, uname=username, passwd=password, email=email):
+        new_user = Users(id=uid, username=username)
+        db.session.add(new_user)
+        db.session.commit()
+        token = jwt.encode(
+            {'id': new_user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+            app.config['SECRET_KEY'], "HS256")
+        return jsonify({'token': token, 'status': 'success'})
     else:
-        return {"status": "alreadyemail"}
+        return jsonify({'status': 'username already exists'})
 
 
-def updatelc(data):
-    uname = data["uname"]
-    key = data["key"]
-    pid = data["pid"]
+@app.route('/api/login', methods=['POST'])
+def login_user():
+    auth = request.authorization
+    if not auth or not auth.username or not auth.password:
+        return jsonify({"status": "failure"})
+
     try:
-        if key == str(keys[uname]):
-            usr = db.retrieve_users()
-            res = db.update_post(pid=pid, uid=usr[uname])
-            return {"status": "success" if res else "failure"}
-        else:
-            return {"status": "logout"}
+        user = Users.query.filter_by(username=auth.username).first()
+
+        if mysql_db.check(auth.username, auth.password):
+            token = jwt.encode(
+                {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+                app.config['SECRET_KEY'], "HS256")
+            return jsonify({'token': token, "status": "success", "uname": user.username})
+
+        return jsonify({"status": "failure"})
     except:
-        return {"status": "logout"}
+        return jsonify({"status": "failure"})
 
 
-def send_post(data):
-    key = data["key"]
-    uname = data["uname"]
-    try:
-        if key == str(keys[uname]):
-            users = db.retrieve_users()
-            uid = users[uname]
-            res = db.insert_posts(u_id=uid, cont=data["content"])
-            return {"status": "success"} if res else {"status": "failure"}
-        else:
-            return {"status": "logout"}
-    except Exception as e:
-        print(e)
-        return {"status": "logout"}
+@app.route("/api/reset", methods=["POST", "GET"])
+def passwdreset():
+    data = request.get_json()
+    username = data["uname"]
+    pass1 = data["pass1"]
+    guid = data["id"]
+    if mysql_db.resetpasswd(username, pass1, guid):
+        return {"status": "success"}
+    else:
+        return {"status": "Unknown Error"}
 
 
-def getfullname(data):
-    uname = data["uname"]
-    try:
-        if data["key"] == str(keys[uname]):
-            ret = db.getfullname(uname)
-            return {"status": "success", "name": ret}
-        else:
-            return {"status": "logout"}
-    except Exception as e:
-        print(e)
-        return {"status": "logout"}
+@app.route("/reset", methods=["POST", "GET"])
+def reset():
+    guid = request.args.get("id")
+    uname = request.args.get("uname")
+    if mysql_db.check_reset(guid, uname):
+        return render_template("resetpass.html", uname=uname)
+    return render_template("forgotpass.html", error="request expired")
 
 
-def getdetails(data):
-    uname = data["uname"]
-    try:
-        if data["key"] == str(keys[uname]):
-            ret = db.getuserdetials(uname)
-            return {"status": "success", "data": ret}
-        else:
-            return {"status": "logout"}
-    except:
-        return {"status": "logout"}
-
-
-def forgotpass(data):
+@app.route("/api/resetrequest", methods=['POST'])
+def resetrequest():
+    data = request.get_json()
     email = data["email"]
-    uname = db.getemail(email)
+    uname = mysql_db.getemail(email)
     if uname:
         guid = uuid.uuid4().hex
-        url = flask.url_for("resetpass", id=guid, uname=uname, _external=True)
+        url = url_for("reset", id=guid, uname=uname, _external=True)
 
         if send_mail.send_mail(email, uname, url):
-            db.insert_reset_request(uname, guid)
+            mysql_db.insert_reset_request(uname, guid)
             return {"status": "success"}
         else:
             return {"status": "noconfig"}
@@ -288,51 +267,69 @@ def forgotpass(data):
         return {"status": "noemail"}
 
 
-def update(data):
+@app.route("/api/newpost", methods=['POST'])
+@token_required
+def new_post(user):
+    data = request.get_json()
     try:
-        uname = data["uname"]
-        if data["key"] == str(keys[uname]):
-            fname = data["fname"]
-            lname = data["lname"]
-            gender = data["gender"]
-            mob = data["mob"]
-            dob = data["dob"]
+        users = mysql_db.retrieve_users()
+        uid = users[user.username]
+        res = mysql_db.insert_posts(u_id=uid, cont=data["content"])
+        return {"status": "success"} if res else {"status": "failure"}
+    except Exception as e:
+        print(e)
+        return {"status": "logout"}
 
-            if not dob:
-                dob = "0000-00-00"
-                age = 0
-            else:
-                age = get_y(dob)
 
-            if not mob:
-                mob = 0
+@app.route("/api/posts", methods=['POST'])
+@token_required
+def get_posts(user):
+    data = request.get_json()
+    try:
+        selfOnly = data["self"]
+        ids = mysql_db.retrieve_users()
+        res = mysql_db.retrieve_posts(ids[user.username], selfOnly)
+        return {"status": "success", "data": res}
+    except KeyError as e:
+        print(repr(e))
+        return {"status": "logout"}
 
-            res = db.retrieve_users()
-            u = db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[uname])
-            if u == mob:
-                return {"status": "mob"}
-            elif u:
-                return {"status": "success"}
-            else:
-                return {"status": "failure"}
+
+@app.route('/api/user_details', methods=["POST"])
+@token_required
+def update_details(user):
+    try:
+        data = request.get_json()
+        fname = data["fname"]
+        lname = data["lname"]
+        gender = data["gender"]
+        mob = data["mob"]
+        dob = data["dob"]
+
+        if not dob:
+            dob = "0000-00-00"
+            age = 0
         else:
-            return {"status": "logout"}
+            age = get_y(dob)
+
+        if not mob:
+            mob = 0
+
+        res = mysql_db.retrieve_users()
+        u = mysql_db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[user])
+        if u == mob:
+            return {"status": "mob"}
+        elif u:
+            return {"status": "success"}
+        else:
+            return {"status": "failure"}
     except KeyError as e:
         return {"status": "logout"}
 
 
-def passwdreset(data):
-    username = data["uname"]
-    pass1 = data["pass1"]
-    if db.resetpasswd(username, pass1):
-        return {"status": "success"}
-    else:
-        return {"status": "Unknown Error"}
-
-
 def get_y(dob: str) -> int:
     _y, _m, _d = dob[:4], dob[5:7], dob[8:]
-    cur = str(date.today())
+    cur = str(datetime.date.today())
     c_y, c_m, c_d = cur[:4], cur[5:7], cur[8:]
     dif_y, dif_m, dif_d = int(c_y) - int(_y), int(c_m) - int(_m), int(c_d) - int(_d)
     if dif_m < 0:
@@ -342,6 +339,5 @@ def get_y(dob: str) -> int:
     return dif_y
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5005, debug=True,
-            use_reloader=False)#, ssl_context=("certificate.crt", "privateKey.key"))  # ,ssl_context='adhoc'
+if __name__ == '__main__':
+    app.run("0.0.0.0", 5005, debug=True)

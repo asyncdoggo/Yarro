@@ -1,59 +1,41 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
-let uname = localStorage.getItem("uname");
-let key = localStorage.getItem("key");
+let token = localStorage.getItem("token")
+let uname = localStorage.getItem("uname")
+ document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
+
+document.getElementById("postbtn").addEventListener("click", async function () {
+
+    let cont = document.getElementById("postcont").value
 
 
-$(document).ready(
-    function () {
+    const response = await fetch("/api/newpost", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-tokens': token
+        },
+        body: JSON.stringify({ "content": cont })
+    }).then((response) => response.json())
 
-        $("#u_image").attr("src", `/images/${uname}`);
+    if ((response.status) == "success") {
+        document.getElementById("postcont").value = ""
+        get_msg()
+    }
 
+});
 
-        $("#postbtn").click(function () {
+document.getElementById("profile").addEventListener("click", function () {
+    send_form("/profile", { "uname": uname, "token": token })
+})
 
-            let cont = document.getElementById("postcont").value
+document.getElementById("logout").addEventListener("click", function () {
+    localStorage.clear()
+    send_form("/", { "subject":"logout","uname": uname, "token": token })
+})
 
-            let msgdata = {
-                "subject": "sendpost",
-                "uname": uname,
-                "key": key,
-                "content": cont
-            }
+get_msg();
 
-            $.ajax({
-                type: 'POST',
-                url: "/",
-                data: JSON.stringify(msgdata),
-                contentType: "application/json",
-                dataType: 'json',
-                success: function (err, req, resp) {
-                    let res = JSON.parse(resp["responseText"]);
-                    let status = res["status"];
-                    if (status == "success") {
-                        document.getElementById("postcont").value = ""
-                    }
-                }
-            });
-        });
-
-        $("#profile").click(function () {
-            send_form("/", { "subject": "profilepage", "uname": uname, "key": key })
-        })
-
-        $("#logout").click(function () {
-            localStorage.setItem("uname", "")
-            localStorage.setItem("key", "")
-            send_form("/", { "subject": "logout", "uname": uname, "key": key })
-        })
-
-        document.querySelector("#homebtn").addEventListener("click", function () {
-            send_form("/", { "subject": "mainpage", "uname": uname, "key": key })
-
-        })
-
-        get_msg();
-
-    })
 
 let pid;
 let uid;
@@ -64,48 +46,42 @@ let date;
 
 async function get_msg() {
 
-        let msgdata = {
-            "subject": "getpost",
-            "uname": uname,
-            "key": key,
-            "self":"false"
-        }
+    const response = await fetch("/api/posts", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-tokens': token
+        },
+        body: JSON.stringify({ "self": "false" })
+    }).then((response) => response.json())
 
-        $.ajax({
-            type: 'POST',
-            url: "/",
-            data: JSON.stringify(msgdata),
-            contentType: "application/json",
-            dataType: 'json',
-            success: function (err, req, resp) {
-                let res = JSON.parse(resp["responseText"]);
+    if (response.status == "success") {
+        let data = response.data
+        document.getElementById("post_section").innerHTML = "";
+        for (i in Object.keys(data)) {
+            var post = data[Object.keys(data)[i]]
+            pid = Object.keys(data)[i];
+            uid = post["uid"];
+            content = post["content"];
+            lc = post["lc"];
+            islike = post["islike"];
+            user = post["uname"];
+            date = post["datetime"]
+            var d = new Date(`${date} UTC`)
+            d = d.toLocaleString("en-us");
 
-                if (res["status"] == "success") {
-                    let data = res["data"];
-                    document.getElementById("post_section").innerHTML = "";
-                    for (i in Object.keys(data)) {
-                        var post = data[Object.keys(data)[i]]
-                        pid = Object.keys(data)[i];
-                        uid = post["uid"];
-                        content = post["content"];
-                        lc = post["lc"];
-                        islike = post["islike"];
-                        user = post["uname"];
-                        date = post["datetime"]
-                        var d = new Date(`${date} UTC`)
-                        d = d.toLocaleString("en-us");
-
-                        var like;
-                        if (islike) {
-                            like = `<span class="material-icons">thumb_up</span>`
-                        }
-                        else {
-                            like = `<span class="material-icons">
+            var like;
+            if (islike) {
+                like = `<span class="material-icons">thumb_up</span>`
+            }
+            else {
+                like = `<span class="material-icons">
                             thumb_up_off_alt
                             </span>`
-                        }
+            }
 
-                        post = `<div class="post" id="${pid}">
+            post = `<div class="post" id="${pid}">
                     <table class="main-table">
                         <tr>
                             <td class="profile_cell">
@@ -130,12 +106,10 @@ async function get_msg() {
                 </div>
                 <hr>`;
 
-                        document.getElementById("post_section").innerHTML += post;
+            document.getElementById("post_section").innerHTML += post;
 
-                    }
-                }
-            }
-        });
+        }
+    }
 }
 
 
@@ -160,26 +134,33 @@ function send_form(action, params) {
 }
 
 
-function onButtonClick(btn) {
+async function onButtonClick(btn) {
     let pid = btn.id
 
-    let msgdata = {
-        "subject": "updatelc",
-        "key": key,
-        "uname": uname,
-        "pid": pid
-    }
+    const response = await fetch("/api/like", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-tokens': token
+        },
+        body: JSON.stringify({ "pid": pid })
+    }).then((response) => response.json())
 
-    $.ajax({
-        type: 'POST',
-        url: "/",
-        data: JSON.stringify(msgdata),
-        contentType: "application/json",
-        dataType: 'json',
-        success: function (err, req, resp) {
-            let res = JSON.parse(resp["responseText"]);
-            let status = res["status"]
+    if(response.status == "success"){
+        let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
+        let lc = document.getElementById(pid).getElementsByTagName(`p`)[2]
+        if(like.innerHTML.trim() == "thumb_up_off_alt"){
+            like.innerHTML = "thumb_up"
+            let temp = parseInt(lc.innerHTML)
+            lc.innerHTML = ""
+            lc.innerHTML = temp + 1
         }
-    });
-    $
+        else{
+            like.innerHTML = "thumb_up_off_alt"
+            let temp = parseInt(lc.innerHTML)
+            lc.innerHTML = ""
+            lc.innerHTML = temp - 1
+        }
+    }
 }

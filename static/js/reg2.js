@@ -1,38 +1,30 @@
-$(document).ready(function () {
 
-    let uname = localStorage.getItem("uname")
-    let key = localStorage.getItem("key")
+let token = localStorage.getItem("token")
 
 
-    $('#reg2_form').on('submit', function (e) {
-        e.preventDefault();
-        var senddata = $("#reg2_form").serializeJSON();
+document.getElementById('reg2_form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const senddata = Object.fromEntries(form.entries());
 
-        senddata["subject"] = "udetails";
-        senddata["key"] = localStorage.getItem("key")
-        senddata["uname"] = localStorage.getItem("uname")
 
-        $.ajax({
-            type: 'POST',
-            url: "/",
-            data: JSON.stringify(senddata),
-            contentType: "application/json",
-            dataType: 'json',
-            success: function (err, req, resp) {
-                msg = JSON.parse(resp["responseText"]);
-                if (msg["status"] == "success") {
-                    console.log(msg)
-                    send_form("/", { "subject": "mainpage", "uname": uname, "key": key})
-                }
-                else if (msg["status"] == "badkey") {
-                    // send_form("/",{"subject":"keyerror"})
-                }
-                else {
-                    $("#error").text(msg["status"]);
-                }
-            }
-        });
-    });
+    const response = await fetch("/api/updatedata", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-tokens': token
+
+        },
+        body: JSON.stringify(senddata)
+    }).then((response) => response.json())
+
+
+    console.log(response)
+
+    if (response.status == "success") {
+        send_form("/", { "subject": "home","token":token })
+    }
 });
 
 function send_form(action, params) {

@@ -3,27 +3,23 @@ import os
 import re
 import uuid
 from functools import wraps
-
 import jwt
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
-from flask_sqlalchemy import SQLAlchemy
 from jwt import ExpiredSignatureError, DecodeError
+from modules import send_mail
 
-from modules import Database as mysql_db, send_mail
+import modules.Database as Data
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.getcwd()}\\Users.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.getcwd()}\\Data.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-mysql_db.initialize("root", "root")
-db = SQLAlchemy(app)
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-
-class Users(db.Model):
-    id = db.Column(db.String(50), primary_key=True)
-    username = db.Column(db.String(30))
+with app.app_context():
+    Data.db.init_app(app)
+    Data.db.create_all()
 
 
 def token_required(f):
@@ -40,7 +36,7 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Users.query.filter_by(id=data['id']).first()
+            current_user = Data.User.query.filter_by(id=data['id']).first()
         except ExpiredSignatureError:
             return jsonify({'status': 'expired'})
         except DecodeError:
@@ -60,11 +56,13 @@ def main():
             jsondata = request.form
             if jsondata["subject"] == "resetsuccess":
                 return render_template("index.html", error="Reset successful")
+            elif jsondata["subject"] == "expired":
+                return render_template("forgotpass.html", error="Request expired")
 
             data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
-            user = Users.query.filter_by(id=data['id']).first()
+            user = Data.User.query.filter_by(id=data['id']).first()
         except ExpiredSignatureError:
-            return jsonify({'message': 'expired'})
+            return jsonify({'message': 'token_expired'})
         except DecodeError:
             return jsonify({"message": "invalid"})
         except KeyError:
@@ -96,7 +94,7 @@ def profile():
     try:
         jsondata = request.form
         data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
-        user = Users.query.filter_by(id=data['id']).first()
+        user = Data.User.query.filter_by(id=data['id']).first()
     except ExpiredSignatureError:
         return jsonify({'message': 'expired'})
     except DecodeError:
@@ -120,7 +118,7 @@ def sendimage(user):
 
 @app.route("/api/updatedata", methods=["POST"])
 @token_required
-def updatedata(user):
+def update_details(user):
     try:
         data = request.get_json()
         fname = data["fname"]
@@ -128,6 +126,7 @@ def updatedata(user):
         gender = data["gender"]
         mob = data["mob"]
         dob = data["dob"]
+
         if not dob:
             dob = "0000-00-00"
             age = 0
@@ -136,25 +135,24 @@ def updatedata(user):
 
         if not mob:
             mob = 0
-        res = mysql_db.retrieve_users()
-        u = mysql_db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[user.username])
+
+        u = Data.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob,
+                        dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id)
         if u == mob:
             return {"status": "mob"}
         elif u:
             return {"status": "success"}
         else:
             return {"status": "failure"}
-
-    except Exception as e:
-        print(repr(e))
-        return {"status": "failure"}
+    except KeyError as e:
+        return {"status": "logout"}
 
 
 @app.route("/api/userdetails", methods=["POST"])
 @token_required
 def userdetails(user):
     try:
-        ret = mysql_db.getuserdetials(user.username)
+        ret = Data.getuserdetials(user.id)
         return {"status": "success", "data": ret}
     except Exception as e:
         print(repr(e))
@@ -174,8 +172,7 @@ def update_lc(user):
     try:
         data = request.get_json()
         pid = data["pid"]
-        usr = mysql_db.retrieve_users()
-        res = mysql_db.update_post(pid=pid, uid=usr[user.username])
+        res = Data.update_like(pid=pid, uid=user.id)
         return {"status": "success" if res else "failure"}
     except Exception as e:
         print(repr(e))
@@ -196,10 +193,8 @@ def register():
         return {"status": "username and password should be between 5 to 30 characters without spaces"}
 
     uid = uuid.uuid4().hex
-    if mysql_db.insert_user(uid=uid, uname=username, passwd=password, email=email):
-        new_user = Users(id=uid, username=username)
-        db.session.add(new_user)
-        db.session.commit()
+    if Data.insert_user(uid=uid, uname=username, passwd=password, email=email):
+        new_user = Data.get_user(username=username)
         token = jwt.encode(
             {'id': new_user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
             app.config['SECRET_KEY'], "HS256")
@@ -215,9 +210,9 @@ def login_user():
         return jsonify({"status": "failure"})
 
     try:
-        user = Users.query.filter_by(username=auth.username).first()
+        user = Data.get_user(username=auth.username)
 
-        if mysql_db.check(auth.username, auth.password):
+        if Data.check_login(auth.username, auth.password):
             token = jwt.encode(
                 {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
                 app.config['SECRET_KEY'], "HS256")
@@ -231,21 +226,22 @@ def login_user():
 @app.route("/api/reset", methods=["POST", "GET"])
 def passwdreset():
     data = request.get_json()
-    username = data["uname"]
+    uid = data["uid"]
     pass1 = data["pass1"]
     guid = data["id"]
-    if mysql_db.resetpasswd(username, pass1, guid):
+    if Data.resetpasswd(uid, pass1, guid):
         return {"status": "success"}
     else:
-        return {"status": "Unknown Error"}
+        return {"status": "expired"}
 
 
 @app.route("/reset", methods=["POST", "GET"])
 def reset():
     guid = request.args.get("id")
-    uname = request.args.get("uname")
-    if mysql_db.check_reset(guid, uname):
-        return render_template("resetpass.html", uname=uname)
+    uid = request.args.get("uid")
+    if Data.check_reset(guid, uid):
+        user = Data.get_user(uid=uid)
+        return render_template("resetpass.html", uname=user.username)
     return render_template("forgotpass.html", error="request expired")
 
 
@@ -253,13 +249,13 @@ def reset():
 def resetrequest():
     data = request.get_json()
     email = data["email"]
-    uname = mysql_db.getemail(email)
-    if uname:
+    user = Data.getemail(email)
+    if user:
         guid = uuid.uuid4().hex
-        url = url_for("reset", id=guid, uname=uname, _external=True)
+        url = url_for("reset", id=guid, uid=user.id, _external=True)
 
-        if send_mail.send_mail(email, uname, url):
-            mysql_db.insert_reset_request(uname, guid)
+        if send_mail.send_mail(email, user.username, url):
+            Data.insert_reset_request(user.id, guid)
             return {"status": "success"}
         else:
             return {"status": "noconfig"}
@@ -272,9 +268,7 @@ def resetrequest():
 def new_post(user):
     data = request.get_json()
     try:
-        users = mysql_db.retrieve_users()
-        uid = users[user.username]
-        res = mysql_db.insert_posts(u_id=uid, cont=data["content"])
+        res = Data.insert_posts(uid=user.id, cont=data["content"])
         return {"status": "success"} if res else {"status": "failure"}
     except Exception as e:
         print(e)
@@ -287,43 +281,10 @@ def get_posts(user):
     data = request.get_json()
     try:
         selfOnly = data["self"]
-        ids = mysql_db.retrieve_users()
-        res = mysql_db.retrieve_posts(ids[user.username], selfOnly)
+        res = Data.get_posts(user.id, selfOnly)
         return {"status": "success", "data": res}
     except KeyError as e:
         print(repr(e))
-        return {"status": "logout"}
-
-
-@app.route('/api/user_details', methods=["POST"])
-@token_required
-def update_details(user):
-    try:
-        data = request.get_json()
-        fname = data["fname"]
-        lname = data["lname"]
-        gender = data["gender"]
-        mob = data["mob"]
-        dob = data["dob"]
-
-        if not dob:
-            dob = "0000-00-00"
-            age = 0
-        else:
-            age = get_y(dob)
-
-        if not mob:
-            mob = 0
-
-        res = mysql_db.retrieve_users()
-        u = mysql_db.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob, dob=dob, uid=res[user])
-        if u == mob:
-            return {"status": "mob"}
-        elif u:
-            return {"status": "success"}
-        else:
-            return {"status": "failure"}
-    except KeyError as e:
         return {"status": "logout"}
 
 

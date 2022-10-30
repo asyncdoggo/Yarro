@@ -8,6 +8,7 @@ document.getElementById("resetButton").addEventListener("click", async function 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const id = urlParams.get('id')
+    const uid = urlParams.get('uid')
 
 
     if (newpass1 == newpass2) {
@@ -18,11 +19,14 @@ document.getElementById("resetButton").addEventListener("click", async function 
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ "uname": uname, "id": id, "pass1": newpass1 })
+            body: JSON.stringify({ "uid": uid, "id": id, "pass1": newpass1 })
         }).then((response) => response.json())
 
         if (response.status == "success") {
             send_form("/", { "subject": "resetsuccess" })
+        }
+        else{
+            send_form("/", {"subject": "expired"})
         }
     }
     else {

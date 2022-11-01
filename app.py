@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import re
 import uuid
@@ -11,7 +12,6 @@ from modules import send_mail
 import modules.Database as Data
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.getcwd()}\\Data.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
@@ -86,6 +86,17 @@ def reset_render():
     return render_template("forgotpass.html")
 
 
+@app.route("/api/fullname", methods=["POST"])
+@token_required
+def fullname(user):
+    try:
+        name = Data.get_fullname(user.username)
+        return {"status": "success", "name": name}
+    except Exception as e:
+        print(repr(e))
+        return {"status": "failure"}
+
+
 @app.route("/profile", methods=["POST", "GET"])
 def profile():
     if request.method == "GET":
@@ -136,6 +147,7 @@ def update_details(user):
         if not mob:
             mob = 0
 
+        print(dob)
         u = Data.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob,
                         dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id)
         if u == mob:
@@ -166,7 +178,7 @@ def get_image(path):
     return send_from_directory("static/images", path)
 
 
-@app.route("/api/like", methods=["GET", "POST"])
+@app.route("/api/like", methods=["POST"])
 @token_required
 def update_lc(user):
     try:
@@ -181,26 +193,30 @@ def update_lc(user):
 
 @app.route('/api/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    email = data["email"]
-    username = data["uname"]
-    password = data["passwd1"]
+    try:
+        data = request.get_json()
+        email = data["email"]
+        username = data["uname"]
+        password = data["passwd1"]
 
-    if not re.search(regex, email):
-        return jsonify({"status": "Invalid Email"})
+        if not re.search(regex, email):
+            return jsonify({"status": "Invalid Email"})
 
-    if (30 > len(username) < 5 or " " in username) or (30 > len(password) < 5 or " " in password):
-        return {"status": "username and password should be between 5 to 30 characters without spaces"}
+        if (30 > len(username) < 5 or " " in username) or (30 > len(password) < 5 or " " in password):
+            return {"status": "username and password should be between 5 to 30 characters without spaces"}
 
-    uid = uuid.uuid4().hex
-    if Data.insert_user(uid=uid, uname=username, passwd=password, email=email):
-        new_user = Data.get_user(username=username)
-        token = jwt.encode(
-            {'id': new_user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
-            app.config['SECRET_KEY'], "HS256")
-        return jsonify({'token': token, 'status': 'success'})
-    else:
-        return jsonify({'status': 'username already exists'})
+        uid = uuid.uuid4().hex
+        if Data.insert_user(uid=uid, uname=username, passwd=password, email=email):
+            new_user = Data.get_user(username=username)
+            token = jwt.encode(
+                {'id': new_user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+                app.config['SECRET_KEY'], "HS256")
+            return jsonify({'token': token, 'status': 'success', "uname": new_user.username})
+        else:
+            return jsonify({'status': 'userexists'})
+    except Exception as e:
+        print(repr(e))
+        return jsonify({"status": "error"})
 
 
 @app.route('/api/login', methods=['POST'])

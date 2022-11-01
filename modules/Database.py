@@ -64,9 +64,18 @@ def update(fname, lname, age, gender, mob, dob, uid):
     return True
 
 
+def get_fullname(username):
+    user = User.query.filter_by(username=username).one()
+    details: Details = Details.query.filter_by(user_id=user.id).one()
+    fullname = details.first_name + " "+ details.last_name
+    return fullname
+
+
+
+
 def getuserdetials(id):
     details = Details.query.filter_by(user_id=id).one()
-    return {"fname": details.first_name, "lname": details.last_name, "age": details.last_name, "gender": details.gender,
+    return {"fname": details.first_name, "lname": details.last_name, "age": details.age, "gender": details.gender,
             "mob": details.mob, "dob": str(details.dob)}
 
 
@@ -200,7 +209,8 @@ def get_posts(uid, selfOnly):
 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
     p = {}
+
     for i, j in result:
-        p[i.post_id] = {"uid": j.id, "content": i.content, "lc": i.l_count, "datetime": str(i.tstamp),
+        p[i.post_id] = {"post_id":i.post_id, "uid": j.id, "content": i.content, "lc": i.l_count, "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
                         "uname": j.username, "islike": 1 if (j.id, i.post_id) in likes else 0}
     return p

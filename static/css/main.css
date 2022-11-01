@@ -5,7 +5,6 @@
 }
 
 
-
 /*<----------------------------------------navbar start---------------------------------------------------->*/
 
 nav {
@@ -40,11 +39,11 @@ nav span {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 1rem 1.2rem;  
+  margin: 1rem 1.2rem;
 }
 
-.navbar-tabs ul li a{
-  background: #ffffff ;
+.navbar-tabs ul li a {
+  background: #ffffff;
   color: #04AA6D;
 }
 
@@ -137,6 +136,7 @@ nav span {
   border: 1px solid;
   /* border-style:none solid; */
   padding: 1vmax;
+  border-radius: 10px;
 }
 
 .create_post_section {
@@ -145,6 +145,7 @@ nav span {
   background: #F5F5F5;
   padding: 1%;
   margin: 2% 0;
+  box-shadow: 1px 1px 1px rgba(109, 109, 109, 0.3);
 }
 
 .user_profile {

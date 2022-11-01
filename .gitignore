@@ -8,8 +8,7 @@ certificate.crt
 privateKey.key
 access.log
 error.log
-bitter.db
 index
 temp
-Users.db
 instance
+Data.db

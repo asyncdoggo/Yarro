@@ -1,7 +1,7 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let token = localStorage.getItem("token")
 let uname = localStorage.getItem("uname")
- document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
+document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
 
 document.getElementById("postbtn").addEventListener("click", async function () {
 
@@ -31,7 +31,7 @@ document.getElementById("profile").addEventListener("click", function () {
 
 document.getElementById("logout").addEventListener("click", function () {
     localStorage.clear()
-    send_form("/", { "subject":"logout","uname": uname, "token": token })
+    send_form("/", { "subject": "logout", "uname": uname, "token": token })
 })
 
 get_msg();
@@ -73,38 +73,38 @@ async function get_msg() {
 
             var like;
             if (islike) {
-                like = `<span class="material-icons">thumb_up</span>`
+                like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">thumb_up</span>`
             }
             else {
-                like = `<span class="material-icons">
+                like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">
                             thumb_up_off_alt
                             </span>`
             }
 
-            post = `<div class="post" id="${pid}">
-                    <table class="main-table">
-                        <tr>
-                            <td class="profile_cell">
-                                <div class="user_profile">
-                                    <img src="/images/${user}" class="profile_img">
-                                </div>
-                            </td>
-                            <td>
-                                <table class="sub-table">
-                                    <tr><p id="uname">${user}</p></tr>
-                                    <tr><p id="content">${content}</p></tr>
-                                    <tr>
-                                        <div class="like_comment_buttons">
-                                            <button id="${pid}" onClick=onButtonClick(this)>${like}</button>
-                                            <p id="like_count">${lc}</p> &emsp;&emsp; <p>${d}</p>
-                                        </div>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <hr>`;
+            post = ` <div class="post" id="${pid}">
+                    <div class="post-profile">
+                        <img src="/images/${user}" class="profile_img">
+                    </div>
+                    <div class="post-content">
+                        <div class="post-username" id="uname">
+                            ${user}
+                        </div>
+
+                        <div class="post-message" id="content">
+                            ${content}
+                        </div>
+
+                        <div class="post-info">
+                            <div class="post-like">
+                                <button id="${pid}" class="post-like-button" onClick=onButtonClick(this)>${like}</button>
+                                <p id="like_count">${lc}</p>
+                            </div>
+                            <div class="post-time">
+                                ${d}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
 
             document.getElementById("post_section").innerHTML += post;
 
@@ -147,16 +147,16 @@ async function onButtonClick(btn) {
         body: JSON.stringify({ "pid": pid })
     }).then((response) => response.json())
 
-    if(response.status == "success"){
+    if (response.status == "success") {
         let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
-        let lc = document.getElementById(pid).getElementsByTagName(`p`)[2]
-        if(like.innerHTML.trim() == "thumb_up_off_alt"){
+        let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
+        if (like.innerHTML.trim() == "thumb_up_off_alt") {
             like.innerHTML = "thumb_up"
             let temp = parseInt(lc.innerHTML)
             lc.innerHTML = ""
             lc.innerHTML = temp + 1
         }
-        else{
+        else {
             like.innerHTML = "thumb_up_off_alt"
             let temp = parseInt(lc.innerHTML)
             lc.innerHTML = ""

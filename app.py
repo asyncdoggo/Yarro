@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import re
 import uuid
@@ -16,6 +15,8 @@ app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.getcwd()}\\Data.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+active_tokens = []
 
 with app.app_context():
     Data.db.init_app(app)
@@ -147,7 +148,6 @@ def update_details(user):
         if not mob:
             mob = 0
 
-        print(dob)
         u = Data.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob,
                         dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id)
         if u == mob:
@@ -230,9 +230,15 @@ def login_user():
 
         if Data.check_login(auth.username, auth.password):
             token = jwt.encode(
-                {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+                {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
                 app.config['SECRET_KEY'], "HS256")
             return jsonify({'token': token, "status": "success", "uname": user.username})
+
+            if token in active_tokens:
+                return {"status": "tokenexists"}
+            else:
+                active_tokens.append(token)
+                return jsonify({'token': token, "status": "success", "uname": user.username})
 
         return jsonify({"status": "failure"})
     except:
@@ -279,6 +285,20 @@ def resetrequest():
         return {"status": "noemail"}
 
 
+@app.route("/api/checklogin", methods=["POST"])
+def check_login():
+    try:
+        data = request.get_json()
+        if data["token"] in active_tokens:
+            return {"status": "success"}
+        else:
+            return {"status": "false"}
+
+    except Exception as e:
+        print(repr(e))
+        return {"status": "failure"}
+
+
 @app.route("/api/newpost", methods=['POST'])
 @token_required
 def new_post(user):
@@ -302,6 +322,18 @@ def get_posts(user):
     except KeyError as e:
         print(repr(e))
         return {"status": "logout"}
+
+
+@app.route("/api/logout", methods=['POST'])
+def logout():
+    try:
+        data = request.get_json()
+        active_tokens.remove(data["token"])
+        return {"status": "success"}
+
+    except Exception as e:
+        print(repr(e))
+        return {"status": "failure"}
 
 
 def get_y(dob: str) -> int:

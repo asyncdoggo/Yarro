@@ -12,7 +12,7 @@ nav {
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  border: 2px solid;
+  border-bottom: 2px solid;
   /* background: tomato; */
   max-width: 100%;
   min-height: 8vh;

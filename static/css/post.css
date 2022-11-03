@@ -7,6 +7,7 @@
     background-color: rgba(216, 216, 216, 0.16);
     border-radius: 10px;
     box-shadow: 1px 1px 1px rgba(109, 109, 109, 0.3);
+    width: 100%;
 }
 
 .post-profile {

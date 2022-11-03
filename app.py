@@ -98,20 +98,21 @@ def fullname(user):
         return {"status": "failure"}
 
 
-@app.route("/profile", methods=["POST", "GET"])
-def profile():
-    if request.method == "GET":
-        return render_template("userprofile.html")
-
+@app.route("/editprofile", methods=["POST"])
+def edit_profile():
     try:
         jsondata = request.form
         data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
         user = Data.User.query.filter_by(id=data['id']).first()
+        return render_template("editprofile.html")
     except ExpiredSignatureError:
         return jsonify({'message': 'expired'})
     except DecodeError:
         return jsonify({"message": "invalid"})
 
+
+@app.route("/profile", methods=["POST", "GET"])
+def profile():
     return render_template("userprofile.html")
 
 

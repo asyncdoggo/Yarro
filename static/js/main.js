@@ -36,6 +36,14 @@ document.getElementById("logout").addEventListener("click", function () {
 
 get_msg();
 
+const options = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: "numeric",
+    minute: "numeric",
+};
+
 
 let pid;
 let uid;
@@ -69,7 +77,7 @@ async function get_msg() {
             user = post["uname"];
             date = post["datetime"]
             var d = new Date(`${date} UTC`)
-            d = d.toLocaleString("en-us");
+            d = d.toLocaleString("en-us", options);
 
             var like;
             if (islike) {

@@ -71,8 +71,6 @@ def main():
 
         if jsondata["subject"] == "logout":
             return render_template("index.html")
-        elif jsondata["subject"] == "regsuccess":
-            return render_template("reg2.html")
         elif jsondata["subject"] == "home":
             return render_template("main.html")
 
@@ -208,13 +206,12 @@ def register():
 
         uid = uuid.uuid4().hex
         if Data.insert_user(uid=uid, uname=username, passwd=password, email=email):
-            new_user = Data.get_user(username=username)
             token = jwt.encode(
-                {'id': new_user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+                {'id': uid, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
                 app.config['SECRET_KEY'], "HS256")
-            return jsonify({'token': token, 'status': 'success', "uname": new_user.username})
+            return jsonify({'token': token, 'status': 'success', "uname": username})
         else:
-            return jsonify({'status': 'userexists'})
+            return jsonify({'status': 'user or email already exists'})
     except Exception as e:
         print(repr(e))
         return jsonify({"status": "error"})
@@ -242,7 +239,7 @@ def login_user():
                 active_tokens.append(token)
                 return jsonify({'token': token, "status": "success", "uname": user.username})
 
-        return jsonify({"status": "failure"})
+        return jsonify({"status": "username or password is incorrect"})
     except:
         return jsonify({"status": "failure"})
 
@@ -306,7 +303,7 @@ def check_login():
 def new_post(user):
     data = request.get_json()
     try:
-        res = Data.insert_posts(uid=user.id, cont=data["content"])
+        res = Data.insert_post(uid=user.id, cont=data["content"])
         return {"status": "success"} if res else {"status": "failure"}
     except Exception as e:
         print(e)

@@ -121,6 +121,12 @@ def insert_user(uid, uname, passwd, email):
         user.email = email
 
         detail = Details()
+        detail.first_name = ""
+        detail.last_name = ""
+        detail.gender = ""
+        detail.age = ""
+        detail.mob = ""
+        detail.dob = datetime.datetime(1000,1,1)
         detail.user_id = uid
         db.session.add(user)
         db.session.add(detail)
@@ -187,13 +193,13 @@ def check_reset(guid, uid):
         print(repr(e))
 
 
-def insert_posts(uid, cont):
+def insert_post(uid, cont):
     post = Posts()
     try:
         post.user_id = uid
         post.content = cont
         post.l_count = 0
-        post.tstamp = datetime.datetime.now()
+        post.tstamp = datetime.datetime.utcnow()
         db.session.add(post)
         db.session.commit()
         return True

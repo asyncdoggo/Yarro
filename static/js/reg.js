@@ -17,7 +17,7 @@ document.getElementById('reg_form').addEventListener('submit', async function (e
         if (response.status == "success") {
             localStorage.setItem("token",response.token)
             localStorage.setItem("uname",senddata["uname"])
-            send_form("/", { "subject": "regsuccess", "token":response.token})
+            send_form("/", { "subject": "home", "token":response.token})
         }
         else{
             document.getElementById("error").innerHTML = response.status

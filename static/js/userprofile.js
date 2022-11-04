@@ -5,12 +5,12 @@ document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
 document.getElementById("uname").innerHTML = uname
 
 
-document.getElementById("editprofile").addEventListener("click",function () {
-    send_form("/editprofile",{"uname":uname,"token":token})
+document.getElementById("editprofile").addEventListener("click", function () {
+    send_form("/editprofile", { "uname": uname, "token": token })
 })
 
 document.getElementById("homebtn").addEventListener("click", function () {
-    send_form("/", { "subject":"home", "token": token })
+    send_form("/", { "subject": "home", "token": token })
 })
 
 document.getElementById("logout").addEventListener("click", function () {
@@ -39,7 +39,7 @@ async function get_msg() {
         }
     }).then((response) => response.json())
 
-    if(response.status == "success"){
+    if (response.status == "success") {
         let name = response.name
         document.getElementById("fullname").innerHTML = name
     }
@@ -92,7 +92,9 @@ async function get_msg() {
                         <div class="post-username" id="uname">
                             ${user}
                         </div>
-
+                        <div class="post-time">
+                        ${d}
+                    </div>
                         <div class="post-message" id="content">
                             ${content}
                         </div>
@@ -102,9 +104,7 @@ async function get_msg() {
                                 <button id="${pid}" class="post-like-button" onClick=onButtonClick(this)>${like}</button>
                                 <p id="like_count">${lc}</p>
                             </div>
-                            <div class="post-time">
-                                ${d}
-                            </div>
+                            
                         </div>
                     </div>
                 </div>`;
@@ -113,7 +113,7 @@ async function get_msg() {
 
         }
     }
-    else{
+    else {
         window.location.href = "/"
     }
 }

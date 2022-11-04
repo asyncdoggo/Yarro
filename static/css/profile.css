@@ -27,8 +27,8 @@
 
 .profile-img img {
     border-radius: 50%;
-    width: 160px;
-    height: 160px;
+    width: 120px;
+    height: 120px;
 }
 
 .user {
@@ -115,5 +115,32 @@
 @media (max-width:800px) {
     .grid-container {
         width: 100%;
+        grid-template-rows: repeat(4, minmax(40px, auto));
+    }
+
+    .profile-img {
+        align-self: flex-start;
+        margin-top: 1rem;
+    }
+
+    .profile-img img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .user {
+        padding-left: 4%;
+    }
+
+    .username {
+        font-size: 24px;
+    }
+
+    .description {
+        padding-left: 4%;
+    }
+
+    .edit-button {
+        width: 75px;
     }
 }

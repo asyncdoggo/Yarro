@@ -7,6 +7,8 @@
 
 /*<----------------------------------------navbar start---------------------------------------------------->*/
 
+
+
 nav {
   display: flex;
   flex-direction: row;
@@ -96,6 +98,7 @@ nav span {
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  right: 0.005rem;
 }
 
 /* Links inside the dropdown */

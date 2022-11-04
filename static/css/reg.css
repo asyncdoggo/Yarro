@@ -1,66 +1,65 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-*{
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body{
+body {
   background-color: #FFFFFF;
-  font-family :'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
 
 }
 
-h2
-{
+h2 {
   font-size: 30px;
-  margin: 2vh 3vw 0vh 3vw ;
+  margin: 2vh 3vw 0vh 3vw;
   letter-spacing: 0.1rem;
 }
 
-main
-{
+main {
   display: flex;
   justify-content: center;
 }
 
-.sign_container
-{
+.sign_container {
   border: 0px solid;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 45vw;
+  width: 40%;
   height: 55vh;
-  margin: 10.8vw 4vh;
+  margin: 10.8vw auto;
   border-radius: 1.8vw;
   background-color: #ffffff;
-  box-shadow:  0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.box{
-  width: 20vw;
-  height: 5vh;
-  margin: 3vh 1vw;
+#reg_form {
+  width: 40%;
+}
 
+
+.box {
+  width: 100%;
+  height: 5vh;
+  margin: 3vh 0px;
 }
 
 input[type=text],
 [type=password],
-[type=email]
-{
+[type=email] {
   width: 100%;
   height: 100%;
-  margin: 2vh;
+  /* margin: 2vh; */
   padding: 2vh 1vw;
   border-radius: 1vh;
   border: 0.5px solid #04AA6D;
 }
 
-input[type=submit]
-{
+input[type=submit] {
   border: 0.5px solid #04AA6D;
   width: 100%;
   height: 100%;
@@ -69,11 +68,20 @@ input[type=submit]
   color: #FFFFFF;
   font-size: 0.9rem;
   font-weight: 500;
-  margin: 2vh 1vw;
+  /* margin: 2vh 1vw; */
 }
 
-a
-{
+a {
   text-decoration: none;
   color: #FFFFFF;
+}
+
+@media (max-width:1000px) {
+  .sign_container {
+    width: 90%;
+  }
+
+  #reg_form {
+    width: 70%;
+  }
 }

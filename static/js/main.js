@@ -83,11 +83,16 @@ async function get_msg() {
 
             post = ` <div class="post" id="${pid}">
                     <div class="post-profile">
+                        <div class="imager">
                         <img src="/images/${user}" class="profile_img">
+                        </div>
                     </div>
                     <div class="post-content">
                         <div class="post-username" id="uname">
                             ${user}
+                        </div>
+                        <div class="post-time">
+                            ${d}
                         </div>
 
                         <div class="post-message" id="content">
@@ -98,9 +103,6 @@ async function get_msg() {
                             <div class="post-like">
                                 <button id="${pid}" class="post-like-button" onClick=onButtonClick(this)>${like}</button>
                                 <p id="like_count">${lc}</p>
-                            </div>
-                            <div class="post-time">
-                                ${d}
                             </div>
                         </div>
                     </div>

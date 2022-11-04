@@ -233,6 +233,7 @@ def login_user():
             token = jwt.encode(
                 {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
                 app.config['SECRET_KEY'], "HS256")
+            active_tokens.append(token)
             return jsonify({'token': token, "status": "success", "uname": user.username})
 
             if token in active_tokens:

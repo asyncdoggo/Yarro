@@ -84,7 +84,9 @@ async function get_msg() {
 
             post = ` <div class="post" id="${pid}">
                     <div class="post-profile">
+                        <div class="imager">
                         <img src="/images/${user}" class="profile_img">
+                        </div>                        
                     </div>
                     <div class="post-content">
                         <div class="post-username" id="uname">

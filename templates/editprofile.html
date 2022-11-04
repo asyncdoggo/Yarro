@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/userprofile.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <!-- <img src="" alt="">-->
+                <h2>B-itter</h2>
+            </div>
+
+            <div class="navbar-tabs">
+                <ul>
+                    <li><a id="homebtn" href="#"> <span class="material-icons">
+                                home
+                            </span></a>
+                        <span>Home</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropbtn"> <span class="material-icons">
+                        person_outline
+                    </span></button>
+                <div class="dropdown-content">
+                    <a href="#" id="profile">Profile</a>
+                    <a href="#" id="logout">Logout</a>
+                </div>
+            </div>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <div class="profile">
+
+            <div class="user_profile" style="margin:0.5% 0;">
+                <img src="" alt="" id="user_image" width="100vw" height="100vh">
+                <form id="image_form" method="POST" enctype="multipart/form-data" action="/sendimage">
+
+                    <label for="image_upload" style="color: purple; margin-left: 15vw; ">change profile
+                        pciture</label>
+
+                    <input type="file" id="image_upload" name="image" accept="image/*">
+                </form>
+                <p id="username" style="margin:0 1%; font-weight:550;"></p>
+            </div>
+            <form id="save_form">
+
+                <div class="inputags">
+                    <p>Firstname</p>
+                    <input type="text" id="fname" name="fname" placeholder="first name">
+                </div>
+
+                <div class="inputags">
+                    <p>Lastname</p>
+                    <input type="text" id="lname" name="lname" placeholder="last name">
+                </div>
+
+                <div class="inputags">
+                    <p>Gender</p>
+                    <input type="text" id="gender" name="gender" placeholder="gender">
+                </div>
+
+                <div class="inputags">
+                    <p>Mobile Number</p>
+                    <input type="tel" id="mob" name="mob" placeholder="Mobile">
+                </div>
+
+                <div class="inputags">
+                    <p>Date of birth</p>
+                    <input type="date" id="dob" name="dob" placeholder="DOB">
+                </div>
+
+                <div class="inputags">
+                    <input type="submit" value="Save">
+                </div>
+
+
+            </form>
+            <p id="errortext"></p>
+        </div>
+    </main>
+    <script src="/static/js/editprofile.js"></script>
+</body>
+
+</html>

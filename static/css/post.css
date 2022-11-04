@@ -1,3 +1,7 @@
+#posts_section {
+    width: 100%;
+}
+
 .post {
     display: grid;
     grid-template-columns: 8% 92%;

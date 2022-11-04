@@ -11,13 +11,34 @@
   align-items: center;
   border: 2px solid;
   width: 40%;
-  height: 80vh;
-  margin: 5vh 30vw;
+  height: 90vh;
+  margin: 5vh auto;
+}
 
+.profile p:last-child {
+  height: 10px;
+}
 
+.inputags {
+  width: 100%;
+}
+
+.inputags p {
+  text-align: left;
+  margin-left: 50px;
+  margin-top: 8px;
 }
 
 
+.inputags input {
+  width: 80%;
+}
+
+
+#save_form {
+  width: 100%;
+  text-align: center;
+}
 
 .user_profile {
   display: flex;
@@ -32,7 +53,6 @@
 [type=date] {
   margin: 1%;
   padding: 1%;
-  width: 30vw;
   height: 5vh;
   border: 0.5px solid #04AA6D;
   border-radius: 0.2rem;
@@ -54,4 +74,10 @@
   border-radius: 0.2rem;
   background: #04AA6D;
   color: #FFFFFF;
+}
+
+@media (max-width:800px) {
+  .profile {
+    width: 99%;
+  }
 }

@@ -131,7 +131,7 @@ nav span {
   justify-content: center;
   align-self: center;
   width: 50%;
-  margin: 2vh 25%;
+  margin: 2vh auto;
   height: 100%;
   border: 1px solid;
   /* border-style:none solid; */
@@ -173,14 +173,6 @@ nav span {
   border-radius: 20vmax;
 }
 
-.post_section {
-  border: 1px solid #F5F5F5;
-  border-radius: 0.5vmax;
-  background: #F5F5F5;
-  padding: 1%;
-  margin-bottom: 5vh;
-}
-
 .like_comment_buttons {
   display: flex;
   flex-direction: row;
@@ -191,6 +183,12 @@ nav span {
   background: #ffffff;
   border: 0px;
   margin: 1%;
+}
+
+@media (max-width:800px) {
+  .main_section {
+    width: 99%;
+  }
 }
 
 /*<----------------------------------------main end-------------------------------------------------------->*/

@@ -183,7 +183,8 @@ def update_lc(user):
     try:
         data = request.get_json()
         pid = data["pid"]
-        res = Data.update_like(pid=pid, uid=user.id)
+        islike = data["islike"]
+        res = Data.update_like(pid=pid, uid=user.id,islike=islike)
         return {"status": "success" if res else "failure"}
     except Exception as e:
         print(repr(e))

@@ -64,22 +64,29 @@
 .post-info {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
 }
 
-.post-like {
+.post-like,
+.post-dislike {
     display: flex;
     width: 34px;
     justify-content: space-between;
     align-items: center;
+    margin-right: 1.4rem;
 }
 
-.post-like-button {
+.post-like-button,
+.post-dislike-button {
     border: 0px;
     background-color: rgba(249, 249, 249, 0.16);
     border-radius: 50%;
     opacity: 1;
+}
+
+.post-dislike-button {
+    margin-top: 0.4rem;
 }
 
 .post-time {

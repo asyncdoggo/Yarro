@@ -50,7 +50,9 @@ let uid;
 let content;
 let lc;
 let islike;
+let isdislike;
 let date;
+let dlc;
 
 async function get_msg() {
 
@@ -73,19 +75,31 @@ async function get_msg() {
             uid = post["uid"];
             content = post["content"];
             lc = post["lc"];
+            dlc = post["dlc"]
             islike = post["islike"];
+            isdislike = post["isdislike"]
             user = post["uname"];
             date = post["datetime"]
             var d = new Date(`${date} UTC`)
             d = d.toLocaleString("en-us", options);
 
             var like;
+            var dislike;
             if (islike) {
                 like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">thumb_up</span>`
             }
             else {
                 like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">
                             thumb_up_off_alt
+                            </span>`
+            }
+
+            if (isdislike) {
+                dislike = '<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%">thumb_down</span>'
+            }
+            else {
+                dislike = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%">
+                            thumb_down_off_alt
                             </span>`
             }
 
@@ -111,6 +125,10 @@ async function get_msg() {
                             <div class="post-like">
                                 <button id="${pid}" class="post-like-button" onClick=onButtonClick(this)>${like}</button>
                                 <p id="like_count">${lc}</p>
+                            </div>
+                            <div class="post-dislike">
+                                <button id="${pid}" class="post-dislike-button" onClick=onButtonClick(this)>${dislike}</button>
+                                <p id="dislike_count">${dlc}</p>
                             </div>
                         </div>
                     </div>
@@ -146,6 +164,11 @@ function send_form(action, params) {
 
 async function onButtonClick(btn) {
     let pid = btn.id
+    let cname = btn.className
+    let islike = 1;
+    if (cname == "post-dislike-button") {
+        islike = 0
+    }
 
     const response = await fetch("/api/like", {
         method: 'POST',
@@ -154,23 +177,41 @@ async function onButtonClick(btn) {
             'Content-Type': 'application/json',
             'x-access-tokens': token
         },
-        body: JSON.stringify({ "pid": pid })
+        body: JSON.stringify({ "pid": pid, "islike": islike })
     }).then((response) => response.json())
 
     if (response.status == "success") {
-        let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
-        let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
-        if (like.innerHTML.trim() == "thumb_up_off_alt") {
-            like.innerHTML = "thumb_up"
-            let temp = parseInt(lc.innerHTML)
-            lc.innerHTML = ""
-            lc.innerHTML = temp + 1
+        if (cname == "post-like-button") {
+            let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
+            let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
+            if (like.innerHTML.trim() == "thumb_up_off_alt") {
+                like.innerHTML = "thumb_up"
+                let temp = parseInt(lc.innerHTML)
+                lc.innerHTML = ""
+                lc.innerHTML = temp + 1
+            }
+            else {
+                like.innerHTML = "thumb_up_off_alt"
+                let temp = parseInt(lc.innerHTML)
+                lc.innerHTML = ""
+                lc.innerHTML = temp - 1
+            }
         }
         else {
-            like.innerHTML = "thumb_up_off_alt"
-            let temp = parseInt(lc.innerHTML)
-            lc.innerHTML = ""
-            lc.innerHTML = temp - 1
+            let like = document.getElementById(pid).getElementsByClassName("material-icons")[1]
+            let lc = document.getElementById(pid).getElementsByTagName(`p`).dislike_count
+            if (like.innerHTML.trim() == "thumb_down_off_alt") {
+                like.innerHTML = "thumb_down"
+                let temp = parseInt(lc.innerHTML)
+                lc.innerHTML = ""
+                lc.innerHTML = temp + 1
+            }
+            else {
+                like.innerHTML = "thumb_down_off_alt"
+                let temp = parseInt(lc.innerHTML)
+                lc.innerHTML = ""
+                lc.innerHTML = temp - 1
+            }
         }
     }
 }

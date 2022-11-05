@@ -34,6 +34,7 @@ class Posts(db.Model):
     user_id = db.Column(db.String(35), db.ForeignKey("users.id"))
     content = db.Column(db.String(255), nullable=False)
     l_count = db.Column(db.Integer)
+    dl_count = db.Column(db.Integer)
     tstamp = db.Column(db.TIMESTAMP)
 
 
@@ -43,6 +44,12 @@ class Likes(db.Model):
     user_id = db.Column(db.String(35))
     post_id = db.Column(db.Integer)
 
+
+class DisLikes(db.Model):
+    __tablename__ = "dislikes"
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.String(35))
+    post_id = db.Column(db.Integer)
 
 class Requests(db.Model):
     __tablename__ = "requests"
@@ -79,25 +86,43 @@ def getuserdetials(id):
             "mob": details.mob, "dob": str(details.dob)}
 
 
-def update_like(pid, uid):
-    try:
-        like = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
-        if like:
-            db.session.delete(like)
-            post = Posts.query.filter_by(post_id=pid).one()
-            post.l_count -= 1
-        else:
-            like = Likes()
-            like.user_id = uid
-            like.post_id = pid
-            db.session.add(like)
-            post = Posts.query.filter_by(post_id=pid).one()
-            post.l_count += 1
-        db.session.commit()
-        return True
-    except Exception as e:
-        print(repr(e))
-
+def update_like(pid, uid,islike):
+    if islike:
+        try:
+            like = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+            if like:
+                db.session.delete(like)
+                post = Posts.query.filter_by(post_id=pid).one()
+                post.l_count -= 1
+            else:
+                like = Likes()
+                like.user_id = uid
+                like.post_id = pid
+                db.session.add(like)
+                post = Posts.query.filter_by(post_id=pid).one()
+                post.l_count += 1
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(repr(e))
+    else:
+        try:
+            like = DisLikes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+            if like:
+                db.session.delete(like)
+                post = Posts.query.filter_by(post_id=pid).one()
+                post.dl_count -= 1
+            else:
+                like = DisLikes()
+                like.user_id = uid
+                like.post_id = pid
+                db.session.add(like)
+                post = Posts.query.filter_by(post_id=pid).one()
+                post.dl_count += 1
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(repr(e)) 
 
 def check_login(username, password):
     try:
@@ -199,6 +224,7 @@ def insert_post(uid, cont):
         post.user_id = uid
         post.content = cont
         post.l_count = 0
+        post.dl_count = 0
         post.tstamp = datetime.datetime.utcnow()
         db.session.add(post)
         db.session.commit()
@@ -214,9 +240,10 @@ def get_posts(uid, selfOnly):
         result = db.session.query(Posts, User).filter(User.id == Posts.user_id, User.id == uid).all()
 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
+    dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == uid).all()
     p = {}
 
     for i, j in result:
-        p[i.post_id] = {"post_id":i.post_id, "uid": j.id, "content": i.content, "lc": i.l_count, "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
-                        "uname": j.username, "islike": 1 if (j.id, i.post_id) in likes else 0}
+        p[i.post_id] = {"post_id":i.post_id, "uid": j.id, "content": i.content, "lc": i.l_count,"dlc":i.dl_count, "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
+                        "uname": j.username, "islike": 1 if (j.id, i.post_id) in likes else 0,"isdislike": 1 if (j.id, i.post_id) in dislikes else 0}
     return p

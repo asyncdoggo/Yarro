@@ -49,10 +49,10 @@ let pid;
 let uid;
 let content;
 let lc;
+let dlc;
 let islike;
 let isdislike;
 let date;
-let dlc;
 
 async function get_msg() {
 

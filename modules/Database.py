@@ -51,6 +51,7 @@ class DisLikes(db.Model):
     user_id = db.Column(db.String(35))
     post_id = db.Column(db.Integer)
 
+
 class Requests(db.Model):
     __tablename__ = "requests"
     id = db.Column(db.Integer, primary_key=True)
@@ -74,10 +75,8 @@ def update(fname, lname, age, gender, mob, dob, uid):
 def get_fullname(username):
     user = User.query.filter_by(username=username).one()
     details: Details = Details.query.filter_by(user_id=user.id).one()
-    fullname = details.first_name + " "+ details.last_name
+    fullname = details.first_name + " " + details.last_name
     return fullname
-
-
 
 
 def getuserdetials(id):
@@ -86,7 +85,7 @@ def getuserdetials(id):
             "mob": details.mob, "dob": str(details.dob)}
 
 
-def update_like(pid, uid,islike):
+def update_like(pid, uid, islike):
     if islike:
         try:
             like = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
@@ -122,7 +121,8 @@ def update_like(pid, uid,islike):
             db.session.commit()
             return True
         except Exception as e:
-            print(repr(e)) 
+            print(repr(e))
+
 
 def check_login(username, password):
     try:
@@ -144,16 +144,16 @@ def insert_user(uid, uname, passwd, email):
         user.id = uid
         user.password = hashpass
         user.email = email
-
+        db.session.add(user)
+        db.session.commit()
         detail = Details()
         detail.first_name = ""
         detail.last_name = ""
         detail.gender = ""
-        detail.age = ""
+        detail.age = 0
         detail.mob = ""
-        detail.dob = datetime.datetime(1000,1,1)
+        detail.dob = datetime.datetime(1000, 1, 1)
         detail.user_id = uid
-        db.session.add(user)
         db.session.add(detail)
         db.session.commit()
         return True
@@ -175,7 +175,7 @@ def get_user(username=None, uid=None):
 def resetpasswd(uid, pass1, guid):
     try:
         req = Requests.query.filter_by(user_id=uid).one()
-        if ph.verify(req.guid,guid):
+        if ph.verify(req.guid, guid):
             pwhash = ph.hash(pass1)
             user = User.query.filter_by(id=uid).one()
             user.password = pwhash
@@ -184,6 +184,8 @@ def resetpasswd(uid, pass1, guid):
             return True
     except Exception as e:
         print(repr(e))
+
+
 def getemail(email):
     try:
         user = User.query.filter_by(email=email).one()
@@ -244,6 +246,8 @@ def get_posts(uid, selfOnly):
     p = {}
 
     for i, j in result:
-        p[i.post_id] = {"post_id":i.post_id, "uid": j.id, "content": i.content, "lc": i.l_count,"dlc":i.dl_count, "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
-                        "uname": j.username, "islike": 1 if (j.id, i.post_id) in likes else 0,"isdislike": 1 if (j.id, i.post_id) in dislikes else 0}
+        p[i.post_id] = {"post_id": i.post_id, "uid": j.id, "content": i.content, "lc": i.l_count, "dlc": i.dl_count,
+                        "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
+                        "uname": j.username, "islike": 1 if (j.id, i.post_id) in likes else 0,
+                        "isdislike": 1 if (j.id, i.post_id) in dislikes else 0}
     return p

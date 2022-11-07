@@ -311,13 +311,28 @@ def new_post(user):
         return {"status": "logout"}
 
 
+@app.route("/api/likedata",methods = ["POST"])
+@token_required
+def likedata(user):
+    try:
+        res = Data.getlikedata(user)
+        return res
+    except Exception as e:
+        return {"status","success"}
+
+# with app.app_context():
+#     user = Data.User()
+#     user.id = "095d196c330943f69e8d8795c874a471"
+#     print(Data.getlikedata(user))
+
+
 @app.route("/api/posts", methods=['POST'])
 @token_required
 def get_posts(user):
     data = request.get_json()
     try:
-        selfOnly = data["self"]
-        res = Data.get_posts(user.id, selfOnly)
+        latest = data["latest"]
+        res = Data.get_posts(user.id, latest)
         return {"status": "success", "data": res}
     except KeyError as e:
         print(repr(e))

@@ -186,6 +186,25 @@ def resetpasswd(uid, pass1, guid):
         print(repr(e))
 
 
+def getlikedata(user):
+    try:
+        result = db.session.query(Posts).all()
+        likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == user.id).all()
+        dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == user.id).all()
+
+
+        p = {}
+        for each in result:
+            p[each.post_id] = {
+                                "lc":each.l_count,
+                                "dlc":each.dl_count,
+                                "islike": 1 if (user.id, each.post_id) in likes else 0,
+                                "isdislike": 1 if (user.id, each.post_id) in dislikes else 0
+                                }
+        return p
+    except Exception as e:
+        print(repr(e))
+
 def getemail(email):
     try:
         user = User.query.filter_by(email=email).one()
@@ -235,12 +254,9 @@ def insert_post(uid, cont):
         print(repr(e))
 
 
-def get_posts(uid, selfOnly):
-    if selfOnly == "false":
-        result = db.session.query(Posts, User).filter(User.id == Posts.user_id).all()
-    else:
-        result = db.session.query(Posts, User).filter(User.id == Posts.user_id, User.id == uid).all()
-
+def get_posts(uid, latest):
+    result = db.session.query(Posts, User).filter(User.id == Posts.user_id,Posts.post_id > latest).all()
+ 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
     dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == uid).all()
     p = {}

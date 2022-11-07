@@ -37,11 +37,20 @@ main {
 
 .box {
   /* border: 2px solid; */
-  width: 100%;
+  width: 20vw;
   height: 5vh;
   margin: 0vh 3vw;
-  display: inline-block;
+  display: inline;
   text-align: center;
+}
+
+
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
 }
 
 input[type=password] {
@@ -65,12 +74,6 @@ button {
   /* margin: 2vh 1vw; */
 }
 
-.box2 {
+.box2{
   margin-bottom: 1%;
-}
-
-@media (max-width: 900px) {
-  .container {
-    width: 100%;
-  }
 }

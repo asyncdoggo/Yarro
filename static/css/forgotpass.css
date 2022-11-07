@@ -69,3 +69,9 @@ button {
     color: #ffffff;
     /* margin: 2vh 1vw; */
 }
+
+@media (max-width:900px) {
+    .container {
+        width: 100%;
+    }
+}

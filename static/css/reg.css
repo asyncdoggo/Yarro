@@ -76,7 +76,7 @@ a {
   color: #FFFFFF;
 }
 
-@media (max-width:1000px) {
+@media (max-width:900px) {
   .sign_container {
     width: 90%;
   }

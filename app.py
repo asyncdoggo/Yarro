@@ -184,11 +184,11 @@ def update_lc(user):
         data = request.get_json()
         pid = data["pid"]
         islike = data["islike"]
-        res = Data.update_like(pid=pid, uid=user.id,islike=islike)
-        return {"status": "success" if res else "failure"}
+        res = Data.update_like(pid=pid, uid=user.id, islike=islike)
+        return {"status": "success", "data": res}
     except Exception as e:
         print(repr(e))
-        return jsonify({"status": "success"})
+        return jsonify({"status": "failure"})
 
 
 @app.route('/api/register', methods=['POST'])
@@ -311,19 +311,14 @@ def new_post(user):
         return {"status": "logout"}
 
 
-@app.route("/api/likedata",methods = ["POST"])
+@app.route("/api/likedata", methods=["POST"])
 @token_required
 def likedata(user):
     try:
         res = Data.getlikedata(user)
         return res
     except Exception as e:
-        return {"status","success"}
-
-# with app.app_context():
-#     user = Data.User()
-#     user.id = "095d196c330943f69e8d8795c874a471"
-#     print(Data.getlikedata(user))
+        return {"status", "success"}
 
 
 @app.route("/api/posts", methods=['POST'])

@@ -86,9 +86,11 @@ def getuserdetials(id):
 
 
 def update_like(pid, uid, islike):
-    if islike:
-        try:
-            like = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+    like = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+    dislike = DisLikes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+    p = {}
+    try:
+        if islike:
             if like:
                 db.session.delete(like)
                 post = Posts.query.filter_by(post_id=pid).one()
@@ -99,29 +101,39 @@ def update_like(pid, uid, islike):
                 like.post_id = pid
                 db.session.add(like)
                 post = Posts.query.filter_by(post_id=pid).one()
+                if dislike:
+                    post.dl_count -= 1
+                    db.session.delete(dislike)
                 post.l_count += 1
+                p["islike"] = 1
             db.session.commit()
-            return True
-        except Exception as e:
-            print(repr(e))
-    else:
-        try:
-            like = DisLikes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
-            if like:
-                db.session.delete(like)
+            p["lc"] = post.l_count
+            p["dlc"] = post.dl_count
+            p["isdislike"] = 0
+        else:
+            if dislike:
+                db.session.delete(dislike)
                 post = Posts.query.filter_by(post_id=pid).one()
                 post.dl_count -= 1
             else:
-                like = DisLikes()
-                like.user_id = uid
-                like.post_id = pid
-                db.session.add(like)
+                dislike = DisLikes()
+                dislike.user_id = uid
+                dislike.post_id = pid
+                db.session.add(dislike)
                 post = Posts.query.filter_by(post_id=pid).one()
+                if like:
+                    post.l_count -= 1
+                    db.session.delete(like)
                 post.dl_count += 1
+                p["isdislike"] = 1
             db.session.commit()
-            return True
-        except Exception as e:
-            print(repr(e))
+            p["lc"] = post.l_count
+            p["dlc"] = post.dl_count
+            p["islike"] = 0
+
+        return p
+    except Exception as e:
+        print(repr(e))
 
 
 def check_login(username, password):
@@ -192,18 +204,18 @@ def getlikedata(user):
         likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == user.id).all()
         dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == user.id).all()
 
-
         p = {}
         for each in result:
             p[each.post_id] = {
-                                "lc":each.l_count,
-                                "dlc":each.dl_count,
-                                "islike": 1 if (user.id, each.post_id) in likes else 0,
-                                "isdislike": 1 if (user.id, each.post_id) in dislikes else 0
-                                }
+                "lc": each.l_count,
+                "dlc": each.dl_count,
+                "islike": 1 if (user.id, each.post_id) in likes else 0,
+                "isdislike": 1 if (user.id, each.post_id) in dislikes else 0
+            }
         return p
     except Exception as e:
         print(repr(e))
+
 
 def getemail(email):
     try:
@@ -255,8 +267,8 @@ def insert_post(uid, cont):
 
 
 def get_posts(uid, latest):
-    result = db.session.query(Posts, User).filter(User.id == Posts.user_id,Posts.post_id > latest).all()
- 
+    result = db.session.query(Posts, User).filter(User.id == Posts.user_id, Posts.post_id > latest).all()
+
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
     dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == uid).all()
     p = {}

@@ -38,7 +38,7 @@ get_msg();
 
 const options = {
     year: 'numeric',
-    month: 'numeric',
+    month: 'short',
     day: 'numeric',
     hour: "numeric",
     minute: "numeric",

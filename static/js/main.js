@@ -26,7 +26,7 @@ document.getElementById("postbtn").addEventListener("click", async function () {
 });
 
 document.getElementById("profile").addEventListener("click", function () {
-    send_form("/profile", { "uname": uname, "token": token })
+    send_form('/profile')
 })
 
 document.getElementById("logout").addEventListener("click", function () {

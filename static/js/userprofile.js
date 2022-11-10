@@ -131,9 +131,9 @@ async function get_msg() {
 
         }
     }
-    else {
-        window.location.href = "/"
-    }
+//    else {
+//        window.location.href = "/"
+//    }
 }
 
 

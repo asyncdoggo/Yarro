@@ -6,6 +6,8 @@ from functools import wraps
 import jwt
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
 from jwt import ExpiredSignatureError, DecodeError
+from sqlalchemy.sql.operators import collate
+
 from modules import send_mail
 
 import modules.Database as Data
@@ -24,6 +26,11 @@ with app.app_context():
 
 
 def token_required(f):
+    """
+    token_required(f) decorator will validate a JWT created token f and return the User Class object defined in modules/Database.
+    token should be sent through HTTP header 'x-access-tokens'
+    """
+
     @wraps(f)
     def decorator(*args, **kwargs):
 
@@ -50,6 +57,9 @@ def token_required(f):
 
 @app.route("/", methods=["GET", "POST"])
 def main():
+    """
+    The root route of the app. will handle rendering of index.html,forgotpass.html,logout.html,home.html
+    """
     if request.method == "GET":
         return render_template("index.html")
     else:
@@ -77,17 +87,23 @@ def main():
 
 @app.route("/register")
 def register_render():
+    """Renders register.html"""
     return render_template("register.html")
 
 
 @app.route("/password/reset")
 def reset_render():
+    """Renders forgotpass.html"""
     return render_template("forgotpass.html")
 
 
 @app.route("/api/fullname", methods=["POST"])
 @token_required
 def fullname(user):
+    """
+    api method, requires token validation
+    returns full name of user in the "name" field of response JSON body
+    """
     try:
         name = Data.get_fullname(user.username)
         return {"status": "success", "name": name}
@@ -98,6 +114,10 @@ def fullname(user):
 
 @app.route("/editprofile", methods=["POST"])
 def edit_profile():
+    """
+    form redirect method, requires token to be sent in the form data as "token" field
+    renders editprofile.html
+    """
     try:
         jsondata = request.form
         data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
@@ -111,12 +131,20 @@ def edit_profile():
 
 @app.route("/profile", methods=["POST", "GET"])
 def profile():
+    """
+    renders userprofile.html
+    """
     return render_template("userprofile.html")
 
 
 @app.route("/api/sendimage", methods=["POST"])
 @token_required
 def sendimage(user):
+    """
+    api method, requires token validation
+    accepts image as a multipart form body as the field "image".
+    The filename of the image should be the username of the user without extension
+    """
     try:
         file = request.files["image"]
         filename = file.filename
@@ -130,6 +158,15 @@ def sendimage(user):
 @app.route("/api/updatedata", methods=["POST"])
 @token_required
 def update_details(user):
+    """
+    api method, requires token validation. Updates user details
+    data fields are defined as follows
+    "fname": first name
+    "lname": last name
+    "gender": gender
+    "mob": mobile no
+    "dob": date of birth in the format yyyy-mm-dd
+    """
     try:
         data = request.get_json()
         fname = data["fname"]
@@ -162,6 +199,17 @@ def update_details(user):
 @app.route("/api/userdetails", methods=["POST"])
 @token_required
 def userdetails(user):
+    """
+    api method, requires token validation
+    returns user details in the "data" field
+    the data is a key value pair of following:
+    "fname": first name
+    "lname": last name
+    "gender": gender
+    "mob": mobile no
+    "age": age
+    "dob": date of birth in the format yyyy-mm-dd
+    """
     try:
         ret = Data.getuserdetials(user.id)
         return {"status": "success", "data": ret}
@@ -172,6 +220,12 @@ def userdetails(user):
 
 @app.route("/images/<path:path>")
 def get_image(path):
+    """
+    method used to fetch user profile image.
+    request path should be /images/username where username is the username of user
+    returns the user profile image associated with username
+    if the image is not found returns the default image
+    """
     if not os.path.exists(f"static/images/{path}"):
         path = "default"
     return send_from_directory("static/images", path)
@@ -180,6 +234,19 @@ def get_image(path):
 @app.route("/api/like", methods=["POST"])
 @token_required
 def update_lc(user):
+    """
+    api method, requires token validation
+    accepts data fields "pid" indicating the post id to like/dislike
+    "islike" 0 or 1 value
+    "islike" = 0 indicated the post is to be disliked
+    "islike" = 1 indicated the post is to be liked
+    returns "data" field in response body
+    data field contains following:
+    "islike" = determines if the post is liked by the user
+    "isdislike" = determines of the post is disliked by the user
+    "lc" = determines the like count of the post
+    "dlc" = determines the dislike count of the post
+    """
     try:
         data = request.get_json()
         pid = data["pid"]
@@ -193,6 +260,12 @@ def update_lc(user):
 
 @app.route('/api/register', methods=['POST'])
 def register():
+    """
+    api method
+    register new user, accept data fields "email", "uname" and "passwd1" for email, username and password
+    passwords are stored as a hash using argon2 hashing algorithm
+    returns a token and username in the fields "token" and "uname"
+    """
     try:
         data = request.get_json()
         email = data["email"]
@@ -220,6 +293,12 @@ def register():
 
 @app.route('/api/login', methods=['POST'])
 def login_user():
+    """
+    api method
+    login method validates username and password,
+    The username and password for login should be sent through the Authorization header
+    returns a token and username in the fields "token" and "uname"
+    """
     auth = request.authorization
     if not auth or not auth.username or not auth.password:
         return jsonify({"status": "failure"})
@@ -234,11 +313,11 @@ def login_user():
             active_tokens.append(token)
             return jsonify({'token': token, "status": "success", "uname": user.username})
 
-            if token in active_tokens:
-                return {"status": "tokenexists"}
-            else:
-                active_tokens.append(token)
-                return jsonify({'token': token, "status": "success", "uname": user.username})
+            # if token in active_tokens:
+            #     return {"status": "tokenexists"}
+            # else:
+            #     active_tokens.append(token)
+            #     return jsonify({'token': token, "status": "success", "uname": user.username})
 
         return jsonify({"status": "username or password is incorrect"})
     except:
@@ -246,7 +325,12 @@ def login_user():
 
 
 @app.route("/api/reset", methods=["POST", "GET"])
-def passwdreset():
+def password_reset():
+    """
+    api method
+    reset password for the given user
+    accepts data fields "uid", "pass1" and "id" as user id. new password and reset guid
+    """
     data = request.get_json()
     uid = data["uid"]
     pass1 = data["pass1"]
@@ -259,6 +343,9 @@ def passwdreset():
 
 @app.route("/reset", methods=["POST", "GET"])
 def reset():
+    """
+    renders the password reset page by checking the GET method args "id" and "uid" for guid and user id
+    """
     guid = request.args.get("id")
     uid = request.args.get("uid")
     if Data.check_reset(guid, uid):
@@ -268,7 +355,12 @@ def reset():
 
 
 @app.route("/api/resetrequest", methods=['POST'])
-def resetrequest():
+def reset_request():
+    """
+    api method to create a reset password request
+    accepts user email as "email"
+    a mail will be sent to the given email address with the reset link
+    """
     data = request.get_json()
     email = data["email"]
     user = Data.getemail(email)
@@ -287,6 +379,9 @@ def resetrequest():
 
 @app.route("/api/checklogin", methods=["POST"])
 def check_login():
+    """
+    api method to check if a user is already logged in
+    """
     try:
         data = request.get_json()
         if data["token"] in active_tokens:
@@ -302,6 +397,10 @@ def check_login():
 @app.route("/api/newpost", methods=['POST'])
 @token_required
 def new_post(user):
+    """
+    api method, requires token validation
+    accepts data field "content" to get the post content
+    """
     data = request.get_json()
     try:
         res = Data.insert_post(uid=user.id, cont=data["content"])
@@ -314,6 +413,10 @@ def new_post(user):
 @app.route("/api/likedata", methods=["POST"])
 @token_required
 def likedata(user):
+    """
+    api method, requires token validation
+    returns like and dislike data for all posts
+    """
     try:
         res = Data.getlikedata(user)
         return res
@@ -324,6 +427,10 @@ def likedata(user):
 @app.route("/api/posts", methods=['POST'])
 @token_required
 def get_posts(user):
+    """
+    api method, requires token validation
+    accepts field "latest", an integer that identifies how many posts does client already have
+    """
     data = request.get_json()
     try:
         latest = data["latest"]
@@ -336,6 +443,10 @@ def get_posts(user):
 
 @app.route("/api/logout", methods=['POST'])
 def logout():
+    """
+    api method, requires token validation
+    method logout, removes the user token from active tokens
+    """
     try:
         data = request.get_json()
         active_tokens.remove(data["token"])

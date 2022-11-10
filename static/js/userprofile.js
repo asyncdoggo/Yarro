@@ -56,7 +56,7 @@ async function get_msg() {
             'Content-Type': 'application/json',
             'x-access-tokens': token
         },
-        body: JSON.stringify({ "self": "true" })
+        body: JSON.stringify({ "latest":0 })
     }).then((response) => response.json())
 
     if (response.status == "success") {
@@ -64,71 +64,72 @@ async function get_msg() {
         document.getElementById("posts_section").innerHTML = "";
         for (i in Object.keys(data)) {
             var post = data[Object.keys(data)[i]]
-            pid = Object.keys(data)[i];
-            uid = post["uid"];
-            content = post["content"];
-            lc = post["lc"];
-            dlc = post["dlc"];
-            islike = post["islike"];
-            isdislike = post["isdislike"];
-            user = post["uname"];
-            date = post["datetime"]
-            var d = new Date(`${date} UTC`)
-            d = d.toLocaleString("en-us");
+            if(post["uname"] == uname){
+                pid = Object.keys(data)[i];
+                uid = post["uid"];
+                content = post["content"];
+                lc = post["lc"];
+                dlc = post["dlc"];
+                islike = post["islike"];
+                isdislike = post["isdislike"];
+                user = post["uname"];
+                date = post["datetime"]
+                var d = new Date(`${date} UTC`)
+                d = d.toLocaleString("en-us");
 
-            var like;
-            var dislike;
+                var like;
+                var dislike;
 
-            if (islike) {
-                like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">thumb_up</span>`
-            }
-            else {
-                like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">
-                            thumb_up_off_alt
-                            </span>`
-            }
+                if (islike) {
+                    like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">thumb_up</span>`
+                }
+                else {
+                    like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">
+                                thumb_up_off_alt
+                                </span>`
+                }
 
-            if (isdislike) {
-                dislike = '<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%">thumb_down</span>'
-            }
-            else {
-                dislike = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%">
-                            thumb_down_off_alt
-                            </span>`
-            }
+                if (isdislike) {
+                    dislike = '<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%">thumb_down</span>'
+                }
+                else {
+                    dislike = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%">
+                                thumb_down_off_alt
+                                </span>`
+                }
 
-            post = ` <div class="post" id="${pid}">
-                    <div class="post-profile">
-                        <div class="imager">
-                        <img src="/images/${user}" class="profile_img">
-                        </div>                        
-                    </div>
-                    <div class="post-content">
-                        <div class="post-username" id="uname">
-                            ${user}
-                        </div>
-                        <div class="post-time">
-                        ${d}
-                    </div>
-                        <div class="post-message" id="content">
-                            ${content}
-                        </div>
-
-                        <div class="post-info">
-                            <div class="post-like">
-                                <button id="${pid}" class="post-like-button" onClick=onButtonClick(this)>${like}</button>
-                                <p id="like_count">${lc}</p>
-                            </div>
-                            <div class="post-dislike">
-                                <button id="${pid}" class="post-dislike-button" onClick=onButtonClick(this)>${dislike}</button>
-                                <p id="dislike_count">${dlc}</p>
+                post = ` <div class="post" id="${pid}">
+                        <div class="post-profile">
+                            <div class="imager">
+                            <img src="/images/${user}" class="profile_img">
                             </div>
                         </div>
-                    </div>
-                </div>`;
+                        <div class="post-content">
+                            <div class="post-username" id="uname">
+                                ${user}
+                            </div>
+                            <div class="post-time">
+                            ${d}
+                        </div>
+                            <div class="post-message" id="content">
+                                ${content}
+                            </div>
 
-            document.getElementById("posts_section").innerHTML += post;
+                            <div class="post-info">
+                                <div class="post-like">
+                                    <button id="${pid}" class="post-like-button" onClick=onButtonClick(this)>${like}</button>
+                                    <p id="like_count">${lc}</p>
+                                </div>
+                                <div class="post-dislike">
+                                    <button id="${pid}" class="post-dislike-button" onClick=onButtonClick(this)>${dislike}</button>
+                                    <p id="dislike_count">${dlc}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
 
+                document.getElementById("posts_section").innerHTML += post;
+            }
         }
     }
 //    else {
@@ -160,7 +161,7 @@ function send_form(action, params) {
 
 async function onButtonClick(btn) {
     let pid = btn.id
-    let cname = btn.classname
+    let cname = btn.className
     let islike = 1;
 
     if (cname == "post-dislike-button") {
@@ -174,41 +175,29 @@ async function onButtonClick(btn) {
             'Content-Type': 'application/json',
             'x-access-tokens': token
         },
-        body: JSON.stringify({ "pid": pid })
+        body: JSON.stringify({ "pid": pid,"islike":islike })
     }).then((response) => response.json())
 
     if (response.status == "success") {
-        if (cname == "post-like-button") {
-            let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
-            let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
-            if (like.innerHTML.trim() == "thumb_up_off_alt") {
-                like.innerHTML = "thumb_up"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp + 1
-            }
-            else {
-                like.innerHTML = "thumb_up_off_alt"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp - 1
-            }
+        data = response.data
+        let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
+        let dislike = document.getElementById(pid).getElementsByClassName("material-icons")[1]
+        let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
+        let dlc = document.getElementById(pid).getElementsByTagName(`p`).dislike_count
+        if(data["islike"] == 1){
+            like.innerText = "thumb_up"
         }
-        else {
-            let like = document.getElementById(pid).getElementsByClassName("material-icons")[1]
-            let lc = document.getElementById(pid).getElementsByTagName(`p`).dislike_count
-            if (like.innerHTML.trim() == "thumb_down_off_alt") {
-                like.innerHTML = "thumb_down"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp + 1
-            }
-            else {
-                like.innerHTML = "thumb_down_off_alt"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp - 1
-            }
+        else{
+            like.innerText = "thumb_up_off_alt"
         }
+        if(data["isdislike"] == 1){
+            dislike.innerText = "thumb_down"
+        }
+        else{
+            dislike.innerText = "thumb_down_off_alt"
+        }
+
+        lc.innerHTML = data["lc"]
+        dlc.innerHTML = data["dlc"]
     }
 }

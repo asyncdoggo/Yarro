@@ -3,14 +3,13 @@ import os
 import re
 import uuid
 from functools import wraps
+
 import jwt
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
 from jwt import ExpiredSignatureError, DecodeError
-from sqlalchemy.sql.operators import collate
-
-from modules import send_mail
 
 import modules.Database as Data
+from modules import send_mail
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
@@ -412,7 +411,7 @@ def new_post(user):
 
 @app.route("/api/likedata", methods=["POST"])
 @token_required
-def likedata(user):
+def like_data(user):
     """
     api method, requires token validation
     returns like and dislike data for all posts

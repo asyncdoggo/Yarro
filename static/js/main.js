@@ -63,7 +63,7 @@ async function get_msg() {
             'Content-Type': 'application/json',
             'x-access-tokens': token
         },
-        body: JSON.stringify({ "self": "false" })
+        body: JSON.stringify({ "latest":0 })
     }).then((response) => response.json())
 
     if (response.status == "success") {
@@ -166,8 +166,9 @@ async function onButtonClick(btn) {
     let pid = btn.id
     let cname = btn.className
     let islike = 1;
+
     if (cname == "post-dislike-button") {
-        islike = 0
+        islike = 0;
     }
 
     const response = await fetch("/api/like", {
@@ -177,41 +178,29 @@ async function onButtonClick(btn) {
             'Content-Type': 'application/json',
             'x-access-tokens': token
         },
-        body: JSON.stringify({ "pid": pid, "islike": islike })
+        body: JSON.stringify({ "pid": pid,"islike":islike })
     }).then((response) => response.json())
 
     if (response.status == "success") {
-        if (cname == "post-like-button") {
-            let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
-            let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
-            if (like.innerHTML.trim() == "thumb_up_off_alt") {
-                like.innerHTML = "thumb_up"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp + 1
-            }
-            else {
-                like.innerHTML = "thumb_up_off_alt"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp - 1
-            }
+        data = response.data
+        let like = document.getElementById(pid).getElementsByClassName("material-icons")[0]
+        let dislike = document.getElementById(pid).getElementsByClassName("material-icons")[1]
+        let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
+        let dlc = document.getElementById(pid).getElementsByTagName(`p`).dislike_count
+        if(data["islike"] == 1){
+            like.innerText = "thumb_up"
         }
-        else {
-            let like = document.getElementById(pid).getElementsByClassName("material-icons")[1]
-            let lc = document.getElementById(pid).getElementsByTagName(`p`).dislike_count
-            if (like.innerHTML.trim() == "thumb_down_off_alt") {
-                like.innerHTML = "thumb_down"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp + 1
-            }
-            else {
-                like.innerHTML = "thumb_down_off_alt"
-                let temp = parseInt(lc.innerHTML)
-                lc.innerHTML = ""
-                lc.innerHTML = temp - 1
-            }
+        else{
+            like.innerText = "thumb_up_off_alt"
         }
+        if(data["isdislike"] == 1){
+            dislike.innerText = "thumb_down"
+        }
+        else{
+            dislike.innerText = "thumb_down_off_alt"
+        }
+
+        lc.innerHTML = data["lc"]
+        dlc.innerHTML = data["dlc"]
     }
 }

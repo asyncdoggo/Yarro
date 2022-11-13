@@ -29,15 +29,6 @@ const options = {
     minute: "numeric",
 };
 
-let pid;
-let uid;
-let content;
-let lc;
-let dlc;
-let islike;
-let isdislike;
-let date;
-
 async function get_msg() {
 
     let response = await fetch("/api/fullname", {
@@ -54,9 +45,6 @@ async function get_msg() {
         document.getElementById("fullname").innerHTML = name
     }
 
-
-
-
     response = await fetch("/api/posts", {
         method: 'POST',
         headers: {
@@ -70,23 +58,27 @@ async function get_msg() {
     if (response.status == "success") {
         let data = response.data
         document.getElementById("posts_section").innerHTML = "";
-        for (i in Object.keys(data)) {
-            var post = data[Object.keys(data)[i]]
+        let keys = Object.keys(data).reverse()
+
+        for (i in keys) {
+            var post = data[keys[i]]
+            let pid = Object.keys(data)[i];
             if(post["uname"] == uname){
-                pid = Object.keys(data)[i];
-                uid = post["uid"];
-                content = post["content"];
-                lc = post["lc"];
-                dlc = post["dlc"];
-                islike = post["islike"];
-                isdislike = post["isdislike"];
-                user = post["uname"];
-                date = post["datetime"]
-                var d = new Date(`${date} UTC`)
+                let pid = Object.keys(data)[i];
+                let uid = post["uid"];
+                let content = post["content"];
+                let lc = post["lc"];
+                let dlc = post["dlc"]
+                let islike = post["islike"];
+                let isdislike = post["isdislike"]
+                let user = post["uname"];
+                let date = post["datetime"]
+                let d = new Date(`${date} UTC`)
                 d = d.toLocaleString("en-us", options);
 
-                var like;
-                var dislike;
+                let like;
+                let dislike;
+
 
                 if (islike) {
                     like = `<span class="material-icons" style="width:100%; height:10%; font-size:18px; border-radius:50%;">thumb_up</span>`

@@ -26,8 +26,8 @@ with app.app_context():
 
 def token_required(f):
     """
-    token_required(f) decorator will validate a JWT created token f and return the User Class object defined in modules/Database.
-    token should be sent through HTTP header 'x-access-tokens'
+    token_required(f) decorator will validate a JWT created token f and return the User Class object defined in
+    modules/Database. token should be sent through HTTP header 'x-access-tokens'
     """
 
     @wraps(f)
@@ -69,8 +69,8 @@ def main():
             elif jsondata["subject"] == "expired":
                 return render_template("forgotpass.html", error="Request expired")
 
-            data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
-            user = Data.User.query.filter_by(id=data['id']).first()
+            jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
+            # Data.User.query.filter_by(id=data['id']).first()
         except ExpiredSignatureError:
             return jsonify({'message': 'token_expired'})
         except DecodeError:
@@ -119,8 +119,8 @@ def edit_profile():
     """
     try:
         jsondata = request.form
-        data = jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
-        user = Data.User.query.filter_by(id=data['id']).first()
+        jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
+        # user = Data.User.query.filter_by(id=data['id']).first()
         return render_template("editprofile.html")
     except ExpiredSignatureError:
         return jsonify({'message': 'expired'})
@@ -191,7 +191,7 @@ def update_details(user):
             return {"status": "success"}
         else:
             return {"status": "failure"}
-    except KeyError as e:
+    except KeyError:
         return {"status": "logout"}
 
 

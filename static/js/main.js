@@ -1,5 +1,4 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
-let token = localStorage.getItem("token")
 let uname = localStorage.getItem("uname")
 document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
 
@@ -13,7 +12,6 @@ document.getElementById("postbtn").addEventListener("click", async function () {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         },
         body: JSON.stringify({ "content": cont })
     }).then((response) => response.json())
@@ -31,7 +29,7 @@ document.getElementById("profile").addEventListener("click", function () {
 
 document.getElementById("logout").addEventListener("click", function () {
     localStorage.clear()
-    send_form("/", { "subject": "logout", "uname": uname, "token": token })
+    send_form("/", { "subject": "logout", "uname": uname})
 })
 
 get_msg();
@@ -51,7 +49,6 @@ async function get_msg() {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         },
         body: JSON.stringify({ "latest":0 })
     }).then((response) => response.json())
@@ -63,7 +60,7 @@ async function get_msg() {
 
         for (i in keys) {
             var post = data[keys[i]]
-            let pid = Object.keys(data)[i];
+            let pid = keys[i];
             let uid = post["uid"];
             let content = post["content"];
             let lc = post["lc"];
@@ -168,7 +165,6 @@ async function onButtonClick(btn) {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         },
         body: JSON.stringify({ "pid": pid,"islike":islike })
     }).then((response) => response.json())

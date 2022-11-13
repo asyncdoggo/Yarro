@@ -1,21 +1,20 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
-let token = localStorage.getItem("token")
 let uname = localStorage.getItem("uname")
 document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
 document.getElementById("uname").innerHTML = uname
 
 
 document.getElementById("editprofile").addEventListener("click", function () {
-    send_form("/editprofile", { "uname": uname, "token": token })
+    send_form("/editprofile", { "uname": uname})
 })
 
 document.getElementById("homebtn").addEventListener("click", function () {
-    send_form("/", { "subject": "home", "token": token })
+    send_form("/", { "subject": "home"})
 })
 
 document.getElementById("logout").addEventListener("click", function () {
     localStorage.clear()
-    send_form("/", { "subject": "logout", "uname": uname, "token": token })
+    send_form("/", { "subject": "logout", "uname": uname})
 })
 
 get_msg();
@@ -36,7 +35,6 @@ async function get_msg() {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         }
     }).then((response) => response.json())
 
@@ -50,7 +48,6 @@ async function get_msg() {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         },
         body: JSON.stringify({ "latest":0 })
     }).then((response) => response.json())
@@ -64,7 +61,7 @@ async function get_msg() {
             var post = data[keys[i]]
             let pid = Object.keys(data)[i];
             if(post["uname"] == uname){
-                let pid = Object.keys(data)[i];
+                let pid = keys[i];
                 let uid = post["uid"];
                 let content = post["content"];
                 let lc = post["lc"];
@@ -173,7 +170,6 @@ async function onButtonClick(btn) {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         },
         body: JSON.stringify({ "pid": pid,"islike":islike })
     }).then((response) => response.json())

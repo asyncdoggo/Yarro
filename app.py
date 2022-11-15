@@ -426,7 +426,7 @@ def like_data(user):
     """
     try:
         res = Data.getlikedata(user)
-        return res
+        return {"status":"success","data":res}
     except Exception as e:
         return {"status", "success"}
 

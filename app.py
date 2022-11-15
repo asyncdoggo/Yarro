@@ -14,7 +14,7 @@ from modules import send_mail
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://root:root@localhost:3306/data"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://root:root@127.0.0.1:3306/data"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 

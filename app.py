@@ -4,6 +4,7 @@ import re
 import uuid
 from functools import wraps
 
+import flask
 import jwt
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
 from jwt import ExpiredSignatureError, DecodeError
@@ -33,10 +34,7 @@ def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
 
-        token = None
-
-        if 'x-access-tokens' in request.headers:
-            token = request.headers['x-access-tokens']
+        token = request.cookies.get("token")
 
         if not token:
             return jsonify({'message': 'a valid token is missing'})
@@ -64,12 +62,13 @@ def main():
     else:
         try:
             jsondata = request.form
+            token = request.cookies.get("token")
             if jsondata["subject"] == "resetsuccess":
                 return render_template("index.html", error="Reset successful")
             elif jsondata["subject"] == "expired":
                 return render_template("forgotpass.html", error="Request expired")
 
-            jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
+            jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             # Data.User.query.filter_by(id=data['id']).first()
         except ExpiredSignatureError:
             return jsonify({'message': 'token_expired'})
@@ -79,7 +78,10 @@ def main():
             return jsonify({"message": "notoken"})
 
         if jsondata["subject"] == "logout":
-            return render_template("index.html")
+            try:
+                active_tokens.remove(token)
+            finally:
+                return render_template("index.html")
         elif jsondata["subject"] == "home":
             return render_template("main.html")
 
@@ -119,7 +121,8 @@ def edit_profile():
     """
     try:
         jsondata = request.form
-        jwt.decode(jsondata["token"], app.config['SECRET_KEY'], algorithms=["HS256"])
+        token = request.cookies.get("token")
+        jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         # user = Data.User.query.filter_by(id=data['id']).first()
         return render_template("editprofile.html")
     except ExpiredSignatureError:
@@ -282,7 +285,9 @@ def register():
             token = jwt.encode(
                 {'id': uid, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
                 app.config['SECRET_KEY'], "HS256")
-            return jsonify({'token': token, 'status': 'success', "uname": username})
+            response = flask.make_response({'status': 'success', "uname": username})
+            response.set_cookie("token", token, httponly=True, secure=True,samesite="Strict")
+            return response
         else:
             return jsonify({'status': 'user or email already exists'})
     except Exception as e:
@@ -310,7 +315,9 @@ def login_user():
                 {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
                 app.config['SECRET_KEY'], "HS256")
             active_tokens.append(token)
-            return jsonify({'token': token, "status": "success", "uname": user.username})
+            response = flask.make_response({"status": "success", "uname": user.username})
+            response.set_cookie("token", token, httponly=True, secure=True,samesite="Strict")
+            return response
 
             # if token in active_tokens:
             #     return {"status": "tokenexists"}
@@ -382,8 +389,9 @@ def check_login():
     api method to check if a user is already logged in
     """
     try:
-        data = request.get_json()
-        if data["token"] in active_tokens:
+        token = request.cookies.get("token")
+
+        if token in active_tokens:
             return {"status": "success"}
         else:
             return {"status": "false"}
@@ -447,8 +455,8 @@ def logout():
     method logout, removes the user token from active tokens
     """
     try:
-        data = request.get_json()
-        active_tokens.remove(data["token"])
+        token = request.cookies.get("token")
+        active_tokens.remove(token)
         return {"status": "success"}
 
     except Exception as e:

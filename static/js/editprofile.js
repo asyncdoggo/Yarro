@@ -1,6 +1,5 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
-let token = localStorage.getItem("token");
 
 
 document.getElementById("username").innerHTML = uname
@@ -16,7 +15,6 @@ document.getElementById("save_form").addEventListener("submit", async function (
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         },
         body: JSON.stringify(data)
     }).then((response) => response.json())
@@ -32,9 +30,6 @@ document.getElementById("save_form").addEventListener("submit", async function (
         formdata.append("image", file, uname)
         const response = await fetch("/api/sendimage", {
             method: 'POST',
-            headers: {
-                'x-access-tokens': token
-            },
             body: formdata
         }).then((response) => response.json())
         
@@ -43,17 +38,17 @@ document.getElementById("save_form").addEventListener("submit", async function (
 })
 
 document.getElementById("homebtn").addEventListener("click", function () {
-    send_form("/", { "subject":"home", "token": token })
+    send_form("/", { "subject":"home"})
 })
 
 document.getElementById("profile").addEventListener("click", function () {
-    send_form("/profile", { "uname": uname, "token": token })
+    send_form("/profile", { "uname": uname})
 })
 
 document.getElementById("logout").addEventListener("click", function (e) {
     e.preventDefault()
     localStorage.clear()
-    send_form("/", { "subject":"logout", "token": token })
+    send_form("/", { "subject":"logout"})
 })
 
 
@@ -70,7 +65,6 @@ async function get_details() {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'x-access-tokens': token
         },
     }).then((response) => response.json())
     

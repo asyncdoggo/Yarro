@@ -14,11 +14,9 @@ const response = await fetch("/api/login", {
 
     let status = response.status;
     if(status == "success"){
-        let token = response.token
         let uname = response.uname
-        localStorage.setItem("token", token);
         localStorage.setItem("uname", uname);
-        send_form("/",{"subject":"home","token":token})
+        send_form("/",{"subject":"home"})
     }
     else{
         document.getElementById("error").innerHTML = response.status;

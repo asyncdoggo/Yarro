@@ -22,15 +22,12 @@ document.getElementById("resetButton").addEventListener("click", async function 
             body: JSON.stringify({ "uid": uid, "id": id, "pass1": newpass1 })
         }).then((response) => response.json())
 
-        if (response.status == "success") {
-            send_form("/", { "subject": "resetsuccess" })
+        if (response.status) {
+            window.location.href = "/"
         }
-        else{
-            send_form("/", {"subject": "expired"})
+        else {
+            document.getElementById("error").innerHTML = "Passwords do not match"
         }
-    }
-    else {
-        document.getElementById("error").innerHTML = "Passwords do not match"
     }
 })
 

@@ -9,7 +9,7 @@ document.getElementById("save_form").addEventListener("submit", async function (
     e.preventDefault();
     const form = new FormData(e.target);
     const data = Object.fromEntries(form.entries());
-    
+
     const response = await fetch("/api/updatedata", {
         method: 'POST',
         headers: {
@@ -19,7 +19,7 @@ document.getElementById("save_form").addEventListener("submit", async function (
         body: JSON.stringify(data)
     }).then((response) => response.json())
 
-    if(response.status = "success"){
+    if (response.status = "success") {
         document.getElementById("errortext").innerHTML = "saved successfully"
     }
 
@@ -32,23 +32,31 @@ document.getElementById("save_form").addEventListener("submit", async function (
             method: 'POST',
             body: formdata
         }).then((response) => response.json())
-        
-    
+
+
     }
 })
 
 document.getElementById("homebtn").addEventListener("click", function () {
-    send_form("/", { "subject":"home"})
+    window.location.href = "/"
 })
 
 document.getElementById("profile").addEventListener("click", function () {
-    send_form("/profile", { "uname": uname})
+    window.location.href = "/profile"
 })
 
-document.getElementById("logout").addEventListener("click", function (e) {
-    e.preventDefault()
+document.getElementById("logout").addEventListener("click", async function () {
     localStorage.clear()
-    send_form("/", { "subject":"logout"})
+    const response = await fetch("/api/logout", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    }).then((response) => response.json())
+    if(response.status == "success"){
+        window.location.reload()
+    }
 })
 
 
@@ -67,7 +75,7 @@ async function get_details() {
             'Content-Type': 'application/json',
         },
     }).then((response) => response.json())
-    
+
     if (response.status == "success") {
         res = response.data
         document.getElementById("user_image").setAttribute("src", `/images/${uname}`);
@@ -79,24 +87,3 @@ async function get_details() {
         // document.getElementById("age").value = res["age"]
     }
 }
-
-function send_form(action, params) {
-    let form = document.createElement('form');
-    form.setAttribute('method', 'post');
-    form.setAttribute('action', action);
-
-    for (let key in params) {
-        if (params.hasOwnProperty(key)) {
-            let hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-        }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-}
-

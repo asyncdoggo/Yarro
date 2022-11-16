@@ -24,12 +24,21 @@ document.getElementById("postbtn").addEventListener("click", async function () {
 });
 
 document.getElementById("profile").addEventListener("click", function () {
-    send_form('/profile')
+    window.location.href = "/profile"
 })
 
-document.getElementById("logout").addEventListener("click", function () {
+document.getElementById("logout").addEventListener("click", async function () {
     localStorage.clear()
-    send_form("/", { "subject": "logout", "uname": uname})
+    const response = await fetch("/api/logout", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    }).then((response) => response.json())
+    if(response.status == "success"){
+        window.location.reload()
+    }
 })
 
 get_msg();
@@ -127,27 +136,6 @@ async function get_msg() {
 
         }
     }
-}
-
-
-function send_form(action, params) {
-    let form = document.createElement('form');
-    form.setAttribute('method', 'post');
-    form.setAttribute('action', action);
-
-    for (let key in params) {
-        if (params.hasOwnProperty(key)) {
-            let hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-        }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
 }
 
 

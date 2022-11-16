@@ -9,12 +9,21 @@ document.getElementById("editprofile").addEventListener("click", function () {
 })
 
 document.getElementById("homebtn").addEventListener("click", function () {
-    send_form("/", { "subject": "home"})
+    window.location.href = "/"
 })
 
-document.getElementById("logout").addEventListener("click", function () {
+document.getElementById("logout").addEventListener("click", async function () {
     localStorage.clear()
-    send_form("/", { "subject": "logout", "uname": uname})
+    const response = await fetch("/api/logout", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    }).then((response) => response.json())
+    if(response.status == "success"){
+        window.location.reload()
+    }
 })
 
 get_msg();

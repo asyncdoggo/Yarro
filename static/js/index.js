@@ -16,7 +16,7 @@ const response = await fetch("/api/login", {
     if(status == "success"){
         let uname = response.uname
         localStorage.setItem("uname", uname);
-        send_form("/",{"subject":"home"})
+        window.location.reload()
     }
     else{
         document.getElementById("error").innerHTML = response.status;

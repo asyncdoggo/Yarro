@@ -8,6 +8,7 @@ import flask
 import jwt
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
 from jwt import ExpiredSignatureError, DecodeError
+from werkzeug.utils import secure_filename
 
 import modules.Database as Data
 from modules import send_mail
@@ -52,38 +53,31 @@ def token_required(f):
     return decorator
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def main():
     """
     The root route of the app. will handle rendering of index.html,forgotpass.html,logout.html,home.html
     """
-    if request.method == "GET":
+    token = request.cookies.get("token")
+    if not token:
         return render_template("index.html")
+    elif token == "success":
+        response = flask.make_response(render_template("index.html", error="Reset successful"))
+        response.delete_cookie("token")
+        return response
+    elif token == "expired":
+        response = flask.make_response(render_template("forgotpass.html", error="Request expired"))
+        response.delete_cookie("token")
+        return response
     else:
         try:
-            jsondata = request.form
-            token = request.cookies.get("token")
-            if jsondata["subject"] == "resetsuccess":
-                return render_template("index.html", error="Reset successful")
-            elif jsondata["subject"] == "expired":
-                return render_template("forgotpass.html", error="Request expired")
-
-            jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            # Data.User.query.filter_by(id=data['id']).first()
-        except ExpiredSignatureError:
-            return jsonify({'message': 'token_expired'})
-        except DecodeError:
-            return jsonify({"message": "invalid"})
-        except KeyError:
-            return jsonify({"message": "notoken"})
-
-        if jsondata["subject"] == "logout":
-            try:
-                active_tokens.remove(token)
-            finally:
-                return render_template("index.html")
-        elif jsondata["subject"] == "home":
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = Data.User.query.filter_by(id=data['id']).first()
             return render_template("main.html")
+        except ExpiredSignatureError:
+            return render_template("index.html")
+        except DecodeError:
+            return render_template("index.html")
 
 
 @app.route("/register")
@@ -120,7 +114,6 @@ def edit_profile():
     renders editprofile.html
     """
     try:
-        jsondata = request.form
         token = request.cookies.get("token")
         jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         # user = Data.User.query.filter_by(id=data['id']).first()
@@ -131,7 +124,7 @@ def edit_profile():
         return jsonify({"message": "invalid"})
 
 
-@app.route("/profile", methods=["POST", "GET"])
+@app.route("/profile", methods=["GET"])
 def profile():
     """
     renders userprofile.html
@@ -149,7 +142,7 @@ def sendimage(user):
     """
     try:
         file = request.files["image"]
-        filename = file.filename
+        filename = secure_filename(file.filename)
         file.save(os.path.join('static/images/', filename))
         return {"status": "success"}
     except KeyError as e:
@@ -228,6 +221,7 @@ def get_image(path):
     returns the user profile image associated with username
     if the image is not found returns the default image
     """
+    path = secure_filename(path)
     if not os.path.exists(f"static/images/{path}"):
         path = "default"
     return send_from_directory("static/images", path)
@@ -285,8 +279,8 @@ def register():
             token = jwt.encode(
                 {'id': uid, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
                 app.config['SECRET_KEY'], "HS256")
-            response = flask.make_response({'status': 'success', "uname": username})
-            response.set_cookie("token", token, httponly=True, secure=True,samesite="Strict")
+            response = flask.make_response({'status': 'success', "uname": flask.escape(username)})
+            response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
             return response
         else:
             return jsonify({'status': 'user or email already exists'})
@@ -315,8 +309,8 @@ def login_user():
                 {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
                 app.config['SECRET_KEY'], "HS256")
             active_tokens.append(token)
-            response = flask.make_response({"status": "success", "uname": user.username})
-            response.set_cookie("token", token, httponly=True, secure=True,samesite="Strict")
+            response = flask.make_response({"status": "success", "uname": flask.escape(user.username)})
+            response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
             return response
 
             # if token in active_tokens:
@@ -342,9 +336,13 @@ def password_reset():
     pass1 = data["pass1"]
     guid = data["id"]
     if Data.resetpasswd(uid, pass1, guid):
-        return {"status": "success"}
+        response = flask.make_response()
+        response.set_cookie("token", "success", httponly=True, secure=True, samesite="Strict")
+        return response
     else:
-        return {"status": "expired"}
+        response = flask.make_response()
+        response.set_cookie("token", "expired", httponly=True, secure=True, samesite="Strict")
+        return response
 
 
 @app.route("/reset", methods=["POST", "GET"])
@@ -426,7 +424,7 @@ def like_data(user):
     """
     try:
         res = Data.getlikedata(user)
-        return {"status":"success","data":res}
+        return {"status": "success", "data": res}
     except Exception as e:
         return {"status", "success"}
 
@@ -457,11 +455,11 @@ def logout():
     try:
         token = request.cookies.get("token")
         active_tokens.remove(token)
-        return {"status": "success"}
-
-    except Exception as e:
-        print(repr(e))
-        return {"status": "failure"}
+    except ValueError as e:
+        pass
+    response = flask.make_response({"status": "success"})
+    response.delete_cookie("token")
+    return response
 
 
 def get_y(dob: str) -> int:

@@ -16,7 +16,7 @@ document.getElementById('reg_form').addEventListener('submit', async function (e
 
         if (response.status == "success") {
             localStorage.setItem("uname",senddata["uname"])
-            send_form("/", { "subject": "home"})
+            window.location.href = "/"
         }
         else{
             document.getElementById("error").innerHTML = response.status
@@ -26,25 +26,3 @@ document.getElementById('reg_form').addEventListener('submit', async function (e
         document.getElementById("error").innerHTML = "passwords do not match";
     }
 })
-
-function send_form(action, params) {
-    var form = document.createElement('form');
-    form.setAttribute('method', 'post');
-    form.setAttribute('action', action);
-
-    for (var key in params) {
-        if (params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-        }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-}
-
-

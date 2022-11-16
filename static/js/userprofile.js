@@ -22,9 +22,7 @@ document.getElementById("logout").addEventListener("click", async function () {
             'Content-Type': 'application/json',
         }
     }).then((response) => response.json())
-    if(response.status == "success"){
-        window.location.reload()
-    }
+    window.location.href = "/"
 })
 
 get_msg();
@@ -45,7 +43,8 @@ async function get_msg() {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({"uname":uname})
     }).then((response) => response.json())
 
     if (response.status == "success") {

@@ -100,7 +100,8 @@ def fullname(user):
     returns full name of user in the "name" field of response JSON body
     """
     try:
-        name = Data.get_fullname(user.username)
+        data = request.get_json()
+        name = Data.get_fullname(data["uname"])
         return {"status": "success", "name": name}
     except Exception as e:
         print(repr(e))
@@ -142,6 +143,7 @@ def profile(uname):
         print(repr(e))
 
     return render_template("userprofile.html", visiting=False, login=True)
+
 
 @app.route("/api/sendimage", methods=["POST"])
 @token_required

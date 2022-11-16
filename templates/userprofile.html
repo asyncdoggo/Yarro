@@ -30,14 +30,14 @@
                     </li>
                 </ul>
             </div>
-             {% if visiting %}
-            <div class="dropdown">
-                <button class="dropbtn"> <span class="material-icons">
-                        person_outline
-                    </span></button>
-                <div class="dropdown-content">
-                    <a href="#" id="logout">Logout</a>
-                </div>
+             {% if not visiting or login %}
+                <div class="dropdown">
+                    <button class="dropbtn"> <span class="material-icons">
+                            person_outline
+                        </span></button>
+                    <div class="dropdown-content">
+                        <a href="#" id="logout">Logout</a>
+                    </div>
              {% endif %}
             </div>
         </nav>
@@ -52,7 +52,7 @@
                 <div class="username" id="uname">
 
                 </div>
-                {% if visiting %}
+                {% if not visiting and login %}
                 <button class="edit-button" id="editprofile">
                     <!--TODO: change class -->
                     Edit Profile
@@ -87,7 +87,7 @@
 
     <footer></footer>
 </body>
- {% if visiting and login %}
+ {% if not visiting or login %}
 <script src="/static/js/userprofile.js"></script>
  {%else%}
 <script src="/static/js/visitprofile.js"></script>

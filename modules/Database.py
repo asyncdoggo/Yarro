@@ -276,6 +276,6 @@ def get_posts(uid, latest):
     for i, j in result:
         p[i.post_id] = {"post_id": i.post_id, "uid": j.id, "content": i.content, "lc": i.l_count, "dlc": i.dl_count,
                         "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
-                        "uname": j.username, "islike": 1 if (j.id, i.post_id) in likes else 0,
-                        "isdislike": 1 if (j.id, i.post_id) in dislikes else 0}
+                        "uname": j.username, "islike": 1 if (uid, i.post_id) in likes else 0,
+                        "isdislike": 1 if (uid, i.post_id) in dislikes else 0}
     return p

@@ -1,12 +1,13 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
-let uname = localStorage.getItem("uname")
+let uname = window.location.pathname.split("/")[2]
 document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
 document.getElementById("uname").innerHTML = uname
 
-
-document.getElementById("editprofile").addEventListener("click", function () {
-    send_form("/editprofile", { "uname": uname})
-})
+try{
+    document.getElementById("editprofile").addEventListener("click", function () {
+        send_form("/editprofile", { "uname": uname})
+    })
+}catch(e){}
 
 document.getElementById("homebtn").addEventListener("click", function () {
     window.location.href = "/"

@@ -24,7 +24,7 @@ document.getElementById("postbtn").addEventListener("click", async function () {
 });
 
 document.getElementById("profile").addEventListener("click", function () {
-    window.location.href = "/profile"
+    window.location.href = `/u/${uname}`
 })
 
 document.getElementById("logout").addEventListener("click", async function () {
@@ -108,7 +108,7 @@ async function get_msg() {
                         </div>
                     </div>
                     <div class="post-content">
-                        <div class="post-username" id="uname">
+                        <div class="post-username" id="uname" onclick=onUserClick(this)>
                             ${user}
                         </div>
                         <div class="post-time">
@@ -136,6 +136,12 @@ async function get_msg() {
 
         }
     }
+}
+
+
+function onUserClick(div) {
+    let name = div.innerHTML.trim()
+    window.location.href = `/u/${name}`
 }
 
 

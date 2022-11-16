@@ -124,13 +124,24 @@ def edit_profile():
         return jsonify({"message": "invalid"})
 
 
-@app.route("/profile", methods=["GET"])
-def profile():
+@app.route("/u/<uname>", methods=["GET"])
+def profile(uname):
     """
     renders userprofile.html
     """
-    return render_template("userprofile.html")
+    try:
+        token = request.cookies.get("token")
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        current_user = Data.User.query.filter_by(id=data['id']).first()
+        if current_user.username == uname:
+            return render_template("userprofile.html", visiting=False, login=True)
+        else:
+            return render_template("userprofile.html", visiting=True, login=True)
 
+    except Exception as e:
+        print(repr(e))
+
+    return render_template("userprofile.html", visiting=False, login=True)
 
 @app.route("/api/sendimage", methods=["POST"])
 @token_required

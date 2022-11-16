@@ -30,7 +30,7 @@
                     </li>
                 </ul>
             </div>
-
+             {% if visiting %}
             <div class="dropdown">
                 <button class="dropbtn"> <span class="material-icons">
                         person_outline
@@ -38,6 +38,7 @@
                 <div class="dropdown-content">
                     <a href="#" id="logout">Logout</a>
                 </div>
+             {% endif %}
             </div>
         </nav>
     </header>
@@ -51,10 +52,12 @@
                 <div class="username" id="uname">
 
                 </div>
+                {% if visiting %}
                 <button class="edit-button" id="editprofile">
                     <!--TODO: change class -->
                     Edit Profile
                 </button>
+                {% endif %}
             </div>
             <!-- Can comment below div to remove the followers information-->
             <!-- <div class="followers">
@@ -84,7 +87,9 @@
 
     <footer></footer>
 </body>
-
+ {% if visiting and login %}
 <script src="/static/js/userprofile.js"></script>
-
+ {%else%}
+<script src="/static/js/visitprofile.js"></script>
+ {% endif %}
 </html>

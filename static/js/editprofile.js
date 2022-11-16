@@ -42,7 +42,7 @@ document.getElementById("homebtn").addEventListener("click", function () {
 })
 
 document.getElementById("profile").addEventListener("click", function () {
-    window.location.href = "/profile"
+    window.location.href = `/u/${uname}`
 })
 
 document.getElementById("logout").addEventListener("click", async function () {

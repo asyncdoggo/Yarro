@@ -70,7 +70,6 @@ async function get_msg() {
         for (i in keys) {
             var post = data[keys[i]]
             let pid = keys[i];
-            let uid = post["uid"];
             let content = post["content"];
             let lc = post["lc"];
             let dlc = post["dlc"]

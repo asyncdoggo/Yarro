@@ -71,7 +71,6 @@ async function get_msg() {
             let pid = Object.keys(data)[i];
             if(post["uname"] == uname){
                 let pid = keys[i];
-                let uid = post["uid"];
                 let content = post["content"];
                 let lc = post["lc"];
                 let dlc = post["dlc"]

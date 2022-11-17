@@ -1,5 +1,4 @@
 flask
-mysql-connector-python
 argon2-cffi
 pyjwt
 Flask-SQLAlchemy

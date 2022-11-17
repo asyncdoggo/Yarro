@@ -6,7 +6,7 @@ from functools import wraps
 
 import flask
 import jwt
-from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
+from flask import Flask, request, jsonify, render_template, url_for, send_from_directory, make_response
 from jwt import ExpiredSignatureError, DecodeError
 from werkzeug.utils import secure_filename
 
@@ -71,8 +71,7 @@ def main():
         return response
     else:
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.User.query.filter_by(id=data['id']).first()
+            jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             return render_template("main.html")
         except ExpiredSignatureError:
             return render_template("index.html")
@@ -130,6 +129,9 @@ def profile(uname):
     """
     renders userprofile.html
     """
+    user = Data.get_user(uname)
+    if not user:
+        return make_response(render_template("404.html", error=f"User {uname} not found"), 404)
     try:
         token = request.cookies.get("token")
         data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
@@ -142,12 +144,12 @@ def profile(uname):
     except Exception as e:
         print(repr(e))
 
-    return render_template("userprofile.html", visiting=False, login=True)
+    return render_template("userprofile.html", visiting=True, login=False)
 
 
 @app.route("/api/sendimage", methods=["POST"])
 @token_required
-def sendimage(user):
+def send_image(user):
     """
     api method, requires token validation
     accepts image as a multipart form body as the field "image".
@@ -155,7 +157,7 @@ def sendimage(user):
     """
     try:
         file = request.files["image"]
-        filename = secure_filename(file.filename)
+        filename = secure_filename(user.username)
         file.save(os.path.join('static/images/', filename))
         return {"status": "success"}
     except KeyError as e:
@@ -206,7 +208,7 @@ def update_details(user):
 
 @app.route("/api/userdetails", methods=["POST"])
 @token_required
-def userdetails(user):
+def user_details(user):
     """
     api method, requires token validation
     returns user details in the "data" field
@@ -315,9 +317,8 @@ def login_user():
         return jsonify({"status": "failure"})
 
     try:
-        user = Data.get_user(username=auth.username)
-
-        if Data.check_login(auth.username, auth.password):
+        user = Data.check_login(auth.username, auth.password)
+        if user:
             token = jwt.encode(
                 {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
                 app.config['SECRET_KEY'], "HS256")
@@ -333,7 +334,7 @@ def login_user():
             #     return jsonify({'token': token, "status": "success", "uname": user.username})
 
         return jsonify({"status": "username or password is incorrect"})
-    except:
+    except Exception:
         return jsonify({"status": "failure"})
 
 
@@ -438,7 +439,7 @@ def like_data(user):
     try:
         res = Data.getlikedata(user)
         return {"status": "success", "data": res}
-    except Exception as e:
+    except Exception:
         return {"status", "success"}
 
 
@@ -468,7 +469,7 @@ def logout():
     try:
         token = request.cookies.get("token")
         active_tokens.remove(token)
-    except ValueError as e:
+    except ValueError:
         pass
     response = flask.make_response({"status": "success"})
     response.delete_cookie("token")
@@ -485,6 +486,11 @@ def get_y(dob: str) -> int:
     elif dif_m == 0 and dif_d < 0:
         dif_y -= 1
     return dif_y
+
+
+@app.route("/404")
+def notfound():
+    return render_template("404.html")
 
 
 if __name__ == '__main__':

@@ -25,7 +25,7 @@ document.getElementById("logout").addEventListener("click", async function () {
     window.location.href = "/"
 })
 
-get_msg();
+get_msg_bio_fullname();
 
 
 const options = {
@@ -36,7 +36,7 @@ const options = {
     minute: "numeric",
 };
 
-async function get_msg() {
+async function get_msg_bio_fullname() {
 
     let response = await fetch("/api/fullname", {
         method: 'POST',
@@ -49,7 +49,9 @@ async function get_msg() {
 
     if (response.status == "success") {
         let name = response.name
+        let bio = response.bio
         document.getElementById("fullname").innerHTML = name
+        document.getElementById("bio").innerHTML = bio
     }
 
     response = await fetch("/api/posts", {

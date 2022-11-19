@@ -3,3 +3,4 @@ argon2-cffi
 pyjwt
 Flask-SQLAlchemy
 mysqlclient
+Werkzeug

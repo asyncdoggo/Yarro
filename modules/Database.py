@@ -26,6 +26,7 @@ class Details(db.Model):
     gender = db.Column(db.String(10))
     mob = db.Column(db.String(10))
     dob = db.Column(db.Date)
+    bio = db.Column(db.String(255))
 
 
 class Posts(db.Model):
@@ -60,7 +61,7 @@ class Requests(db.Model):
     tstamp = db.Column(db.TIMESTAMP)
 
 
-def update(fname, lname, age, gender, mob, dob, uid):
+def update(fname, lname, age, gender, mob, dob, uid,bio):
     detail = Details.query.filter_by(user_id=uid).one()
     detail.first_name = fname
     detail.last_name = lname
@@ -68,21 +69,23 @@ def update(fname, lname, age, gender, mob, dob, uid):
     detail.gender = gender
     detail.mob = mob
     detail.dob = dob
+    detail.bio = bio
     db.session.commit()
     return True
 
 
-def get_fullname(username):
+def get_fullname_bio(username):
     user = User.query.filter_by(username=username).one()
     details: Details = Details.query.filter_by(user_id=user.id).one()
     fullname = details.first_name + " " + details.last_name
-    return fullname
+    bio = details.bio
+    return fullname,bio
 
 
 def getuserdetials(id):
     details = Details.query.filter_by(user_id=id).one()
     return {"fname": details.first_name, "lname": details.last_name, "age": details.age, "gender": details.gender,
-            "mob": details.mob, "dob": str(details.dob)}
+            "mob": details.mob, "dob": str(details.dob),"bio":details.bio}
 
 
 def update_like(pid, uid, islike):

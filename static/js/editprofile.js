@@ -84,6 +84,6 @@ async function get_details() {
         document.getElementById("gender").value = res["gender"]
         document.getElementById("mob").value = res["mob"]
         document.getElementById("dob").value = res["dob"]
-        // document.getElementById("age").value = res["age"]
+         document.getElementById("bio").value = res["bio"]
     }
 }

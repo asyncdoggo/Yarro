@@ -3,7 +3,6 @@ import os
 import re
 import uuid
 from functools import wraps
-
 import flask
 import jwt
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory, make_response
@@ -97,11 +96,12 @@ def fullname(user):
     """
     api method, requires token validation
     returns full name of user in the "name" field of response JSON body
+    and user bio as field "bio"
     """
     try:
         data = request.get_json()
-        name = Data.get_fullname(data["uname"])
-        return {"status": "success", "name": name}
+        name, bio = Data.get_fullname_bio(data["uname"])
+        return {"status": "success", "name": name, "bio": bio}
     except Exception as e:
         print(repr(e))
         return {"status": "failure"}
@@ -116,7 +116,6 @@ def edit_profile():
     try:
         token = request.cookies.get("token")
         jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        # user = Data.User.query.filter_by(id=data['id']).first()
         return render_template("editprofile.html")
     except ExpiredSignatureError:
         return jsonify({'message': 'expired'})
@@ -184,6 +183,7 @@ def update_details(user):
         gender = data["gender"]
         mob = data["mob"]
         dob = data["dob"]
+        bio = data["bio"]
 
         if not dob:
             dob = "0000-00-00"
@@ -195,7 +195,7 @@ def update_details(user):
             mob = 0
 
         u = Data.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob,
-                        dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id)
+                        dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id,bio=bio)
         if u == mob:
             return {"status": "mob"}
         elif u:

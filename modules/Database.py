@@ -169,6 +169,7 @@ def insert_user(uid, uname, passwd, email):
         detail.mob = ""
         detail.dob = datetime.datetime(1000, 1, 1)
         detail.user_id = uid
+        detail.bio = ""
         db.session.add(detail)
         db.session.commit()
         return True

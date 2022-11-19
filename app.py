@@ -195,7 +195,7 @@ def update_details(user):
             mob = 0
 
         u = Data.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob,
-                        dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id,bio=bio)
+                        dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id, bio=bio)
         if u == mob:
             return {"status": "mob"}
         elif u:
@@ -422,8 +422,12 @@ def new_post(user):
     """
     data = request.get_json()
     try:
-        res = Data.insert_post(uid=user.id, cont=data["content"])
-        return {"status": "success"} if res else {"status": "failure"}
+        content: str = data["content"]
+        if content.strip():
+            res = Data.insert_post(uid=user.id, cont=content)
+            return {"status": "success"} if res else {"status": "failure"}
+        else:
+            return {"status": "nocontent"}
     except Exception as e:
         print(e)
         return {"status": "logout"}

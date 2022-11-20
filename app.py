@@ -92,7 +92,7 @@ def reset_render():
 
 @app.route("/api/fullname", methods=["POST"])
 @token_required
-def fullname(user):
+def fullname(_):
     """
     api method, requires token validation
     returns full name of user in the "name" field of response JSON body
@@ -183,7 +183,7 @@ def update_details(user):
         gender = data["gender"]
         mob = data["mob"]
         dob = data["dob"]
-        bio = data["bio"]
+        bio = data["bio"][0:254]
 
         if not dob:
             dob = "0000-00-00"

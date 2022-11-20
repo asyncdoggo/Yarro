@@ -87,3 +87,12 @@ async function get_details() {
          document.getElementById("bio").value = res["bio"]
     }
 }
+
+
+document.getElementById("bio").addEventListener("input",function (e) {
+    let str = document.getElementById("bio").value
+    if(str.length > 255){
+        str = str.substr(0,255)
+        document.getElementById("bio").value = str
+    }
+})

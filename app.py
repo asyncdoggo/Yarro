@@ -298,7 +298,7 @@ def register():
         if not re.search(email_regex, email):
             return jsonify({"status": "Invalid Email"})
 
-        if not (re.search(username_regex, username) and re.search(username_regex, password)):
+        if not (re.search(username_regex, username)) and (32 > password > 6 and " " not in password):
             return {"status": "username and password should be between 4 to 32 characters without spaces"}
 
         uid = uuid.uuid4().hex

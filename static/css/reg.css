@@ -71,6 +71,18 @@ input[type=submit] {
   /* margin: 2vh 1vw; */
 }
 
+input[type=submit]:disabled {
+  border: 0.5px solid #323336;
+  width: 100%;
+  height: 100%;
+  border-radius: 1vh;
+  background-color: #323336;
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 500;
+  /* margin: 2vh 1vw; */
+}
+
 a {
   text-decoration: none;
   color: #FFFFFF;

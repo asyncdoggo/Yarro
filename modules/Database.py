@@ -14,6 +14,7 @@ class User(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    confirmed = db.Column(db.Boolean, nullable=False)
 
 
 class Details(db.Model):
@@ -61,7 +62,23 @@ class Requests(db.Model):
     tstamp = db.Column(db.TIMESTAMP)
 
 
-def update(fname, lname, age, gender, mob, dob, uid,bio):
+class Friendship(db.Model):
+    __tablename__ = "friend"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id1 = db.Column(db.String(35), db.ForeignKey("users.id"))
+    user_id2 = db.Column(db.String(35), db.ForeignKey("users.id"))
+    byuserid = db.Column(db.String(35), db.ForeignKey("users.id"))
+
+
+class EmailRequests(db.Model):
+    __tablename__ = "emailrequests"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(35), db.ForeignKey("users.id"), unique=True, nullable=False)
+    guid = db.Column(db.String(255), nullable=False)
+    tstamp = db.Column(db.TIMESTAMP)
+
+
+def update(fname, lname, age, gender, mob, dob, uid, bio):
     detail = Details.query.filter_by(user_id=uid).one()
     detail.first_name = fname
     detail.last_name = lname
@@ -79,13 +96,13 @@ def get_fullname_bio(username):
     details: Details = Details.query.filter_by(user_id=user.id).one()
     fullname = details.first_name + " " + details.last_name
     bio = details.bio
-    return fullname,bio
+    return fullname, bio
 
 
-def getuserdetials(id):
-    details = Details.query.filter_by(user_id=id).one()
+def getuserdetials(uid):
+    details = Details.query.filter_by(user_id=uid).one()
     return {"fname": details.first_name, "lname": details.last_name, "age": details.age, "gender": details.gender,
-            "mob": details.mob, "dob": str(details.dob),"bio":details.bio}
+            "mob": details.mob, "dob": str(details.dob), "bio": details.bio}
 
 
 def update_like(pid, uid, islike):
@@ -150,7 +167,7 @@ def check_login(username, password):
         print(repr(e))
 
 
-def insert_user(uid, uname, passwd, email):
+def insert_user(uid, guid, uname, passwd, email):
     try:
         hashpass = ph.hash(passwd)
 
@@ -159,18 +176,21 @@ def insert_user(uid, uname, passwd, email):
         user.id = uid
         user.password = hashpass
         user.email = email
+        user.confirmed = False
         db.session.add(user)
         db.session.commit()
         detail = Details()
-        detail.first_name = ""
-        detail.last_name = ""
-        detail.gender = ""
+        detail.first_name = detail.last_name = detail.gender = detail.mob = detail.bio = ""
         detail.age = 0
-        detail.mob = ""
         detail.dob = datetime.datetime(1000, 1, 1)
         detail.user_id = uid
-        detail.bio = ""
         db.session.add(detail)
+        guid_hash = ph.hash(guid)
+        request = EmailRequests()
+        request.user_id = uid
+        request.guid = guid_hash
+        request.tstamp = datetime.datetime.now()
+        db.session.add(request)
         db.session.commit()
         return True
     except Exception as e:
@@ -283,3 +303,63 @@ def get_posts(uid, latest):
                         "uname": j.username, "islike": 1 if (uid, i.post_id) in likes else 0,
                         "isdislike": 1 if (uid, i.post_id) in dislikes else 0}
     return p
+
+
+def friend_request(user1, user2):
+    friend = Friendship()
+    friend.user_id1 = user1
+    friend.user_id2 = user2
+    friend.byuserid = user1
+    db.session.add(friend)
+    db.session.commit()
+
+
+def accept_request(user1, user2):
+    friend = Friendship.query.filter_by(user_id1=user1, user_id2=user2).one_or_none()
+    friend.byuserid = None
+    db.session.commit()
+
+
+def get_friends(user):
+    friends1 = Friendship.query.filter_by(user_id1=user)
+    friends2 = Friendship.query.filter_by(user_id2=user)
+
+    sq = friends1.union(friends2).all()
+    res = []
+
+    for i in sq:
+        res.append({
+            "user_id1": i.user_id1,
+            "user_id2": i.user_id2,
+            "byuserid": i.byuserid if not i.byuserid else "null"
+        })
+
+    return res
+
+
+def confirm_email(guid, uid):
+    try:
+        req = EmailRequests.query.filter_by(user_id=uid).one()
+        guidhash = req.guid
+        if ph.verify(guidhash, guid):
+            user = User.query.filter_by(id=uid).one()
+            user.confirmed = True
+            db.session.delete(req)
+            db.session.commit()
+            return True
+    except Exception as e:
+        print(repr(e))
+
+
+def resend_request(uid, guid):
+    try:
+        req = EmailRequests.query.filter_by(user_id=uid).one_or_none()
+        if not req:
+            req = EmailRequests()
+        req.user_id = uid
+        req.guid = ph.hash(guid)
+        req.tstamp = datetime.datetime.now()
+        db.session.add(req)
+        db.session.commit()
+    except Exception as e:
+        print(repr(e))

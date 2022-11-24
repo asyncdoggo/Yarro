@@ -1,4 +1,5 @@
 document.getElementById('reg_form').addEventListener('submit', async function (e) {
+    document.getElementById("reg").disabled = true
     e.preventDefault();
     const form = new FormData(e.target);
     const senddata = Object.fromEntries(form.entries());
@@ -20,9 +21,11 @@ document.getElementById('reg_form').addEventListener('submit', async function (e
         }
         else{
             document.getElementById("error").innerHTML = response.status
+            document.getElementById("reg").disabled = false
         }
     }
     else {
         document.getElementById("error").innerHTML = "passwords do not match";
+        document.getElementById("reg").disabled = false
     }
 })

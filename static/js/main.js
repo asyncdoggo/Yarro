@@ -37,7 +37,7 @@ document.getElementById("logout").addEventListener("click", async function () {
         }
     }).then((response) => response.json())
     if(response.status == "success"){
-        window.location.reload()
+        window.location.href = "/"
     }
 })
 

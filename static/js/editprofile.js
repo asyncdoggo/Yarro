@@ -1,7 +1,6 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
 
-
 document.getElementById("username").innerHTML = uname
 get_details()
 
@@ -85,6 +84,10 @@ async function get_details() {
         document.getElementById("mob").value = res["mob"]
         document.getElementById("dob").value = res["dob"]
          document.getElementById("bio").value = res["bio"]
+
+
+let str = document.getElementById("bio").value
+document.getElementById("biocount").innerHTML = `Bio ${str.length}/255`
     }
 }
 
@@ -95,4 +98,6 @@ document.getElementById("bio").addEventListener("input",function (e) {
         str = str.substr(0,255)
         document.getElementById("bio").value = str
     }
+    document.getElementById("biocount").innerHTML = `Bio ${str.length}/255`
+
 })

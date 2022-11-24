@@ -16,9 +16,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://root:root@127.0.0.1:3306/data"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-active_tokens = []
+username_regex = r"^\w(?:\w|[.-](?=\w)){3,31}$"
+
+active_tokens = {}
 
 with app.app_context():
     Data.db.init_app(app)
@@ -42,6 +44,8 @@ def token_required(f):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.User.query.filter_by(id=data['id']).first()
+            if not current_user.confirmed:
+                return {"status": "email"}
         except ExpiredSignatureError:
             return jsonify({'status': 'expired'})
         except DecodeError:
@@ -70,11 +74,13 @@ def main():
         return response
     else:
         try:
-            jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            return render_template("main.html")
-        except ExpiredSignatureError:
-            return render_template("index.html")
-        except DecodeError:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = Data.User.query.filter_by(id=data['id']).first()
+            if current_user.confirmed:
+                return render_template("main.html")
+            else:
+                return render_template("confirmemail.html")
+        except Exception:
             return render_template("index.html")
 
 
@@ -115,8 +121,12 @@ def edit_profile():
     """
     try:
         token = request.cookies.get("token")
-        jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        return render_template("editprofile.html")
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        current_user = Data.User.query.filter_by(id=data['id']).first()
+        if current_user.confirmed:
+            return render_template("editprofile.html")
+        else:
+            return render_template("index.html")
     except ExpiredSignatureError:
         return jsonify({'message': 'expired'})
     except DecodeError:
@@ -135,11 +145,13 @@ def profile(uname):
         token = request.cookies.get("token")
         data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         current_user = Data.User.query.filter_by(id=data['id']).first()
-        if current_user.username == uname:
-            return render_template("userprofile.html", visiting=False, login=True)
+        if current_user.confirmed:
+            if current_user.username == uname:
+                return render_template("userprofile.html", visiting=False, login=True)
+            else:
+                return render_template("userprofile.html", visiting=True, login=True)
         else:
-            return render_template("userprofile.html", visiting=True, login=True)
-
+            return render_template("confirmemail.html")
     except Exception as e:
         print(repr(e))
 
@@ -253,10 +265,10 @@ def update_lc(user):
     "islike" = 1 indicated the post is to be liked
     returns "data" field in response body
     data field contains following:
-    "islike" = determines if the post is liked by the user
-    "isdislike" = determines of the post is disliked by the user
-    "lc" = determines the like count of the post
-    "dlc" = determines the dislike count of the post
+    "islike" = indicates if the post is liked by the user
+    "isdislike" = indicates if the post is disliked by the user
+    "lc" = indicates the like count of the post
+    "dlc" = indicates the dislike count of the post
     """
     try:
         data = request.get_json()
@@ -283,20 +295,26 @@ def register():
         username = data["uname"]
         password = data["passwd1"]
 
-        if not re.search(regex, email):
+        if not re.search(email_regex, email):
             return jsonify({"status": "Invalid Email"})
 
-        if (30 > len(username) < 5 or " " in username) or (30 > len(password) < 5 or " " in password):
-            return {"status": "username and password should be between 5 to 30 characters without spaces"}
+        if not (re.search(username_regex, username) and re.search(username_regex, password)):
+            return {"status": "username and password should be between 4 to 32 characters without spaces"}
 
         uid = uuid.uuid4().hex
-        if Data.insert_user(uid=uid, uname=username, passwd=password, email=email):
+        guid = uuid.uuid4().hex
+        if Data.insert_user(uid=uid, guid=guid, uname=username, passwd=password, email=email):
             token = jwt.encode(
                 {'id': uid, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
                 app.config['SECRET_KEY'], "HS256")
-            response = flask.make_response({'status': 'success', "uname": flask.escape(username)})
-            response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
-            return response
+
+            url = url_for("confirm_email", id=guid, uid=uid, _external=True)
+            if send_mail.send_mail(email, username, url, True):
+                response = flask.make_response({'status': 'success', "uname": flask.escape(username)})
+                response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
+                return response
+            else:
+                return {"status": "error"}
         else:
             return jsonify({'status': 'user or email already exists'})
     except Exception as e:
@@ -322,18 +340,14 @@ def login_user():
             token = jwt.encode(
                 {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
                 app.config['SECRET_KEY'], "HS256")
-            active_tokens.append(token)
-            response = flask.make_response({"status": "success", "uname": flask.escape(user.username)})
+            active_tokens[user.username] = token
+            response = flask.make_response(
+                {"status": "success" if user.confirmed else "email", "uname": flask.escape(user.username)})
             response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
             return response
+        else:
+            return jsonify({"status": "username or password is incorrect"})
 
-            # if token in active_tokens:
-            #     return {"status": "tokenexists"}
-            # else:
-            #     active_tokens.append(token)
-            #     return jsonify({'token': token, "status": "success", "uname": user.username})
-
-        return jsonify({"status": "username or password is incorrect"})
     except Exception:
         return jsonify({"status": "failure"})
 
@@ -386,7 +400,7 @@ def reset_request():
         guid = uuid.uuid4().hex
         url = url_for("reset", id=guid, uid=user.id, _external=True)
 
-        if send_mail.send_mail(email, user.username, url):
+        if send_mail.send_mail(email, user.username, url, False):
             Data.insert_reset_request(user.id, guid)
             return {"status": "success"}
         else:
@@ -400,14 +414,18 @@ def check_login():
     """
     api method to check if a user is already logged in
     """
+
     try:
         token = request.cookies.get("token")
-
-        if token in active_tokens:
-            return {"status": "success"}
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        current_user = Data.User.query.filter_by(id=data['id']).first()
+        if current_user.confirmed:
+            if token in active_tokens.values():
+                return {"status": "success"}
+            else:
+                return {"status": "false"}
         else:
-            return {"status": "false"}
-
+            return {"status": "email"}
     except Exception as e:
         print(repr(e))
         return {"status": "failure"}
@@ -461,23 +479,94 @@ def get_posts(user):
         return {"status": "success", "data": res}
     except KeyError as e:
         print(repr(e))
-        return {"status": "logout"}
+        return {"status": "failure"}
 
 
 @app.route("/api/logout", methods=['POST'])
-def logout():
+@token_required
+def logout(user):
     """
     api method, requires token validation
     method logout, removes the user token from active tokens
     """
     try:
-        token = request.cookies.get("token")
-        active_tokens.remove(token)
-    except ValueError:
+        active_tokens.pop(user.username)
+    except KeyError:
         pass
     response = flask.make_response({"status": "success"})
     response.delete_cookie("token")
     return response
+
+
+@app.route("/confirm", methods=["GET"])
+def confirm_email():
+    """
+    renders the password reset page by checking the GET method args "id" and "uid" for guid and user id
+    """
+    guid = request.args.get("id")
+    uid = request.args.get("uid")
+    Data.confirm_email(guid, uid)
+    return flask.render_template("index.html", error="Email confirmed successfully")
+
+
+@app.route("/api/resend_confirm", methods=["POST"])
+def resend_confirm():
+    try:
+        token = request.cookies.get("token")
+
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        user = Data.User.query.filter_by(id=data['id']).first()
+
+        guid = uuid.uuid4().hex
+        Data.resend_request(user.id, guid)
+        url = url_for("confirm_email", id=guid, uid=user.id, _external=True)
+        send_mail.send_mail(user.email, user.username, url, True)
+
+    except Exception as e:
+        pass
+
+    return {"status": "success"}
+
+
+@app.route("/api/add_friend", methods=['POST'])
+@token_required
+def add_friend(user):
+    """
+    api method, requires token validation
+    accepts field "userid", userid to which friend request is sent to
+    """
+    data = request.get_json()
+    try:
+        userid = data["userid"]
+        Data.friend_request(user.id, userid)
+        return {"status": "success"}
+    except KeyError as e:
+        print(repr(e))
+        return {"status": "failure"}
+
+
+@app.route("/api/accept_friend", methods=["POST"])
+@token_required
+def accept_friend(user):
+    try:
+        data = request.get_json()
+        userid = data["userid"]
+        Data.accept_request(userid.id, userid)
+        return {"status": "success"}
+    except Exception as e:
+        print(repr(e))
+        return {"status": "failure"}
+
+
+@app.route("/api/get_friends", methods=["POST"])
+@token_required
+def get_friends(user):
+    try:
+        data = Data.get_friends(user.id)
+        return {"status": "success", "data": data}
+    except Exception as e:
+        print(repr(e))
+        return {"status": "failure"}
 
 
 def get_y(dob: str) -> int:
@@ -490,11 +579,6 @@ def get_y(dob: str) -> int:
     elif dif_m == 0 and dif_d < 0:
         dif_y -= 1
     return dif_y
-
-
-@app.route("/404")
-def notfound():
-    return render_template("404.html")
 
 
 if __name__ == '__main__':

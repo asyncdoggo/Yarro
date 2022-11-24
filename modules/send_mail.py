@@ -5,7 +5,7 @@ import os
 from email.message import EmailMessage
 
 
-def send_mail(to_email, uname, url):
+def send_mail(to_email, uname, url, confirm):
     try:
         f = open('modules/gapw.json')
 
@@ -19,11 +19,21 @@ def send_mail(to_email, uname, url):
         context = ssl.create_default_context()
 
         msg = EmailMessage()
-        msg.set_content(
-            f"Biitter account reset request\n Your B-itter account username is {uname} \n To reset your password "
-            f"click this link:\n {url}")
 
-        msg['Subject'] = 'B-itter password reset'
+        if not confirm:
+            msg.set_content(
+                f"Biitter account reset request\n Your B-itter account username is {uname} \n To reset your password "
+                f"click this link:\n {url}")
+
+            msg['Subject'] = 'B-itter password reset'
+        else:
+            msg.set_content(
+                f"""
+                To confirm your email click this link: \n {url}
+                """
+            )
+            msg['Subject'] = 'B-itter verify email'
+
         msg['From'] = mailaddr
         msg['To'] = to_email
 

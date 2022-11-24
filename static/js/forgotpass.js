@@ -1,5 +1,5 @@
 document.getElementById("resetButton").addEventListener("click",async function () {
-
+    document.getElementById("resetButton").disabled = true
     var email = document.getElementById("email").value;
 
     const response = await fetch("/api/resetrequest", {
@@ -20,5 +20,6 @@ document.getElementById("resetButton").addEventListener("click",async function (
     else{
         document.getElementById("error").innerHTML = status
     }
+    document.getElementById("reg").disabled = false
 })
 

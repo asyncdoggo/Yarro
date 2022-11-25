@@ -20,7 +20,7 @@ class User(db.Model):
 class Details(db.Model):
     __tablename__ = "details"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id"))
+    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     age = db.Column(db.Integer)
@@ -33,7 +33,7 @@ class Details(db.Model):
 class Posts(db.Model):
     __tablename__ = "posts"
     post_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id"))
+    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
     content = db.Column(db.String(255), nullable=False)
     l_count = db.Column(db.Integer)
     dl_count = db.Column(db.Integer)
@@ -57,7 +57,7 @@ class DisLikes(db.Model):
 class Requests(db.Model):
     __tablename__ = "requests"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     guid = db.Column(db.String(255), nullable=False)
     tstamp = db.Column(db.TIMESTAMP)
 
@@ -65,15 +65,15 @@ class Requests(db.Model):
 class Friendship(db.Model):
     __tablename__ = "friend"
     id = db.Column(db.Integer, primary_key=True)
-    user_id1 = db.Column(db.String(35), db.ForeignKey("users.id"))
-    user_id2 = db.Column(db.String(35), db.ForeignKey("users.id"))
-    byuserid = db.Column(db.String(35), db.ForeignKey("users.id"))
+    user_id1 = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
+    user_id2 = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
+    byuserid = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
 
 
 class EmailRequests(db.Model):
     __tablename__ = "emailrequests"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id"), unique=True, nullable=False)
+    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
     guid = db.Column(db.String(255), nullable=False)
     tstamp = db.Column(db.TIMESTAMP)
 

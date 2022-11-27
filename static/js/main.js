@@ -36,7 +36,7 @@ document.getElementById("logout").addEventListener("click", async function () {
             'Content-Type': 'application/json',
         }
     }).then((response) => response.json())
-    if(response.status == "success"){
+    if (response.status == "success") {
         window.location.href = "/"
     }
 })
@@ -59,7 +59,7 @@ async function get_msg() {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ "latest":0 })
+        body: JSON.stringify({ "latest": 0 })
     }).then((response) => response.json())
 
     if (response.status == "success") {
@@ -140,6 +140,7 @@ async function get_msg() {
 
 function onUserClick(div) {
     let name = div.innerHTML.trim()
+    div.style.color = 'darkviolet';
     window.location.href = `/u/${name}`
 }
 
@@ -159,7 +160,7 @@ async function onButtonClick(btn) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ "pid": pid,"islike":islike })
+        body: JSON.stringify({ "pid": pid, "islike": islike })
     }).then((response) => response.json())
 
     if (response.status == "success") {
@@ -168,16 +169,16 @@ async function onButtonClick(btn) {
         let dislike = document.getElementById(pid).getElementsByClassName("material-icons")[1]
         let lc = document.getElementById(pid).getElementsByTagName(`p`).like_count
         let dlc = document.getElementById(pid).getElementsByTagName(`p`).dislike_count
-        if(data["islike"] == 1){
+        if (data["islike"] == 1) {
             like.innerText = "thumb_up"
         }
-        else{
+        else {
             like.innerText = "thumb_up_off_alt"
         }
-        if(data["isdislike"] == 1){
+        if (data["isdislike"] == 1) {
             dislike.innerText = "thumb_down"
         }
-        else{
+        else {
             dislike.innerText = "thumb_down_off_alt"
         }
 

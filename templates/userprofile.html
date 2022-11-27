@@ -30,15 +30,15 @@
                     </li>
                 </ul>
             </div>
-             {% if not visiting or login %}
-                <div class="dropdown">
-                    <button class="dropbtn"> <span class="material-icons">
-                            person_outline
-                        </span></button>
-                    <div class="dropdown-content">
-                        <a href="#" id="logout">Logout</a>
-                    </div>
-             {% endif %}
+            {% if not visiting or login %}
+            <div class="dropdown">
+                <button class="dropbtn"> <span class="material-icons">
+                        person_outline
+                    </span></button>
+                <div class="dropdown-content">
+                    <a href="#" id="logout">Logout</a>
+                </div>
+                {% endif %}
             </div>
         </nav>
     </header>
@@ -66,7 +66,7 @@
                 <p>1 Following</p>
             </div> -->
             <!-- User can write here description and by default it contains name of user-->
-            <div class="description" id="fullname">
+            <div id="fullname">
 
             </div>
             <div class="description" id="bio">
@@ -79,7 +79,7 @@
                 </div>
                 <!-- From below posts start delete them they are static-->
                 <div id="posts_section">
-                    
+
                 </div>
 
             </div>
@@ -90,9 +90,10 @@
 
     <footer></footer>
 </body>
- {% if not visiting or login %}
+{% if not visiting or login %}
 <script src="/static/js/userprofile.js"></script>
- {%else%}
+{%else%}
 <script src="/static/js/visitprofile.js"></script>
- {% endif %}
+{% endif %}
+
 </html>

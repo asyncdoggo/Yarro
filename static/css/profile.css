@@ -89,6 +89,9 @@
 
     font-size: 18px;
     font-weight: 500;
+
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .user-posts {
@@ -110,6 +113,16 @@
     cursor: pointer;
     margin-bottom: 10px;
     font-size: 18px;
+}
+
+#fullname {
+    padding-left: 8%;
+    padding-right: 4%;
+    padding-bottom: 2%;
+    padding-top: 1%;
+
+    font-size: 18px;
+    font-weight: 500;
 }
 
 @media (max-width:800px) {
@@ -137,6 +150,10 @@
     }
 
     .description {
+        padding-left: 4%;
+    }
+
+    #fullname {
         padding-left: 4%;
     }
 

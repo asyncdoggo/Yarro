@@ -23,22 +23,23 @@
   width: 100%;
 }
 
-.inputags p label {
-  text-align: left;
-  margin-left: 50px;
-  margin-top: 8px;
+#save_form {
+  width: 100%;
+  text-align: center;
 }
 
+.inputags p {
+  text-align: left;
+  margin-left: 50px;
+  margin-top: 6px;
+}
 
 .inputags input {
   width: 80%;
 }
 
 
-#save_form {
-  width: 100%;
-  text-align: center;
-}
+
 
 .user_profile {
   display: flex;

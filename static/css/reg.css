@@ -56,7 +56,11 @@ input[type=text],
   /* margin: 2vh; */
   padding: 2vh 1vw;
   border-radius: 1vh;
-  border: 0.5px solid #04AA6D;
+  border: 0.1rem solid #4d4e4d;
+}
+input[type="password"]{
+  outline: none;
+
 }
 
 input[type=submit] {

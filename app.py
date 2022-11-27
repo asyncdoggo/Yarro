@@ -14,11 +14,11 @@ from modules import send_mail
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://root:root@127.0.0.1:3306/data"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:root@127.0.0.1:3306/data"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-
 username_regex = r"^\w(?:\w|[.-](?=\w)){3,31}$"
+password_regex = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
 
 active_tokens = {}
 
@@ -298,8 +298,12 @@ def register():
         if not re.search(email_regex, email):
             return jsonify({"status": "Invalid Email"})
 
-        if not (re.search(username_regex, username)) and (32 > password > 6 and " " not in password):
-            return {"status": "username and password should be between 4 to 32 characters without spaces"}
+        if not (re.search(username_regex, username)):
+            return {"status": "username should be between 4 to 32 characters without spaces"}
+
+        if not (re.search(password_regex, password)):
+            return {"status": "password should be between 8 to 32 characters, at least one letter, one number and one "
+                              "special character"}
 
         uid = uuid.uuid4().hex
         guid = uuid.uuid4().hex

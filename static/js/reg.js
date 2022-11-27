@@ -2,7 +2,6 @@ var password = ""
 var confirmPassword = ""
 document.getElementById('passwd1').addEventListener('input', (event) => {
     password = event.target.value
-    console.log(password.length)
     if (password.length == 0) event.target.style.borderColor = '#000000'
     else {
         event.target.style.borderColor = '#00ff00'
@@ -11,7 +10,6 @@ document.getElementById('passwd1').addEventListener('input', (event) => {
 
 document.getElementById('passwd2').addEventListener('input', (event) => {
     confirmPassword = event.target.value
-    console.log(confirmPassword.length)
     if (confirmPassword.length == 0) event.target.style.borderColor = '#000000'
     else {
         if (password == confirmPassword)

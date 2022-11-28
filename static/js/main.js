@@ -140,7 +140,6 @@ async function get_msg() {
 
 function onUserClick(div) {
     let name = div.innerHTML.trim()
-    div.style.color = 'darkviolet';
     window.location.href = `/u/${name}`
 }
 

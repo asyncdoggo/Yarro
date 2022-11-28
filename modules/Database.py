@@ -328,10 +328,14 @@ def get_friends(user):
     res = []
 
     for i in sq:
+        user1 = User.query.filter_by(id=i.user_id1).one()
+        user2 = User.query.filter_by(id=i.user_id2).one()
+        user3 = User.query.filter_by(id=i.byuserid).one_or_none()
+
         res.append({
-            "user_id1": i.user_id1,
-            "user_id2": i.user_id2,
-            "byuserid": i.byuserid if not i.byuserid else "null"
+            "user1": user1.username,
+            "user2": user2.username,
+            "by": user3.username if user3 else "null"
         })
 
     return res

@@ -63,6 +63,27 @@ def main():
     """
     token = request.cookies.get("token")
     if not token:
+        return render_template("landing.html")
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        current_user = Data.User.query.filter_by(id=data['id']).first()
+        if current_user.confirmed:
+            return render_template("main.html")
+        return render_template("landing.html")
+    except Exception:
+        return render_template("landing.html")
+
+
+@app.route("/register")
+def register_render():
+    """Renders register.html"""
+    return render_template("register.html")
+
+
+@app.route("/login")
+def login():
+    token = request.cookies.get("token")
+    if not token:
         return render_template("index.html")
     elif token == "success":
         response = flask.make_response(render_template("index.html", error="Reset successful"))
@@ -77,17 +98,11 @@ def main():
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.User.query.filter_by(id=data['id']).first()
             if current_user.confirmed:
-                return render_template("main.html")
+                return flask.redirect("/")
             else:
                 return render_template("confirmemail.html")
         except Exception:
             return render_template("index.html")
-
-
-@app.route("/register")
-def register_render():
-    """Renders register.html"""
-    return render_template("register.html")
 
 
 @app.route("/password/reset")

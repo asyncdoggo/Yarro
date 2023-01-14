@@ -19,6 +19,7 @@ const response = await fetch("/api/login", {
         window.location.reload()
     }
     else{
+        Snackbar.show({pos:"bottom-center",text: response.status})
         document.getElementById("error").innerHTML = response.status;
     }
 })

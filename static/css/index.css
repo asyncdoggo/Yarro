@@ -1,121 +1,115 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background-color: #FFFFFF;
-  font-family: 'Poppins', sans-serif;
-
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-h2 {
-  font-size: 40px;
-  margin: 2vh 3vw 0vh 3vw;
-}
-
-.container {
-  border: 0px solid;
-  width: 40%;
-  height: 55vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 10.8vw 4vh;
-  border-radius: 1.8vw;
-  background-color: #ffffff;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-
-}
-
-.box {
-  /* border: 2px solid; */
+.header{
   width: 100%;
-  height: 55vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  place-content: space-between;
 }
 
-.box h2 {
-  font-size: 32px;
+body{
+  background-color: #f7f7f7;
 }
 
-.cont {
-  /* border: 2px solid; */
-  margin: 1vw 2vh;
-  width: 20vw;
-  height: 5vh;
+.header > button {
+  background-color: white;
+  height: 30px;
+  width: 100px;
+  border-radius: 25rem;
+  border-color: purple;
+  border-width: 1px;
+  color: purple;
+  margin-top: 15px;
+  margin-right: 15px;
 }
 
-input[type="text"],
-[type="password"],
-[type="date"],
-[type="email"] {
-  width: 100%;
-  height: 100%;
-  padding: 2vh 1vw;
-  border-radius: 1vh;
-  border: 0.5px solid #04AA6D;
-}
-
-input[type="submit"] {
-  border: 0.5px solid #04AA6D;
-  width: 100%;
-  height: 100%;
-  border-radius: 1vh;
-  background-color: #04AA6D;
-  color: #FFFFFF;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.box1,
-.box2,
-.box3 {
-  width: 60%;
-}
-
-#error {
-  height: 1.6rem;
-}
-
-.box4 {
-  margin-top: 1rem;
-  width: 40%;
-}
-
-.box4 input {
+.header > button:hover {
   cursor: pointer;
 }
 
-a {
+
+.header > p{
+  padding-left: 20px;
+  font-size: x-large;
+  margin-top: 15px;
+}
+
+main{
+  margin-top: 100px;
+}
+
+.containerx{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin-left: 100px;
+}
+
+.image-container > img{
+  width: 600px;
+}
+
+.form-container{
+  border: 1px solid;
+  border-radius: 3rem;
+  display: flex;
+  flex-direction: column;
+  padding: 70px 50px 70px 50px;
+  border-color: white;
+  background-color: white;
+  margin-right: 100px;
+}
+
+@media only screen and (max-width: 1104px) {
+  .image-container{
+    display: none;
+  }
+}
+
+
+.phrase-container{
+  display: flex;
+  justify-content: center;
+}
+
+.phrase{
+  font-size: x-large;
+  text-align: center;
+}
+
+.login-form{
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+}
+
+.login-form > input{
+  margin: 8px;
+  border-radius: 1em;
+  height: 35px;
+  padding-left: 15px; 
+}
+
+.login-form > input[type=submit]{
+  margin-top: 20px;
+  border-radius: 25rem;
+  height: 40px; 
+  color: white;
+  font-size: medium;
+  background-color:rgb(112, 52, 228);
+  padding-left: 0px;
+}
+
+.login-form > input[type=submit]:hover{
+  cursor: pointer;
+}
+
+.forgot-text{
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
   text-decoration: none;
-  color: black;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  font-weight: lighter;
-  font-size: 16px;
-  border-bottom: 1px solid black;
 }
 
-@media (max-width:1100px) {
-  .container {
-    width: 50%;
-  }
-}
-
-@media (max-width:800px) {
-  .container {
-    width: 100%;
-  }
+.forgot-text:hover{
+  text-decoration: underline;
 }

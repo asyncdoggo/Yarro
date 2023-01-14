@@ -81,6 +81,14 @@
   border: 0.5px solid #04AA6D;
 }
 
+.count{
+  display: block;
+  position: relative;
+  flex-direction: row-reverse;
+  align-content: flex-end;
+  flex-wrap: nowrap;
+}
+
 @media (max-width:800px) {
   .profile {
     width: 99%;

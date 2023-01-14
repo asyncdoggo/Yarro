@@ -90,14 +90,3 @@ let str = document.getElementById("bio").value
 document.getElementById("biocount").innerHTML = `Bio ${str.length}/255`
     }
 }
-
-
-document.getElementById("bio").addEventListener("input",function (e) {
-    let str = document.getElementById("bio").value
-    if(str.length > 255){
-        str = str.substr(0,255)
-        document.getElementById("bio").value = str
-    }
-    document.getElementById("biocount").innerHTML = `Bio ${str.length}/255`
-
-})

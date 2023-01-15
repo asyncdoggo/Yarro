@@ -178,7 +178,7 @@ def send_image(user):
     try:
         file = request.files["image"]
         filename = secure_filename(user.username)
-        file.save(os.path.join('static/images/', filename))
+        file.save(os.path.join('static/userimages/', filename))
         return {"status": "success"}
     except KeyError as e:
         print(e)
@@ -258,9 +258,9 @@ def get_image(path):
     if the image is not found returns the default image
     """
     path = secure_filename(path)
-    if not os.path.exists(f"static/images/{path}"):
+    if not os.path.exists(f"static/userimages/{path}"):
         path = "default"
-    return send_from_directory("static/images", path)
+    return send_from_directory("static/userimages", path)
 
 
 @app.route("/api/like", methods=["POST"])
@@ -519,7 +519,7 @@ def confirm_email():
     guid = request.args.get("id")
     uid = request.args.get("uid")
     Data.confirm_email(guid, uid)
-    return flask.render_template("index.html", error="Email confirmed successfully")
+    return flask.redirect("/")
 
 
 @app.route("/api/resend_confirm", methods=["POST"])

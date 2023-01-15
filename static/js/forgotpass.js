@@ -1,25 +1,36 @@
-document.getElementById("resetButton").addEventListener("click",async function () {
-    document.getElementById("resetButton").disabled = true
-    var email = document.getElementById("email").value;
-
-    const response = await fetch("/api/resetrequest", {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "email": email })
-    }).then((response) => response.json())
-    let status = response.status
-    if(status == "success"){
-        document.getElementById("error").innerHTML = "Email sent successfully"
-    }
-    else if(status == "noemail"){
-        document.getElementById("error").innerHTML = "Email does not exists"
-    }
-    else{
-        document.getElementById("error").innerHTML = status
-    }
-    document.getElementById("reg").disabled = false
-})
-
+document
+    .getElementById("resetButton")
+    .addEventListener("click", async function () {
+        document.getElementById("resetButton").disabled = true;
+        var email = document.getElementById("email").value;
+        try {
+            const response = await fetch("/api/resetrequest", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: email }),
+            }).then((response) => response.json());
+            let status = response.status;
+            if (status == "success") {
+                Snackbar.show({
+                    pos: "bottom-center",
+                    text: "Email sent successfully",
+                });
+            } else if (status == "noemail") {
+                Snackbar.show({
+                    pos: "bottom-center",
+                    text: "Email does not exists",
+                });
+            } else {
+                Snackbar.show({
+                    pos: "bottom-center",
+                    text: status,
+                });
+            }
+        } catch (error) {} 
+        finally {
+            document.getElementById("resetButton").disabled = false;
+        }
+    });

@@ -10,10 +10,12 @@ document.getElementById("resend").addEventListener("click",async function(){
         }).then((response) => response.json())
 
         if(response.status == "success"){
-            document.getElementById("error").innerHTML = "email sent successfully"
+            Snackbar.show({
+                pos: "bottom-center",
+                text: "email sent successfully",
+            });
         }
     }
-
     e = false
 
     })

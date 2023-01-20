@@ -1,69 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>B-itter -Its Your Thought</title>
+        <!-- <link rel="stylesheet" href="/static/css/main.css" /> -->
+        <!-- <link rel="stylesheet" href="/static/css/post.css" /> -->
+        <script
+            src="https://kit.fontawesome.com/9ac9c74418.js"
+            crossorigin="anonymous"
+        ></script>
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="/static/js/snackbar.js"></script>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B-itter -Its Your Thought</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/post.css">
-    <script src="https://kit.fontawesome.com/9ac9c74418.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-
-<body>
-
-<header>
-    <nav>
-        <div class="logo">
-            <h2>B-itter</h2>
-        </div>
-
-        <div class="navbar-tabs">
-            <ul>
-                <li><a id="homebtn" href="#"> <span class="material-icons">
-                                home
-                            </span></a>
-                    <span>Home</span>
-                </li>
-            </ul>
-        </div>
-
-        <div class="dropdown">
-            <button class="dropbtn"> <span class="material-icons">
-                        person_outline
-                    </span></button>
-            <div class="dropdown-content">
-                <a href="#" id="profile">Profile</a>
-                <a href="#" id="logout">Logout</a>
+    <body>
+        <div
+            class="header border border-r-0 border-l-0 border-black pb-4 w-full flex flex-row place-content-between"
+        >
+            <p class="pl-6 text-xl pt-6 font-bold">Bitter</p>
+            <div class="relative inline-block group">
+                <div
+                    class="profile-container pt-4 px-2 min-w-[50px] min-h-[50px]"
+                >
+                    <img
+                        id="profile-img"
+                        src=""
+                        alt="pfp"
+                        class="min-w-[50px] h-[50px] rounded-full"
+                    />
+                </div>
+                <div
+                    class="navs group-hover:block absolute hidden w-36 right-1 z-1 shadow-xl"
+                >
+                    <p
+                        class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300"
+                        id="profile-btn"
+                    >
+                        Profile
+                    </p>
+                    <p
+                        class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300"
+                        id="logout-btn"
+                    >
+                        Logout
+                    </p>
+                </div>
             </div>
         </div>
-    </nav>
-</header>
+        <main>
+            <div
+                id="modal"
+                class="relative z-10"
+                hidden
+                aria-labelledby="modal-title"
+                role="dialog"
+                aria-modal="true"
+            >
+                <!--
+                Background backdrop, show/hide based on modal state.
+            
+                Entering: "ease-out duration-300"
+                  From: "opacity-0"
+                  To: "opacity-100"
+                Leaving: "ease-in duration-200"
+                  From: "opacity-100"
+                  To: "opacity-0"
+              -->
+                <div
+                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                ></div>
 
-<main>
-    <div class="main_section">
-        <div class="create_post_section">
-            <div class="user_profile">
-                <img src="" id="u_image" width="40vw" alt="" height="40vh">
-                <input type="text" id="postcont" placeholder="Have a topic that excites you? Post about it">
-                <!-- <i class="fa-light fa-user"></i> -->
-                <!-- <button id="click_to_write">Have a topic that excites you? Post about it</button> -->
-                <button class="post_article" id="postbtn">Post</button>
+                <div class="fixed inset-0 z-10 overflow-y-auto">
+                    <div
+                        class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+                    >
+                        <!--
+                    Modal panel, show/hide based on modal state.
+            
+                    Entering: "ease-out duration-300"
+                      From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                      To: "opacity-100 translate-y-0 sm:scale-100"
+                    Leaving: "ease-in duration-200"
+                      From: "opacity-100 translate-y-0 sm:scale-100"
+                      To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  -->
+                        <div
+                            class="relative mb-[300px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg"
+                        >
+                            <div
+                                class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4 border"
+                            >
+                                <div
+                                    class="sm:flex sm:items-start mt-2 text-center sm:mt-0 sm:ml-4 sm:text-left"
+                                >
+                                    <p class="text-lg font-medium">New Post</p>
+                                </div>
+                            </div>
+                            <div>
+                                <p>
+                                    <textarea
+                                        name="content"
+                                        id="postcontent"
+                                        cols="30"
+                                        rows="10"
+                                        class="w-full resize-none px-5 py-5 focus:outline-none"
+                                    ></textarea>
+                                </p>
+                            </div>
+                            <div
+                                class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+                            >
+                                <button
+                                    type="button"
+                                    id="post_btn"
+                                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                                >
+                                    Post
+                                </button>
+                                <button
+                                    type="button"
+                                    id="cancle_btn"
+                                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <hr>
-        <div id="post_section">
-
-        </div>
-    </div>
-</main>
-
-
-<footer></footer>
-</body>
-
-<script src="/static/js/main.js"></script>
-
+            
+                <div
+                    class="postbox-container flex flex-row md:mx-36 lg:mx-80 mx-10 mt-16"
+                >
+                    <div class="postbox px-2 w-full flex flex-row mb-8">
+                        <div class="pfp min-w-[45px] min-h-[45px] pt-4 pr-4">
+                            <img
+                                id="u_image"
+                                src=""
+                                alt="pfp"
+                                class="min-w-[45px] h-[45px] rounded-full"
+                            />
+                        </div>
+                        <div class="input my-4 w-full">
+                            <input
+                                id="postbox"
+                                class="border border-black w-full rounded-full px-4 h-12 focus:outline-none hover:bg-gray-200 hover:cursor-pointer"
+                                placeholder="Have a topic that excites you? Post about it"
+                                readonly
+                            />
+                        </div>
+                    </div>
+                </div>
+                <post-section self="false"></post-section>
+            
+        </main>
+    </body>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/PostSection.js"></script>
 </html>

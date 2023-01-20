@@ -455,7 +455,7 @@ def new_post(user):
     try:
         content: str = data["content"]
         if content.strip():
-            res = Data.insert_post(uid=user.id, cont=content)
+            res = Data.insert_post(uid=user.id, cont=content.strip())
             return {"status": "success"} if res else {"status": "failure"}
         else:
             return {"status": "nocontent"}
@@ -520,7 +520,6 @@ def confirm_email():
     uid = request.args.get("uid")
     Data.confirm_email(guid, uid)
     return flask.redirect("/")
-
 
 @app.route("/api/resend_confirm", methods=["POST"])
 def resend_confirm():

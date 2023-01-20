@@ -67,8 +67,8 @@ class PostSection extends HTMLElement {
 
     render() {
         if (!this.loading) {
-            let uname = localStorage.getItem("uname")
-            let self = this.getAttribute("self")
+            let uname = window.location.pathname.split("/")[2]
+            let self = this.getAttribute("user")
 
             let data = this.posts;
             let keys = Object.keys(data).reverse();

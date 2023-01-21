@@ -39,7 +39,7 @@ class PostSection extends HTMLElement {
         if (response.status == "success") {
             let data = response.data;
             this.posts = data;
-            this.innerHTML = `<div class="post-area w-full flex flex-col px-10 md:px-36 lg:px-80" id="post_section"> </div>`;
+            this.innerHTML = `<div class="post-area w-full flex flex-col px-1 md:px-36 lg:px-80" id="post_section"> </div>`;
         }
         this.loading = false;
     }

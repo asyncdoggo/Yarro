@@ -1,94 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>B-itter -Its Your Thought</title>
-        <!-- <link rel="stylesheet" href="/static/css/main.css" /> -->
-        <!-- <link rel="stylesheet" href="/static/css/post.css" /> -->
-        <script
-            src="https://kit.fontawesome.com/9ac9c74418.js"
-            crossorigin="anonymous"
-        ></script>
-        <link
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            rel="stylesheet"
-        />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="/static/js/snackbar.js"></script>
-    </head>
 
-    <body>
-        <div
-            class="header border border-r-0 border-l-0 border-black pb-4 w-full flex flex-row place-content-between"
-        >
-            <p class="pl-6 text-xl pt-6 font-bold">Bitter</p>
-            <span class="material-icons pt-8 hover:cursor-pointer" id="homebtn">home</span>
-            <div class="relative inline-block group">
-                <div
-                    class="profile-container pt-4 px-2 min-w-[50px] min-h-[50px]"
-                >
-                    <img
-                        id="pfpimage"
-                        src=""
-                        alt="pfp"
-                        class="min-w-[50px] h-[50px] rounded-full"
-                    />
-                </div>
-                {% if not visiting or login %}
-                <div
-                    class="navs group-hover:block absolute hidden w-36 right-1 z-1 shadow-xl"
-                >
-                    <p
-                        class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300"
-                        id="logout"
-                    >
-                        Logout
-                    </p>
-                </div>
-                {% endif %}
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>B-itter -Its Your Thought</title>
+    <!-- <link rel="stylesheet" href="/static/css/main.css" /> -->
+    <!-- <link rel="stylesheet" href="/static/css/post.css" /> -->
+    <script src="https://kit.fontawesome.com/9ac9c74418.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/js/snackbar.js"></script>
+</head>
+
+<body>
+    <div class="header border border-r-0 border-l-0 border-black pb-4 w-full flex flex-row place-content-between">
+        <p class="pl-6 text-xl pt-6 font-bold">Bitter</p>
+        <span class="material-icons pt-8 hover:cursor-pointer" id="homebtn">home</span>
+        <div class="relative inline-block group">
+            <div class="profile-container pt-4 px-2 min-w-[50px] min-h-[50px]">
+                <img id="pfpimage" src="" alt="pfp" class="min-w-[50px] h-[50px] rounded-full" />
             </div>
+            {% if not visiting or login %}
+            <div class="navs group-hover:block absolute hidden w-36 right-1 z-1 shadow-xl">
+                <p class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300" id="logout">
+                    Logout
+                </p>
+            </div>
+            {% endif %}
         </div>
-        <main class="flex flex-col">
-            <div
-                class="data flex flex-row pt-12 pl-4 pr-10 md:px-36 lg:px-80"
-            >
-                <div class="pfp-container w-full flex flex-row mb-8">
-                    <div class="pfp min-w-[120px] min-h-[120px] pt-4 pr-4">
-                        <img
-                            id="pfpimage2"
-                            src=""
-                            alt="pfp"
-                            class="min-w-[120px] h-[120px] rounded-full"
-                        />
-                    </div>
-                    <div class="flex flex-row place-content-between">
-                        <div class="uname-fullname pl-12 pt-4 flex flex-col">
-                            <div class="flex flex-row">
-                            <p id="uname" class="p-2 font-medium "></p>
+    </div>
+    <main class="flex flex-col">
+        <div class="data flex flex-row pt-12 pl-4 pr-10 md:px-36 lg:px-80">
+            <div class="pfp-container w-full flex flex-row mb-8">
+                <div class="pfp min-w-[120px] min-h-[120px] pt-4 pr-4">
+                    <img id="pfpimage2" src="" alt="pfp" class="min-w-[120px] h-[120px] rounded-full" />
+                </div>
+                <div class="flex flex-row place-content-between">
+                    <div class="uname-fullname pl-12 pt-4 flex flex-col">
+                        <div class="flex flex-row">
+                            <p id="uname" class="p-2 font-medium"></p>
                             <div class="editbtn mt-1 ml-4">
                                 {% if not visiting and login %}
-                                <button id="editprofile" class="edit-button bg-white-900 h-[30px] w-[100px] border rounded-full border-purple-900 text-purple-900 hover:cursor-pointer hover:bg-purple-600 hover:text-white">Edit Profile</button>
+                                <button id="editprofile"
+                                    class="edit-button bg-white-900 h-[30px] w-[100px] border rounded-full border-purple-900 text-purple-900 hover:cursor-pointer hover:bg-purple-600 hover:text-white">
+                                    Edit Profile
+                                </button>
                                 {% endif %}
                             </div>
                         </div>
-                            <p id="fullname" class="p-2"></p>
-                            <div class="bio pl-2 pt-8">
-                                <p class="whitespace-pre-wrap" id="bio"></p>
-                            </div>
+                        <p id="fullname" class="p-2"></p>
+                        <div class="bio pl-2 pt-8">
+                            <p class="whitespace-pre-wrap" id="bio"></p>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <post-section user="true"></post-section>
-        </main>
-    </body>
-    {% if not visiting or login %}
-    <script src="/static/js/PostSection.js"></script>
-    <script src="/static/js/userprofile.js"></script>
-    {%else%}
-    <script src="/static/js/visitprofile.js"></script>
-    {% endif %}
+        </div>
+
+        <post-section user="true"></post-section>
+    </main>
+</body>
+{% if not visiting or login %}
+<script src="/static/js/PostSection.js"></script>
+<script src="/static/js/userprofile.js"></script>
+{%else%}
+<script src="/static/js/visitprofile.js"></script>
+{% endif %}
+
 </html>

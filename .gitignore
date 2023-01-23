@@ -13,3 +13,4 @@ temp
 instance
 Data.db
 .vercel
+/build_files/

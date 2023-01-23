@@ -101,7 +101,7 @@ class PostSection extends HTMLElement {
                 this.children[0].innerHTML += ` <div class="post flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
         <div class="first-row flex flex-row w-full ">
             <div
-                class="pfp-container min-w-[45px] min-h-[45px] pt-2 pr-4"
+                class="pfp-container min-w-[45px] min-h-[45px] pt-1 pr-4 ml-2"
             >
                 <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
             </div>
@@ -117,9 +117,9 @@ class PostSection extends HTMLElement {
                 </div> -->
             </div>
         </div>
-        <div class="content pl-14 pr-2 whitespace-pre-wrap text-lg">${content}</div>
+        <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content}</div>
         <div class="buttons-row flex flex-row">
-            <div class="lc flex flex-row pl-14 pt-4">
+            <div class="lc flex flex-row pl-16 pt-4">
                 <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
                     islike ? "thumb_up" : "thumb_up_off_alt"
                 }</span>

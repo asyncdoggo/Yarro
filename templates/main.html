@@ -17,7 +17,6 @@
         />
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="/static/js/snackbar.js"></script>
-        <script src="/static/js/main.js"></script>
         <script src="/static/js/PostSection.js"></script>
     </head>
 
@@ -117,32 +116,31 @@
                     </div>
                 </div>
             </div>
-            
-                <div
-                    class="postbox-container flex flex-row md:mx-36 lg:mx-80  mt-16"
-                >
-                    <div class="postbox px-2 w-full flex flex-row mb-8">
-                        <div class="pfp min-w-[45px] min-h-[45px] pt-4 pr-4">
-                            <img
-                                id="u_image"
-                                src=""
-                                alt="pfp"
-                                class="min-w-[45px] h-[45px] rounded-full"
-                            />
-                        </div>
-                        <div class="input my-4 w-full">
-                            <input
-                                id="postbox"
-                                class="border border-black w-full rounded-full px-4 h-12 focus:outline-none hover:bg-gray-200 hover:cursor-pointer"
-                                placeholder="Have a topic that excites you? Post about it"
-                                readonly
-                            />
-                        </div>
+
+            <div
+                class="postbox-container flex flex-row md:mx-36 lg:mx-80 mt-16"
+            >
+                <div class="postbox px-2 w-full flex flex-row mb-8">
+                    <div class="pfp min-w-[45px] min-h-[45px] pt-4 pr-4">
+                        <img
+                            id="u_image"
+                            src=""
+                            alt="pfp"
+                            class="min-w-[45px] h-[45px] rounded-full"
+                        />
+                    </div>
+                    <div class="input my-4 w-full">
+                        <input
+                            id="postbox"
+                            class="border border-black w-full rounded-full px-4 h-12 focus:outline-none hover:bg-gray-200 hover:cursor-pointer"
+                            placeholder="Have a topic that excites you? Post about it"
+                            readonly
+                        />
                     </div>
                 </div>
-                <post-section user="false"></post-section>
-            
+            </div>
+            <post-section user="false"></post-section>
+            <script src="/static/js/main.js"></script>
         </main>
     </body>
-   
 </html>

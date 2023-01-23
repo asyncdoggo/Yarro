@@ -1,56 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <link rel="stylesheet" href="/static/css/index.css" /> -->
-    <link rel="stylesheet" type="text/css" href="/static/css/snackbar.css">
-    <script src="/static/js/snackbar.js"></script>
-    <title>Bitter - Its your Thought</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-
-<body class="bg-[#f7f7f7]">
-    <div class="header w-full flex flex-row place-content-between ">
-        <p class="pl-2 text-xl mt-4">Bitter</p>
-        <button
-            class="bg-white-900 h-[30px] w-[100px] border rounded-full border-purple-900 mt-4 mr-4 text-purple-900 hover:cursor-pointer"
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- <link rel="stylesheet" href="/static/css/index.css" /> -->
+        <link rel="stylesheet" type="text/css" href="/static/css/snackbar.css">
+        <script src="/static/js/snackbar.js"></script>
+        <title>Bitter - Its your Thought</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-[#f7f7f7]">
+        <div class="header w-full flex flex-row place-content-between ">
+            <p class="pl-2 text-xl mt-4">Bitter</p>
+            <button class="bg-white-900 h-[30px] w-[100px] border rounded-full border-purple-900 mt-4 mr-4 text-purple-900 hover:cursor-pointer" 
             onClick="window.location.href='/register'">
-            Sign Up
-        </button>
-    </div>
-    <main class="mt-28">
-        <div class="containerx flex justify-center lg:flex-row lg:place-content-evenly lg:mr-10">
-            <div class="image-container hidden lg:block">
-                <img class="w-[600px] " src="/static/images/login.png" alt="someimage" />
-            </div>
-
-            <div class="form-container border rounded-[3rem] flex flex-col px-[50px] py-[70px] border-white bg-white  ">
-                <form id="login_form" class="login-form flex flex-col w-[360px] lg:w-[400px] ">
-                    <div class="phrase-container flex justify-center ">
-                        <p class="phrase text-xl text-center ">
-                            Share your thoughts with people and connect to
-                            them
-                        </p>
-                    </div>
-
-                    <input class="m-[8px] rounded-[1em] h-[35px] pl-[15px] border-2 " type="text" name="uname"
-                        placeholder="username" id="uname" />
-                    <input class="m-[8px] rounded-[1em] h-[35px] pl-[15px] border-2 " type="password" name="passwd"
-                        placeholder="Password" id="passwd" />
-                    <input class="mt-[20px] rounded-full h-[40px] text-white text-m bg-[#7034E4] hover:cursor-pointer "
-                        type="submit" name="login_btn" id="login_btn" value="Login" />
-                    <a href="/password/reset"
-                        class="forgot-text flex justify-center mt-[50px] hover:underline underline-offset-1">
-                        Forgot password
-                    </a>
-                </form>
-            </div>
+                Sign Up
+            </button>
         </div>
-    </main>
-    <script src="/static/js/index.js"></script>
-</body>
+        <main class="mt-28">
+            <div class="containerx flex justify-center lg:flex-row lg:place-content-evenly lg:mr-10">
+                <div class="image-container hidden lg:block">
+                    <img class="w-[600px] " src="/static/images/login.png" alt="someimage" />
+                </div>
 
+                <div class="form-container border rounded-[3rem] flex flex-col px-[50px] py-[70px] border-white bg-white  ">
+                    <form id="login_form" class="login-form flex flex-col w-[360px] lg:w-[400px] ">
+                        <div class="phrase-container flex justify-center ">
+                            <p class="phrase text-xl text-center ">
+                                Share your thoughts with people and connect to
+                                them
+                            </p>
+                        </div>
+
+                        <input
+                            class="m-[8px] rounded-[1em] h-[35px] pl-[15px] border-2 "
+                            type="text"
+                            name="uname"
+                            placeholder="username"
+                            id="uname"
+                        />
+                        <input
+                        class="m-[8px] rounded-[1em] h-[35px] pl-[15px] border-2 "
+
+                            type="password"
+                            name="passwd"
+                            placeholder="Password"
+                            id="passwd"
+                        />
+                        <input
+                        class="mt-[20px] rounded-full h-[40px] text-white text-m bg-[#7034E4] hover:cursor-pointer "
+
+                            type="submit"
+                            name="login_btn"
+                            id="login_btn"
+                            value="Login"
+                        />
+                        <a href="/password/reset" class="forgot-text flex justify-center mt-[50px] hover:underline underline-offset-1">
+                            Forgot password
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <script src="/static/js/index.js"></script>
+    </body>
 </html>

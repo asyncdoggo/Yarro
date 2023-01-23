@@ -1,5 +1,8 @@
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
+let page = 0;
+let bottom = false;
+// let uname = window.location.pathname.split("/")[2] userprofile TODO
 document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
 document.getElementById("profile-img").setAttribute("src", `/images/${uname}`);
 
@@ -68,7 +71,9 @@ document
 
             if (response.status == "success") {
                 document.getElementById("postcontent").value = "";
-                document.getElementsByTagName("post-section")[0].getPosts();
+                document.getElementById("post_section").innerHTML = "";
+                page = 0;
+                getPosts();
             }
         }
         document.getElementById("modal").hidden = true;
@@ -90,6 +95,83 @@ document
         }
     });
 
+
+async function getPosts() {
+    let response = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ page: page }),
+    }).then((response) => response.json());
+
+    if (response.status == "success") {
+        page += 10;
+        let data = response.data;
+        let keys = Object.keys(data).reverse();
+        let i;
+        const options = {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+        };
+        
+        let section = document.getElementById("post_section")
+        
+        for (i in keys) {
+            var post = data[keys[i]];
+            let pid = keys[i];
+            let content = linkify(post["content"]);
+            let lc = post["lc"];
+            let dlc = post["dlc"];
+            let islike = post["islike"];
+            let isdislike = post["isdislike"];
+            let user = post["uname"];
+            let date = post["datetime"];
+            let d = new Date(`${date} UTC`);
+            d = d.toLocaleString("en-us", options);
+            section.innerHTML += `<div class="post flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
+        <div class="first-row flex flex-row w-full ">
+            <div
+                class="pfp-container min-w-[45px] min-h-[45px] pt-1 pr-4 ml-2"
+            >
+                <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
+            </div>
+            <div class="uname-date flex flex-col w-full">
+                <div
+                    class="username pt-3 flex flex-row w-full place-content-between"
+                >
+                    <a href="/u/${user}" class="hover:underline underline-offset-1 accent-black font-medium text-lg" >${user}</a>
+                    <p class="pr-4 text-xs ">${d}</p>
+                </div>
+                <!-- <div class="username">
+                    <p class="text-sm"></p>
+                </div> -->
+            </div>
+        </div>
+        <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content}</div>
+        <div class="buttons-row flex flex-row">
+            <div class="lc flex flex-row pl-16 pt-4">
+                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
+                islike ? "thumb_up" : "thumb_up_off_alt"
+            }</span>
+                <p class="pl-2">${lc}</p>
+            </div>
+            <div class="dlc flex flex-row pl-4 pt-4">
+                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
+                isdislike ? "thumb_down" : "thumb_down_off_alt"
+            }</span>
+                <p class="pl-2">${dlc}</p>
+            </div>
+        </div>
+    </div>`;
+        }
+    }
+    bottom = false
+}
 
 function linkify(inputText) {
     var replacedText, replacePattern1, replacePattern2, replacePattern3;
@@ -120,3 +202,14 @@ function linkify(inputText) {
     return replacedText;
 }
 
+
+let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop
+window.onscroll = function(ev) {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > lastScrollTop && (window.innerHeight + window.scrollY) >= document.body.offsetHeight){
+        getPosts()   
+    }
+    lastScrollTop = st <= 0 ? 0 : st;
+};
+
+getPosts()

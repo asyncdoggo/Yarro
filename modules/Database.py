@@ -1,4 +1,5 @@
 import datetime
+from sqlalchemy import desc
 
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
@@ -290,8 +291,9 @@ def insert_post(uid, cont):
         print(repr(e))
 
 
-def get_posts(uid, latest):
-    result = db.session.query(Posts, User).filter(User.id == Posts.user_id, Posts.post_id > latest).all()
+# TODO: Paging
+def get_posts(uid, page):
+    result = db.session.query(Posts, User).filter(User.id == Posts.user_id).order_by(desc(Posts.post_id)).limit(10).offset(page).all()
 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
     dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == uid).all()

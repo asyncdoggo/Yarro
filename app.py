@@ -59,17 +59,17 @@ def token_required(f):
 @app.route("/", methods=["GET"])
 def main():
     """
-    The root route of the app. will handle rendering of index.html,forgotpass.html,logout.html,home.html
+    The root route of the app. will handle rendering of index.html and forgotpass.html
     """
     token = request.cookies.get("token")
     if not token:
         return render_template("index.html")
     elif token == "success":
-        response = flask.make_response(render_template("index.html", error="Reset successful"))
+        response = flask.make_response(render_template("index.html"))
         response.delete_cookie("token")
         return response
     elif token == "expired":
-        response = flask.make_response(render_template("forgotpass.html", error="Request expired"))
+        response = flask.make_response(render_template("forgotpass.html"))
         response.delete_cookie("token")
         return response
     else:
@@ -394,8 +394,8 @@ def reset():
     uid = request.args.get("uid")
     if Data.check_reset(guid, uid):
         user = Data.get_user(uid=uid)
-        return render_template("resetpass.html", uname=user.username)
-    return render_template("forgotpass.html", error="request expired")
+        return render_template("resetpass.html")
+    return render_template("forgotpass.html")
 
 
 @app.route("/api/resetrequest", methods=['POST'])
@@ -486,8 +486,8 @@ def get_posts(user):
     """
     data = request.get_json()
     try:
-        latest = data["latest"]
-        res = Data.get_posts(user.id, latest)
+        page = data["page"]
+        res = Data.get_posts(user.id, page)
         return {"status": "success", "data": res}
     except KeyError as e:
         print(repr(e))

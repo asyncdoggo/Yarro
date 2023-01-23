@@ -7,7 +7,7 @@ document.getElementById("uname").innerHTML = uname
 
 try{
     document.getElementById("editprofile").addEventListener("click", function () {
-        send_form("/editprofile", { "uname": uname})
+        window.location.href = "/profile/edit"
     })
 }catch(e){}
 

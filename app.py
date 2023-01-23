@@ -122,11 +122,10 @@ def fullname(_):
         return {"status": "failure"}
 
 
-@app.route("/editprofile", methods=["POST"])
+@app.route("/profile/edit")
 def edit_profile():
     """
-    form redirect method, requires token to be sent in the form data as "token" field
-    renders editprofile.html
+    Render editprofile.html requires token in cookie
     """
     try:
         token = request.cookies.get("token")

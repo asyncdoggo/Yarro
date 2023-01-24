@@ -78,15 +78,10 @@ async function get_details() {
     if (response.status == "success") {
         res = response.data
         document.getElementById("user_image").setAttribute("src", `/images/${uname}`);
-        document.getElementById("fname").value = res["fname"]
-        document.getElementById("lname").value = res["lname"]
+        document.getElementById("name").value = res["name"]
         document.getElementById("gender").value = res["gender"]
         document.getElementById("mob").value = res["mob"]
         document.getElementById("dob").value = res["dob"]
          document.getElementById("bio").value = res["bio"]
-
-
-let str = document.getElementById("bio").value
-document.getElementById("biocount").innerHTML = `Bio ${str.length}/255`
     }
 }

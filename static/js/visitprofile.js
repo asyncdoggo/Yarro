@@ -10,4 +10,4 @@ document.getElementById("homebtn").addEventListener("click", function () {
     window.location.href = "/"
 })
 
-document.getElementsByTagName("post-section")[0].innerHTML = `Login to see ${uname}'s posts`
+document.getElementById("post_section").innerHTML = `Login to see ${uname}'s posts`

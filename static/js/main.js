@@ -134,23 +134,34 @@ async function getPosts() {
             let fullname = post["fullname"]
             let d = new Date(`${date} UTC`);
             d = d.toLocaleString("en-us", options);
-            section.innerHTML += `<div class="post flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
-        <div class="first-row flex flex-row w-full ">
+            section.innerHTML += `<div class="post group flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
+        <div class="first-row flex flex-row w-full">
             <div
                 class="pfp-container min-w-[45px] min-h-[45px] pt-1 pr-4 ml-2"
             >
                 <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
             </div>
             <div class="fullname-date flex flex-col w-full">
-                <div
-                    class="fullname mb-[-5px] flex flex-row w-full place-content-between"
-                >
+                <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
                     <p class="text-lg font-medium ">${fullname}</p>
-                    <p class="pr-4 text-xs ">${d}</p>
+                    <div class="flex flex-row relative">
+                        <p class="pr-8 text-xs ">${d}</p>
+                    
+                        ${uname != user ? "": `<div class="group/options flex flex-row">
+                        <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover:block">
+                            keyboard_arrow_down
+                        </span>
+                        <div class="group-hover/options:block absolute hidden w-24 top-4 right-1 z-1 shadow-xl">
+                            <p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300" id="profile-btn" onClick=deleteRequest(${pid})>
+                                Delete
+                            </p>
+                        </div>
+                    </div>`}
+                    </div>
                 </div>
-                <div class="username">
+            <div class="username">
                 <a href="/u/${user}" class="hover:underline underline-offset-1 accent-black font-medium text-gray-500 text-sm" >@${user}</a>
-                </div>
+            </div>
             </div>
         </div>
         <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content}</div>
@@ -212,5 +223,23 @@ window.onscroll = function(ev) {
     }
     lastScrollTop = st <= 0 ? 0 : st;
 };
+
+
+async function deleteRequest(pid){
+    const response = await fetch("/api/deletepost", {
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pid: pid }),
+    }).then((response) => response.json());
+    if (response.status == "success") {
+        page = 0
+        document.getElementById("post_section").innerHTML = "";
+        await getPosts()
+    }
+}
+
 
 getPosts()

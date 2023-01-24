@@ -29,7 +29,7 @@ with app.app_context():
 
 def token_required(f):
     """
-    token_required(f) decorator will validate a JWT created token f and return the User Class object defined in
+    token_required(f) decorator will validate a token f and return the User Class object defined in
     modules/Database. token should be sent through HTTP header 'x-access-tokens'
     """
 
@@ -44,8 +44,9 @@ def token_required(f):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.User.query.filter_by(id=data['id']).first()
+        
             if not current_user.confirmed:
-                return {"status": "email"}
+                return {"status": "email"}  
         except ExpiredSignatureError:
             return jsonify({'status': 'expired'})
         except DecodeError:
@@ -190,16 +191,14 @@ def update_details(user):
     """
     api method, requires token validation. Updates user details
     data fields are defined as follows
-    "fname": first name
-    "lname": last name
+    "name": name of user
     "gender": gender
     "mob": mobile no
     "dob": date of birth in the format yyyy-mm-dd
     """
     try:
         data = request.get_json()
-        fname = data["fname"]
-        lname = data["lname"]
+        name = data["name"]
         gender = data["gender"]
         mob = data["mob"]
         dob = data["dob"]
@@ -214,7 +213,7 @@ def update_details(user):
         if not mob:
             mob = 0
 
-        u = Data.update(fname=fname, lname=lname, age=age, gender=gender, mob=mob,
+        u = Data.update(name=name, age=age, gender=gender, mob=mob,
                         dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id, bio=bio)
         if u == mob:
             return {"status": "mob"}
@@ -233,8 +232,7 @@ def user_details(user):
     api method, requires token validation
     returns user details in the "data" field
     the data is a key value pair of following:
-    "fname": first name
-    "lname": last name
+    "name": name of user
     "gender": gender
     "mob": mobile no
     "age": age
@@ -482,7 +480,7 @@ def like_data(user):
 def get_posts(user):
     """
     api method, requires token validation
-    accepts field "latest", an integer that identifies how many posts does client already have
+    accepts field "page", an integer that identifies next page
     """
     data = request.get_json()
     try:

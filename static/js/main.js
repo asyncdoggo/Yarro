@@ -131,6 +131,7 @@ async function getPosts() {
             let isdislike = post["isdislike"];
             let user = post["uname"];
             let date = post["datetime"];
+            let fullname = post["fullname"]
             let d = new Date(`${date} UTC`);
             d = d.toLocaleString("en-us", options);
             section.innerHTML += `<div class="post flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
@@ -140,16 +141,16 @@ async function getPosts() {
             >
                 <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
             </div>
-            <div class="uname-date flex flex-col w-full">
+            <div class="fullname-date flex flex-col w-full">
                 <div
-                    class="username pt-3 flex flex-row w-full place-content-between"
+                    class="fullname mb-[-5px] flex flex-row w-full place-content-between"
                 >
-                    <a href="/u/${user}" class="hover:underline underline-offset-1 accent-black font-medium text-lg" >${user}</a>
+                    <p class="text-lg font-medium ">${fullname}</p>
                     <p class="pr-4 text-xs ">${d}</p>
                 </div>
-                <!-- <div class="username">
-                    <p class="text-sm"></p>
-                </div> -->
+                <div class="username">
+                <a href="/u/${user}" class="hover:underline underline-offset-1 accent-black font-medium text-gray-500 text-sm" >@${user}</a>
+                </div>
             </div>
         </div>
         <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content}</div>

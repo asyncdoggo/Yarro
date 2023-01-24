@@ -22,8 +22,7 @@ class Details(db.Model):
     __tablename__ = "details"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
-    first_name = db.Column(db.String(50))
-    last_name = db.Column(db.String(50))
+    name = db.Column(db.String(50))
     age = db.Column(db.Integer)
     gender = db.Column(db.String(10))
     mob = db.Column(db.String(10))
@@ -44,15 +43,15 @@ class Posts(db.Model):
 class Likes(db.Model):
     __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35))
-    post_id = db.Column(db.Integer)
+    user_id = db.Column(db.String(35),db.ForeignKey("users.id", ondelete="CASCADE"))
+    post_id = db.Column(db.Integer,db.ForeignKey("posts.post_id", ondelete="CASCADE"))
 
 
 class DisLikes(db.Model):
     __tablename__ = "dislikes"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35))
-    post_id = db.Column(db.Integer)
+    user_id = db.Column(db.String(35),db.ForeignKey("users.id", ondelete="CASCADE"))
+    post_id = db.Column(db.Integer,db.ForeignKey("posts.post_id", ondelete="CASCADE"))
 
 
 class Requests(db.Model):
@@ -79,10 +78,9 @@ class EmailRequests(db.Model):
     tstamp = db.Column(db.TIMESTAMP)
 
 
-def update(fname, lname, age, gender, mob, dob, uid, bio):
+def update(name, age, gender, mob, dob, uid, bio):
     detail = Details.query.filter_by(user_id=uid).one()
-    detail.first_name = fname
-    detail.last_name = lname
+    detail.name = name
     detail.age = age
     detail.gender = gender
     detail.mob = mob
@@ -95,14 +93,14 @@ def update(fname, lname, age, gender, mob, dob, uid, bio):
 def get_fullname_bio(username):
     user = User.query.filter_by(username=username).one()
     details: Details = Details.query.filter_by(user_id=user.id).one()
-    fullname = details.first_name + " " + details.last_name
+    fullname = details.name
     bio = details.bio
     return fullname, bio
 
 
 def getuserdetials(uid):
     details = Details.query.filter_by(user_id=uid).one()
-    return {"fname": details.first_name, "lname": details.last_name, "age": details.age, "gender": details.gender,
+    return {"name": details.name, "age": details.age, "gender": details.gender,
             "mob": details.mob, "dob": str(details.dob), "bio": details.bio}
 
 
@@ -181,7 +179,7 @@ def insert_user(uid, guid, uname, passwd, email):
         db.session.add(user)
         db.session.commit()
         detail = Details()
-        detail.first_name = detail.last_name = detail.gender = detail.mob = detail.bio = ""
+        detail.name = detail.gender = detail.mob = detail.bio = ""
         detail.age = 0
         detail.dob = datetime.datetime(1000, 1, 1)
         detail.user_id = uid
@@ -291,19 +289,23 @@ def insert_post(uid, cont):
         print(repr(e))
 
 
-# TODO: Paging
 def get_posts(uid, page):
-    result = db.session.query(Posts, User).filter(User.id == Posts.user_id).order_by(desc(Posts.post_id)).limit(10).offset(page).all()
+    result = db.session.query(Posts,User,Details).filter(User.id == Posts.user_id,User.id == Details.user_id).order_by(desc(Posts.post_id)).limit(10).offset(page).all()
 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
     dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == uid).all()
     p = {}
 
-    for i, j in result:
-        p[i.post_id] = {"post_id": i.post_id, "content": i.content, "lc": i.l_count, "dlc": i.dl_count,
+    for i, j, k in result:
+        p[i.post_id] = {"post_id": i.post_id,
+                        "content": i.content, 
+                        "lc": i.l_count, 
+                        "dlc": i.dl_count,
                         "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
-                        "uname": j.username, "islike": 1 if (uid, i.post_id) in likes else 0,
-                        "isdislike": 1 if (uid, i.post_id) in dislikes else 0}
+                        "uname": j.username, 
+                        "islike": 1 if (uid, i.post_id) in likes else 0,
+                        "isdislike": 1 if (uid, i.post_id) in dislikes else 0,
+                        "fullname":k.name}
     return p
 
 

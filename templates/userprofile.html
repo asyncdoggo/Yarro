@@ -64,7 +64,7 @@
                         />
                     </div>
                     <div class="flex flex-row place-content-between">
-                        <div class="uname-fullname pl-12 pt-4 flex flex-col">
+                        <div class="uname-name pl-12 pt-4 flex flex-col">
                             <div class="flex flex-row">
                             <p id="uname" class="p-2 font-medium "></p>
                             <div class="editbtn mt-1 ml-4">
@@ -73,7 +73,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                            <p id="fullname" class="p-2"></p>
+                            <p id="name" class="p-2"></p>
                             <div class="bio pl-2 pt-8">
                                 <p class="whitespace-pre-wrap" id="bio"></p>
                             </div>
@@ -82,11 +82,12 @@
                 </div>
             </div>
             
-            <post-section user="true"></post-section>
+            <div class="post-area w-full flex flex-col px-1 md:px-36 lg:px-80" id="post_section"> 
+                
+            </div>
         </main>
     </body>
     {% if not visiting or login %}
-    <script src="/static/js/PostSection.js"></script>
     <script src="/static/js/userprofile.js"></script>
     {%else%}
     <script src="/static/js/visitprofile.js"></script>

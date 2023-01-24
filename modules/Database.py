@@ -371,3 +371,12 @@ def resend_request(uid, guid):
         db.session.commit()
     except Exception as e:
         print(repr(e))
+
+
+def deletePost(uid,pid):
+    try:
+        res = Posts.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+        db.session.delete(res)
+        db.session.commit()
+    except Exception as e:
+        print(e)

@@ -8,7 +8,6 @@ import jwt
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory, make_response
 from jwt import ExpiredSignatureError, DecodeError
 from werkzeug.utils import secure_filename
-
 import modules.Database as Data
 from modules import send_mail
 
@@ -44,9 +43,9 @@ def token_required(f):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.User.query.filter_by(id=data['id']).first()
-        
+
             if not current_user.confirmed:
-                return {"status": "email"}  
+                return {"status": "email"}
         except ExpiredSignatureError:
             return jsonify({'status': 'expired'})
         except DecodeError:
@@ -492,6 +491,19 @@ def get_posts(user):
         return {"status": "failure"}
 
 
+@app.route("/api/deletepost", methods=["POST"])
+@token_required
+def delete_post(user):
+    data = request.get_json()
+    try:
+        pid = data["pid"]
+        Data.deletePost(user.id,pid)
+        return {"status": "success"}
+    except Exception as e:
+        print(e)
+        return {"status": "failure"}
+
+
 @app.route("/api/logout", methods=['POST'])
 @token_required
 def logout(user):
@@ -517,6 +529,7 @@ def confirm_email():
     uid = request.args.get("uid")
     Data.confirm_email(guid, uid)
     return flask.redirect("/")
+
 
 @app.route("/api/resend_confirm", methods=["POST"])
 def resend_confirm():

@@ -6,88 +6,82 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/editprofile.css">
+    <!-- <link rel="stylesheet" href="/static/css/editprofile.css"> -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>Document</title>
+    <title>B-itter</title>
 </head>
 
 <body>
-
-    <header>
-        <nav>
-            <div class="logo">
-                <!-- <img src="" alt="">-->
-                <h2>B-itter</h2>
+    <header class="header border border-r-0 border-l-0 border-black pb-4 w-full flex flex-row place-content-between">
+        <p class="pl-6 text-xl pt-6 font-bold">Bitter</p>
+        <div class="relative inline-block group">
+            <div class="profile-container pt-4 px-2 min-w-[50px] min-h-[50px] mr-[5rem]">
+                <img id="profile-img" src="" alt="pfp" class="min-w-[50px] h-[50px] rounded-full" />
             </div>
-
-            <div class="navbar-tabs">
-                <ul>
-                    <li><a id="homebtn" href="#"> <span class="material-icons">
-                                home
-                            </span></a>
-                        <span>Home</span>
-                    </li>
-                </ul>
+            <div class="navs group-hover:block absolute hidden w-36 right-1 z-1 shadow-xl">
+                <p class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300" id="profile-btn">
+                    Profile
+                </p>
+                <p class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300" id="logout-btn">
+                    Logout
+                </p>
             </div>
-
-            <div class="dropdown">
-                <button class="dropbtn"> <span class="material-icons">
-                        person_outline
-                    </span></button>
-                <div class="dropdown-content">
-                    <a href="#" id="profile">Profile</a>
-                    <a href="#" id="logout">Logout</a>
-                </div>
-            </div>
-        </nav>
+        </div>
     </header>
 
-    <main>
 
-        <div class="profile">
+    <main class="flex justify-center my-12 w-full">
+        <div class="profile flex flex-col items-center w-[50%] border-2 ">
 
-            <div class="user_profile" style="margin:0.5% 0;">
-                <img src="" alt="" id="user_image" width="100vw" height="100vh">
+            <div class="user_profile flex flex-col items-center" >
+                <img src="" alt="" id="user_image" width="100vw" height="100vh" />
                 <form id="image_form" method="POST" enctype="multipart/form-data" action="/sendimage">
-
-                    <label for="image_upload" style="color: purple; margin-left: 32%; ">change profile
-                        pciture</label>
-
-                    <input type="file" id="image_upload" name="image" accept="image/*">
+                    <label for="image_upload" style="color: purple; margin-left: 32%">change profile pciture</label>
+                    <input type="file" id="image_upload" name="image" accept="image/*" />
                 </form>
-                <p id="username" style="margin:0 1%; font-weight:550;"></p>
+                <p id="username" style="margin: 0 1%; font-weight: 550"></p>
             </div>
-            <form id="save_form">
 
-                <div class="inputags">
-                    <p>name</p>
-                    <input type="text" id="name" name="name" placeholder="Name">
+            <form id="save_form" class="flex flex-col px-8 my-4 w-[80%] border-2">
+
+                <div class="inputags mt-2">
+                    <p>Name</p>
+                    <input type="text" class="border-2 w-full p-2"  id="fname" name="fname" placeholder="first name" />
                 </div>
 
-                <div class="inputags">
+                <div class="inputags mt-2 ">
+                    <p>Username</p>
+                    <input type="text" class="border-2 w-full p-2" id="lname" name="lname" placeholder="last name" />
+                </div>
+
+                <div class="inputags mt-2">
                     <p>Gender</p>
-                    <input type="text" id="gender" name="gender" placeholder="gender">
+                    <select id="gender" class="border-2 w-full p-2" name="gender" class="w-full">
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="O">Other</option>
+                    </select>
+                    <!-- <input type="text" id="gender" name="gender" placeholder="gender" /> -->
                 </div>
 
-                <div class="inputags">
+                <div class="inputags mt-2">
                     <p>Mobile Number</p>
-                    <input type="tel" id="mob" name="mob" placeholder="Mobile">
+                    <input type="tel" class="border-2 w-full p-2" id="mob" name="mob" placeholder="Mobile" />
                 </div>
 
-                <div class="inputags">
+                <div class="inputags mt-2">
                     <p>Date of birth</p>
-                    <input type="date" id="dob" name="dob" placeholder="DOB">
+                    <input type="date" class="border-2 w-full p-2" id="dob" name="dob" placeholder="DOB" />
                 </div>
-                <div class="inputags">
+                <div class="inputags mt-2">
                     <p id="biocount">Bio (limit to 255 characters)</p>
-                    <textarea type="text" id="bio" name="bio" placeholder="Bio" maxlength="255"></textarea>
+                    <textarea type="text" class="border-2 w-full p-2" id="bio" name="bio" placeholder="Bio" maxlength="255"></textarea>
                 </div>
 
-                <div class="inputags">
-                    <input type="submit" value="Save">
+                <div class="inputags mt-2">
+                    <input type="submit" value="Save" />
                 </div>
-
-
             </form>
             <p id="errortext"></p>
         </div>

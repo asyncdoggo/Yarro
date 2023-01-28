@@ -1,5 +1,8 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
+document.getElementById("profile_img").setAttribute("src", `/images/${uname}`);
+
+
 
 document.getElementById("username").innerHTML = uname
 get_details()
@@ -19,7 +22,7 @@ document.getElementById("save_form").addEventListener("submit", async function (
     }).then((response) => response.json())
 
     if (response.status = "success") {
-        document.getElementById("errortext").innerHTML = "saved successfully"
+        Snackbar.show({pos:"bottom-center",text: response.status});
     }
 
     const file = document.getElementById("image_upload").files[0]

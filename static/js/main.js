@@ -2,7 +2,6 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
 let page = 0;
 let bottom = false;
-// let uname = window.location.pathname.split("/")[2] userprofile TODO
 document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
 document.getElementById("profile-img").setAttribute("src", `/images/${uname}`);
 
@@ -137,7 +136,7 @@ async function getPosts() {
             section.innerHTML += `<div class="post group flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
         <div class="first-row flex flex-row w-full">
             <div
-                class="pfp-container min-w-[45px] min-h-[45px] pt-1 pr-4 ml-2"
+                class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
             >
                 <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
             </div>

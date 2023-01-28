@@ -192,7 +192,7 @@ async function getPosts() {
             section.innerHTML += `<div class="post group flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
             <div class="first-row flex flex-row w-full">
                 <div
-                    class="pfp-container min-w-[45px] min-h-[45px] pt-1 pr-4 ml-2"
+                    class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
                 >
                     <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
                 </div>
@@ -262,8 +262,8 @@ async function deleteRequest(pid){
 let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop
 window.onscroll = function(ev) {
     var st = window.pageYOffset || document.documentElement.scrollTop;
-    if (st > lastScrollTop && (window.innerHeight + window.scrollY) >= document.body.offsetHeight){
-        getPosts()   
+    if (st > lastScrollTop && (window.innerHeight + window.scrollY) >= document.body.offsetHeight + 17){
+        getPosts()  
     }
     lastScrollTop = st <= 0 ? 0 : st;
 };

@@ -4,8 +4,8 @@ document
         document.getElementById("resetButton").disabled = true;
         var email = document.getElementById("email").value;
         try {
-            const response = await fetch("/api/resetrequest", {
-                method: "POST",
+            const response = await fetch("/api/reset", {
+                method: "PUT",
                 headers: {
                     Accept: "application/json",
                     "Content-Type": "application/json",

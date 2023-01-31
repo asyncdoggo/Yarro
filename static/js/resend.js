@@ -1,8 +1,8 @@
 let e = true
 document.getElementById("resend").addEventListener("click",async function(){
     if(e){
-        const response = await fetch("/api/resend_confirm", {
-            method: 'POST',
+        const response = await fetch("/api/register", {
+            method: 'PUT',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',

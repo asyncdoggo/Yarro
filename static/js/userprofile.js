@@ -1,7 +1,8 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = window.location.pathname.split("/")[2]
-document.getElementById("pfpimage").setAttribute("src", `/images/${uname}`);
-document.getElementById("pfpimage2").setAttribute("src", `/images/${uname}`);
+let username = localStorage.getItem("uname")
+document.getElementById("pfpimage").setAttribute("src", `/image/${uname}`);
+document.getElementById("pfpimage2").setAttribute("src", `/image/${uname}`);
 let page = 0
 document.getElementById("uname").innerHTML = uname
 
@@ -40,13 +41,12 @@ const options = {
 
 async function get_msg_bio_fullname() {
 
-    let response = await fetch("/api/fullname", {
+    let response = await fetch("/api/name", {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"uname":uname})
+        }
     }).then((response) => response.json())
 
     if (response.status == "success") {
@@ -147,13 +147,8 @@ function linkify(inputText) {
 
 
 async function getPosts() {
-    let response = await fetch("/api/posts", {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ page: page }),
+    let response = await fetch(`/api/posts?page=${page}`, {
+        method: "GET"
     }).then((response) => response.json());
 
     if (response.status == "success") {
@@ -194,7 +189,7 @@ async function getPosts() {
                 <div
                     class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
                 >
-                    <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
+                    <img src="/image/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
                 </div>
                 <div class="fullname-date flex flex-col w-full">
                     <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
@@ -202,7 +197,7 @@ async function getPosts() {
                         <div class="flex flex-row relative">
                             <p class="pr-8 text-xs ">${d}</p>
                         
-                            ${uname != user ? "": `<div class="group/options flex flex-row">
+                            ${username != user ? "": `<div class="group/options flex flex-row">
                             <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover:block">
                                 keyboard_arrow_down
                             </span>
@@ -243,8 +238,8 @@ async function getPosts() {
 
 
 async function deleteRequest(pid){
-    const response = await fetch("/api/deletepost", {
-        method: "POST",
+    const response = await fetch("/api/posts", {
+        method: "DELETE",
         headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -253,8 +248,7 @@ async function deleteRequest(pid){
     }).then((response) => response.json());
     if (response.status == "success") {
         page = 0
-        document.getElementById("post_section").innerHTML = "";
-        await getPosts()
+        document.getElementById(pid).remove();
     }
 }
 

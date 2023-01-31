@@ -4,3 +4,4 @@ pyjwt
 Flask-SQLAlchemy
 mysqlclient
 Werkzeug
+flask-restful

@@ -1,7 +1,7 @@
 let uname = window.location.pathname.split("/")[2]
 
-document.getElementById("pfpimage").setAttribute("src", `/images/${uname}`);
-document.getElementById("pfpimage2").setAttribute("src", `/images/${uname}`);
+document.getElementById("pfpimage").setAttribute("src", `/image/${uname}`);
+document.getElementById("pfpimage2").setAttribute("src", `/image/${uname}`);
 
 document.getElementById("uname").innerHTML = uname
 

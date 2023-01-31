@@ -2,8 +2,8 @@ const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
 let page = 0;
 let bottom = false;
-document.getElementById("u_image").setAttribute("src", `/images/${uname}`);
-document.getElementById("profile-img").setAttribute("src", `/images/${uname}`);
+document.getElementById("u_image").setAttribute("src", `/image/${uname}`);
+document.getElementById("profile-img").setAttribute("src", `/image/${uname}`);
 
 document.getElementById("profile-btn").addEventListener("click", function () {
     window.location.href = `/u/${uname}`;
@@ -59,7 +59,7 @@ document
         let cont = document.getElementById("postcontent").value;
 
         if (cont.trim().length > 0) {
-            const response = await fetch("/api/newpost", {
+            const response = await fetch("/api/posts", {
                 method: "POST",
                 headers: {
                     Accept: "application/json",
@@ -96,13 +96,8 @@ document
 
 
 async function getPosts() {
-    let response = await fetch("/api/posts", {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ page: page }),
+    let response = await fetch(`/api/posts?page=${page}`, {
+        method: "GET"
     }).then((response) => response.json());
 
     if (response.status == "success") {
@@ -138,7 +133,7 @@ async function getPosts() {
             <div
                 class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
             >
-                <img src="/images/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
+                <img src="/image/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
             </div>
             <div class="fullname-date flex flex-col w-full">
                 <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
@@ -225,8 +220,8 @@ window.onscroll = function(ev) {
 
 
 async function deleteRequest(pid){
-    const response = await fetch("/api/deletepost", {
-        method: "POST",
+    const response = await fetch("/api/posts", {
+        method: "DELETE",
         headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -235,8 +230,7 @@ async function deleteRequest(pid){
     }).then((response) => response.json());
     if (response.status == "success") {
         page = 0
-        document.getElementById("post_section").innerHTML = "";
-        await getPosts()
+        document.getElementById(pid).remove();
     }
 }
 

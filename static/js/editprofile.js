@@ -1,6 +1,6 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
-document.getElementById("profile_img").setAttribute("src", `/images/${uname}`);
+document.getElementById("profile_img").setAttribute("src", `/image/${uname}`);
 
 
 
@@ -12,11 +12,11 @@ document.getElementById("save_form").addEventListener("submit", async function (
     const form = new FormData(e.target);
     const data = Object.fromEntries(form.entries());
 
-    const response = await fetch("/api/updatedata", {
-        method: 'POST',
+    const response = await fetch("/api/user_details", {
+        method: 'PUT',
         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
         },
         body: JSON.stringify(data)
     }).then((response) => response.json())
@@ -30,7 +30,7 @@ document.getElementById("save_form").addEventListener("submit", async function (
 
         var formdata = new FormData()
         formdata.append("image", file, uname)
-        const response = await fetch("/api/sendimage", {
+        const response = await fetch("/api/image", {
             method: 'POST',
             body: formdata
         }).then((response) => response.json())
@@ -70,17 +70,13 @@ document.getElementById("image_upload").addEventListener("change", function () {
 
 
 async function get_details() {
-    const response = await fetch("/api/userdetails", {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
+    const response = await fetch("/api/user_details", {
+        method: 'GET'
     }).then((response) => response.json())
 
     if (response.status == "success") {
         res = response.data
-        document.getElementById("user_image").setAttribute("src", `/images/${uname}`);
+        document.getElementById("user_image").setAttribute("src", `/image/${uname}`);
         document.getElementById("name").value = res["name"]
         document.getElementById("gender").value = res["gender"]
         document.getElementById("mob").value = res["mob"]

@@ -1,5 +1,3 @@
-const uname = document.getElementById("uname").innerHTML
-
 document.getElementById("resetButton").addEventListener("click", async function () {
 
     let newpass1 = document.getElementById("newpass1").value;

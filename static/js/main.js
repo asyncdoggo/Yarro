@@ -53,9 +53,8 @@ async function onBtnPress(pid, btn) {
     }
 }
 
-document
-    .getElementById("post_btn")
-    .addEventListener("click", async function () {
+document.getElementById("post_btn")
+        .addEventListener("click", async function () {
         let cont = document.getElementById("postcontent").value;
 
         if (cont.trim().length > 0) {

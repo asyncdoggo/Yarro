@@ -1,8 +1,8 @@
 import datetime
 from sqlalchemy import desc
-
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 
 db = SQLAlchemy()
 
@@ -43,15 +43,15 @@ class Posts(db.Model):
 class Likes(db.Model):
     __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35),db.ForeignKey("users.id", ondelete="CASCADE"))
-    post_id = db.Column(db.Integer,db.ForeignKey("posts.post_id", ondelete="CASCADE"))
+    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.post_id", ondelete="CASCADE"))
 
 
 class DisLikes(db.Model):
     __tablename__ = "dislikes"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35),db.ForeignKey("users.id", ondelete="CASCADE"))
-    post_id = db.Column(db.Integer,db.ForeignKey("posts.post_id", ondelete="CASCADE"))
+    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.post_id", ondelete="CASCADE"))
 
 
 class Requests(db.Model):
@@ -290,7 +290,9 @@ def insert_post(uid, cont):
 
 
 def get_posts(uid, page):
-    result = db.session.query(Posts,User,Details).filter(User.id == Posts.user_id,User.id == Details.user_id).order_by(desc(Posts.post_id)).limit(10).offset(page).all()
+    result = db.session.query(Posts, User, Details).filter(User.id == Posts.user_id,
+                                                           User.id == Details.user_id).order_by(
+        desc(Posts.post_id)).limit(10).offset(page).all()
 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
     dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == uid).all()
@@ -298,14 +300,14 @@ def get_posts(uid, page):
 
     for i, j, k in result:
         p[i.post_id] = {"post_id": i.post_id,
-                        "content": i.content, 
-                        "lc": i.l_count, 
+                        "content": i.content,
+                        "lc": i.l_count,
                         "dlc": i.dl_count,
                         "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
-                        "uname": j.username, 
+                        "uname": j.username,
                         "islike": 1 if (uid, i.post_id) in likes else 0,
                         "isdislike": 1 if (uid, i.post_id) in dislikes else 0,
-                        "fullname":k.name}
+                        "fullname": k.name}
     return p
 
 
@@ -373,10 +375,18 @@ def resend_request(uid, guid):
         print(repr(e))
 
 
-def deletePost(uid,pid):
+def deletePost(uid, pid):
     try:
         res = Posts.query.filter_by(user_id=uid, post_id=pid).one_or_none()
         db.session.delete(res)
         db.session.commit()
     except Exception as e:
         print(e)
+
+
+def search(user):
+    result = db.session.query(User, Details).filter((User.id == Details.user_id) & ((User.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%")))).all()
+    res = set()
+    for i in result:
+        res.add(i[0].username)
+    return list(res)

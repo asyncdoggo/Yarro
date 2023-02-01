@@ -176,6 +176,18 @@ def confirm_email():
     return flask.redirect("/")
 
 
+@app.route("/search", methods=["GET"])
+@token_required
+def search(_):
+    try:
+        search_user = request.args.get("user")
+        users = Data.search(search_user)
+        return render_template("search.html", users=users)
+    except Exception as e:
+        print(repr(e))
+        return {"status": "failure"}
+
+
 class FullnameBio(Resource):
     @token_required
     def post(self, user):

@@ -178,14 +178,30 @@ def confirm_email():
 
 @app.route("/search", methods=["GET"])
 @token_required
-def search(_):
+def search(user):
     try:
-        search_user = request.args.get("user")
-        users = Data.search(search_user)
-        return render_template("search.html", users=users)
+        search_uname = request.args.get("user")
+        users = Data.search(search_uname)
+        return render_template("search.html", users=users,uname=user.username)
     except Exception as e:
         print(repr(e))
-        return {"status": "failure"}
+        return render_template("404.html")
+
+
+
+
+class SearchUser(Resource):
+    @token_required
+    def get(self,_):
+        try:
+            user = request.args.get("user")
+            users = Data.search(user)
+            return {"status":"success","data":users}
+        except Exception as e:
+            print(e)
+            return {"status":"failure"}
+
+api.add_resource(SearchUser, "/api/search")
 
 
 class FullnameBio(Resource):

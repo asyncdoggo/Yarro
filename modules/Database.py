@@ -385,8 +385,12 @@ def deletePost(uid, pid):
 
 
 def search(user):
-    result = db.session.query(User, Details).filter((User.id == Details.user_id) & ((User.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%")))).all()
-    res = set()
+    result = db.session.query(User, Details).filter(
+        (User.id == Details.user_id) & ((User.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%")))).all()
+    res = []
     for i in result:
-        res.add(i[0].username)
-    return list(res)
+        res.append({
+            "username": i[0].username,
+            "name": i[1].name
+        })
+    return res

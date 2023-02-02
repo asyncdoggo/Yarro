@@ -136,7 +136,7 @@ async function getPosts() {
             </div>
             <div class="fullname-date flex flex-col w-full">
                 <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
-                    <p class="text-lg font-medium ">${fullname}</p>
+                    <p class="text-lg font-medium ">${fullname}&nbsp;</p>
                     <div class="flex flex-row relative">
                         <p class="pr-8 text-xs ">${d}</p>
                     

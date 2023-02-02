@@ -206,9 +206,10 @@ api.add_resource(SearchUser, "/api/search")
 
 class FullnameBio(Resource):
     @token_required
-    def post(self, user):
+    def get(self, _):
         try:
-            name, bio = Data.get_fullname_bio(user.username)
+            user = request.args.get("user")
+            name, bio = Data.get_fullname_bio(user)
             return {"status": "success", "name": name, "bio": bio}
         except Exception as e:
             print(repr(e))

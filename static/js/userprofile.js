@@ -41,12 +41,8 @@ const options = {
 
 async function get_msg_bio_fullname() {
 
-    let response = await fetch("/api/name", {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        }
+    let response = await fetch(`/api/name?user=${uname}`, {
+        method: 'GET'
     }).then((response) => response.json())
 
     if (response.status == "success") {

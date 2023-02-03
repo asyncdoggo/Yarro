@@ -2,7 +2,6 @@ import datetime
 from sqlalchemy import desc
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import or_
 
 db = SQLAlchemy()
 

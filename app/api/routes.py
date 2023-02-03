@@ -3,30 +3,23 @@ import os
 import re
 import uuid
 from functools import wraps
+
 import flask
 import jwt
-from flask import Flask, request, jsonify, render_template, url_for, send_from_directory, make_response
+from flask import request, jsonify, url_for, send_from_directory
 from jwt import ExpiredSignatureError, DecodeError
 from werkzeug.utils import secure_filename
-import modules.Database as Data
-from modules import send_mail
-from flask_restful import Resource, Api
+import app.Database as Data
+from app.send_mail import send_mail
+from flask_restful import Resource
 
-app = Flask(__name__)
-api = Api(app)
-
-app.config['SECRET_KEY'] = '004f2af45d3a4e161a7dd2d17fdae47f'
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:root@127.0.0.1:3306/data"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-username_regex = r"^\w(?:\w|[.-](?=\w)){3,31}$"
-password_regex = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+from flask import current_app
 
 active_tokens = {}
 
-with app.app_context():
-    Data.db.init_app(app)
-    Data.db.create_all()
+email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+username_regex = r"^\w(?:\w|[.-](?=\w)){3,31}$"
+password_regex = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
 
 
 def token_required(f):
@@ -44,7 +37,7 @@ def token_required(f):
             return jsonify({'message': 'a valid token is missing'})
 
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.User.query.filter_by(id=data['id']).first()
 
             if not current_user.confirmed:
@@ -59,149 +52,16 @@ def token_required(f):
     return decorator
 
 
-@app.route("/", methods=["GET"])
-def main():
-    """
-    The root route of the app. will handle rendering of index.html and forgotpass.html
-    """
-    token = request.cookies.get("token")
-    if not token:
-        return render_template("index.html")
-    elif token == "success":
-        response = flask.make_response(render_template("index.html"))
-        response.delete_cookie("token")
-        return response
-    elif token == "expired":
-        response = flask.make_response(render_template("forgotpass.html"))
-        response.delete_cookie("token")
-        return response
-    else:
-        try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.User.query.filter_by(id=data['id']).first()
-            if current_user.confirmed:
-                return render_template("main.html")
-            else:
-                return render_template("confirmemail.html")
-        except Exception:
-            return render_template("index.html")
-
-
-@app.route("/register")
-def register_render():
-    """Renders register.html"""
-    token = request.cookies.get("token")
-    try:
-        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.User.query.filter_by(id=data['id']).first()
-        if current_user.confirmed:
-            return flask.redirect("/")
-        else:
-            return render_template("confirmemail.html")
-    except Exception:
-        return render_template("register.html")
-
-
-@app.route("/profile/edit")
-def edit_profile():
-    """
-    Render editprofile.html requires token in cookie
-    """
-    try:
-        token = request.cookies.get("token")
-        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.User.query.filter_by(id=data['id']).first()
-        if current_user.confirmed:
-            return render_template("editprofile.html")
-        else:
-            return render_template("index.html")
-    except ExpiredSignatureError:
-        return jsonify({'message': 'expired'})
-    except DecodeError:
-        return jsonify({"message": "invalid"})
-
-
-@app.route("/u/<uname>", methods=["GET"])
-def profile(uname):
-    """
-    renders userprofile.html
-    """
-    user = Data.get_user(uname)
-    if not user:
-        return make_response(render_template("404.html", error=f"User {uname} not found"), 404)
-    try:
-        token = request.cookies.get("token")
-        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.User.query.filter_by(id=data['id']).first()
-        if current_user.confirmed:
-            if current_user.username == uname:
-                return render_template("userprofile.html", visiting=False, login=True)
-            else:
-                return render_template("userprofile.html", visiting=True, login=True)
-        else:
-            return render_template("confirmemail.html")
-    except Exception as e:
-        print(repr(e))
-
-    return render_template("userprofile.html", visiting=True, login=False)
-
-
-@app.route("/password/reset")
-def reset_render():
-    """Renders forgotpass.html"""
-    return render_template("forgotpass.html")
-
-
-@app.route("/reset", methods=["GET"])
-def reset():
-    """
-    renders the password reset page by checking the GET method args "id" and "uid" for guid and user id
-    """
-    guid = request.args.get("id")
-    uid = request.args.get("uid")
-    if Data.check_reset(guid, uid):
-        user = Data.get_user(uid=uid)
-        return render_template("resetpass.html", uname=user.username)
-    return render_template("forgotpass.html")
-
-
-@app.route("/confirm", methods=["GET"])
-def confirm_email():
-    """
-    renders the password reset page by checking the GET method args "id" and "uid" for guid and user id
-    """
-    guid = request.args.get("id")
-    uid = request.args.get("uid")
-    Data.confirm_email(guid, uid)
-    return flask.redirect("/")
-
-
-@app.route("/search", methods=["GET"])
-@token_required
-def search(user):
-    try:
-        search_uname = request.args.get("user")
-        users = Data.search(search_uname)
-        return render_template("search.html", users=users,uname=user.username)
-    except Exception as e:
-        print(repr(e))
-        return render_template("404.html")
-
-
-
-
 class SearchUser(Resource):
     @token_required
-    def get(self,_):
+    def get(self, _):
         try:
             user = request.args.get("user")
             users = Data.search(user)
-            return {"status":"success","data":users}
+            return {"status": "success", "data": users}
         except Exception as e:
             print(e)
-            return {"status":"failure"}
-
-api.add_resource(SearchUser, "/api/search")
+            return {"status": "failure"}
 
 
 class FullnameBio(Resource):
@@ -216,29 +76,26 @@ class FullnameBio(Resource):
             return {"status": "failure"}
 
 
-api.add_resource(FullnameBio, "/api/name")
-
-
 class Image(Resource):
     def get(self, path):
         path = secure_filename(path)
-        if not os.path.exists(f"static/userimages/{path}"):
+        image_file = os.path.join(flask.current_app.root_path, "static", "userimages", path)
+        image_folder = os.path.join(flask.current_app.root_path, "static", "userimages")
+        if not os.path.exists(image_file):
             path = "default"
-        return send_from_directory("static/userimages", path)
+        return send_from_directory(image_folder, path)
 
     @token_required
     def post(self, user):
         try:
             file = request.files["image"]
             filename = secure_filename(user.username)
-            file.save(os.path.join('static/userimages/', filename))
+
+            file.save(os.path.join(flask.current_app.root_path, "static", "userimages", filename))
             return {"status": "success"}
         except KeyError as e:
             print(e)
             return {"status": "failure"}
-
-
-api.add_resource(Image, "/api/image", "/image/<path:path>")
 
 
 class UserDetails(Resource):
@@ -282,9 +139,6 @@ class UserDetails(Resource):
             return {"status": "logout"}
 
 
-api.add_resource(UserDetails, "/api/user_details")
-
-
 class Like(Resource):
     @token_required
     def get(self, user):
@@ -305,9 +159,6 @@ class Like(Resource):
         except Exception as e:
             print(repr(e))
             return jsonify({"status": "failure"})
-
-
-api.add_resource(Like, "/api/like")
 
 
 class Register(Resource):
@@ -335,10 +186,10 @@ class Register(Resource):
             if Data.insert_user(uid=uid, guid=guid, uname=username, passwd=password, email=email):
                 token = jwt.encode(
                     {'id': uid, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
-                    app.config['SECRET_KEY'], "HS256")
+                    current_app.config['SECRET_KEY'], "HS256")
 
-                url = url_for("confirm_email", id=guid, uid=uid, _external=True)
-                if send_mail.send_mail(email, username, url, True):
+                url = url_for("views.confirm_email", id=guid, uid=uid, _external=True)
+                if send_mail(email, username, url, True):
                     response = flask.make_response({'status': 'success', "uname": flask.escape(username)})
                     response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
                     return response
@@ -354,13 +205,13 @@ class Register(Resource):
         try:
             token = request.cookies.get("token")
 
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             user = Data.User.query.filter_by(id=data['id']).first()
 
             guid = uuid.uuid4().hex
             Data.resend_request(user.id, guid)
-            url = url_for("confirm_email", id=guid, uid=user.id, _external=True)
-            send_mail.send_mail(user.email, user.username, url, True)
+            url = url_for("views.confirm_email", id=guid, uid=user.id, _external=True)
+            send_mail(user.email, user.username, url, True)
 
         except Exception as e:
             pass
@@ -368,14 +219,11 @@ class Register(Resource):
         return {"status": "success"}
 
 
-api.add_resource(Register, "/api/register")
-
-
 class Login(Resource):
     def get(self):
         try:
             token = request.cookies.get("token")
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.User.query.filter_by(id=data['id']).first()
             if current_user.confirmed:
                 if token in active_tokens.values():
@@ -398,7 +246,7 @@ class Login(Resource):
             if user:
                 token = jwt.encode(
                     {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
-                    app.config['SECRET_KEY'], "HS256")
+                    current_app.config['SECRET_KEY'], "HS256")
                 active_tokens[user.username] = token
                 response = flask.make_response(
                     {"status": "success" if user.confirmed else "email", "uname": flask.escape(user.username)})
@@ -409,9 +257,6 @@ class Login(Resource):
 
         except Exception:
             return jsonify({"status": "failure"})
-
-
-api.add_resource(Login, "/api/login")
 
 
 class ResetPassword(Resource):
@@ -436,18 +281,15 @@ class ResetPassword(Resource):
         user = Data.getemail(email)
         if user:
             guid = uuid.uuid4().hex
-            url = url_for("reset", id=guid, uid=user.id, _external=True)
+            url = url_for("views.reset", id=guid, uid=user.id, _external=True)
 
-            if send_mail.send_mail(email, user.username, url, False):
+            if send_mail(email, user.username, url, False):
                 Data.insert_reset_request(user.id, guid)
                 return {"status": "success"}
             else:
                 return {"status": "noconfig"}
         else:
             return {"status": "noemail"}
-
-
-api.add_resource(ResetPassword, "/api/reset")
 
 
 class Posts(Resource):
@@ -487,9 +329,6 @@ class Posts(Resource):
             return {"status": "failure"}
 
 
-api.add_resource(Posts, "/api/posts")
-
-
 class Logout(Resource):
     @token_required
     def post(self, user):
@@ -500,9 +339,6 @@ class Logout(Resource):
         response = flask.make_response({"status": "success"})
         response.delete_cookie("token")
         return response
-
-
-api.add_resource(Logout, "/api/logout")
 
 
 #
@@ -557,7 +393,3 @@ def get_years(dob: str) -> int:
     elif dif_m == 0 and dif_d < 0:
         dif_y -= 1
     return dif_y
-
-
-if __name__ == '__main__':
-    app.run("0.0.0.0", 5005, debug=True)

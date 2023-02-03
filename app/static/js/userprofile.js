@@ -1,7 +1,7 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = window.location.pathname.split("/")[2]
 let username = localStorage.getItem("uname")
-document.getElementById("pfpimage").setAttribute("src", `/image/${uname}`);
+document.getElementById("pfpimage").setAttribute("src", `/image/${username}`);
 document.getElementById("pfpimage2").setAttribute("src", `/image/${uname}`);
 let page = 0
 document.getElementById("uname").innerHTML = uname

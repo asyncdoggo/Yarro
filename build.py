@@ -4,7 +4,7 @@ import os
 import subprocess
 
 shutil.rmtree("./build_files", True)
-files = ["static", "templates", "modules", "app.py", "requirements.txt", ".gitignore"]
+files = ["app", "run.py", "requirements.txt", ".gitignore"]
 print("Copying files...")
 
 for i in files:
@@ -13,7 +13,7 @@ for i in files:
     else:
         shutil.copy(i, f"./build_files/{i}")
 
-with open("./build_files/static/css/input.css", "w") as file:
+with open("./build_files/app/static/css/input.css", "w") as file:
     file.write("@tailwind base;\n@tailwind components;\n@tailwind utilities;")
 
 with open("./build_files/tailwind.config.js", "w") as file:
@@ -28,11 +28,12 @@ module.exports = {
 }
 """)
 
-cmd = "npx tailwindcss -i ./build_files/static/css/input.css -o ./build_files/static/css/output.css -c ./build_files/tailwind.config.js"
+print("Building tailwind css files")
+cmd = "npx tailwindcss -i ./build_files/app/static/css/input.css -o ./build_files/app/static/css/output.css -c ./build_files/tailwind.config.js"
 
 subprocess.run(cmd, shell=True, check=True)
 
-files = glob.glob("./build_files/templates/*", recursive=True)
+files = glob.glob("./build_files/app/templates/*", recursive=True)
 
 for i in files:
     with open(i) as file:
@@ -42,7 +43,7 @@ for i in files:
                       """<link rel="stylesheet" href="/static/css/output.css">""")
         file.write(x)
 
-os.remove("./build_files/static/css/input.css")
+os.remove("./build_files/app/static/css/input.css")
 os.remove("./build_files/tailwind.config.js")
 
 print("build done")

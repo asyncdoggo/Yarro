@@ -16,14 +16,14 @@ document.getElementById("searchForm").addEventListener("submit", async function(
             if(data.length > 0){
                 for(let i in data){
                     document.getElementById("user_section").innerHTML += `
-                        <a href="/u/${data[i]['username']}" class="userCard flex flex-row shadow-md w-full pb-2 mb-2">
-                        <div class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-4">
-                            <img src="/image/${data[i]['username']}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full"/>
-                        </div>
-                        <div class="fullname-uname flex flex-col w-full">
-                            <p class="text-lg font-medium">${data[i]["name"]}&nbsp;</p>
-                            <p class="font-medium text-gray-500">@${data[i]['username']}</p>
-                        </div>
+                        <a href="/u/${data[i]['username']}" class="flex mt-2 items-center bg-white p-6 rounded-lg shadow">
+                          <div class="flex-shrink-0">
+                            <img class="h-12 w-12 rounded-full" src='/image/${data[i]["username"]}' alt="User Avatar">
+                          </div>
+                          <div class="ml-6">
+                            <h2 class="font-bold text-lg">${data[i]["name"]}</h2>
+                            <p class="text-gray-700">@${data[i]["username"]}</p>
+                          </div>
                         </a>
                     `
                     history.pushState({},"",`/search?user=${user}`)

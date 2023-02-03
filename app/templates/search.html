@@ -96,15 +96,15 @@
                 id="user_section"
             >
                 {%for item in users%}
-                <a href="/u/{{item['username']}}" class="userCard flex flex-row shadow-md w-full pb-2 mb-2">
-                    <div class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-4">
-                        <img src="/image/{{item['username']}}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full"/>
-                    </div>
-                    <div class="fullname-uname flex flex-col w-full">
-                        <p class="text-lg font-medium">{{item['name']}}&nbsp;</p>
-                        <p class="font-medium text-gray-500">@{{item['username']}}</p>
-                    </div>
-                    </a>
+                <a href="/u/{{item['username']}}" class="flex mt-2 items-center bg-white p-6 rounded-lg shadow">
+                          <div class="flex-shrink-0">
+                            <img class="h-12 w-12 rounded-full" src='/image/{{item["username"]}}' alt="User Avatar">
+                          </div>
+                          <div class="ml-6">
+                            <h2 class="font-bold text-lg">{{item['name']}}</h2>
+                            <p class="text-gray-700">@{{item['username']}}</p>
+                          </div>
+                        </a>
                 {%endfor%}
         </div>
         </main>

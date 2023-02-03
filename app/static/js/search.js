@@ -1,4 +1,4 @@
-// var uname = localStorage.getItem("uname");
+ var uname = localStorage.getItem("uname");
 
 document.getElementById("searchForm").addEventListener("submit", async function(e) {
     e.preventDefault();
@@ -46,3 +46,25 @@ document.getElementById("searchForm").addEventListener("submit", async function(
 document.getElementById("homebtn").addEventListener("click",function () {
     window.location.href = "/";
 })
+
+
+document.getElementById("profile-btn").addEventListener("click",function () {
+    window.location.href = `/u/${uname}`;
+})
+
+
+document
+    .getElementById("logout-btn")
+    .addEventListener("click", async function () {
+        localStorage.clear();
+        const response = await fetch("/api/logout", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        }).then((response) => response.json());
+        if (response.status == "success") {
+            window.location.href = "/";
+        }
+    });

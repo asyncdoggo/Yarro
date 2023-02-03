@@ -16,6 +16,10 @@ document.getElementById("homebtn").addEventListener("click", function () {
     window.location.href = "/"
 })
 
+document.getElementById("searchbtn").addEventListener("click", function () {
+    window.location.href = "/search"
+})
+
 document.getElementById("logout").addEventListener("click", async function () {
     localStorage.clear()
     const response = await fetch("/api/logout", {

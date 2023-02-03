@@ -2,16 +2,6 @@
 test.py
 venv
 __pycache__
-modules/__pycache__
-modules/gapw.json
 .vscode
-certificate.crt
-privateKey.key
-access.log
-error.log
-index
-temp
-instance
-Data.db
-.vercel
 /build_files/
+app/gapw.json

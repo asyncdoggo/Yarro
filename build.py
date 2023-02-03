@@ -45,6 +45,7 @@ for i in files:
 
 os.remove("./build_files/app/static/css/input.css")
 os.remove("./build_files/tailwind.config.js")
+os.remove("./build_files/app/gapw.json")
 
 print("build done")
 

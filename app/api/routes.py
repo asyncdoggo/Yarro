@@ -80,7 +80,7 @@ class Image(Resource):
     def get(self, path):
         uid = secure_filename(path)
         image_path = glob.glob(os.path.join(flask.current_app.root_path, "static", "userimages", f"{path}.*"))
-        image_file = image_path[0].split("\\")[-1] if image_path else "default.png"
+        image_file = image_path[0].split(os.sep)[-1] if image_path else "default.png"
         image_folder = os.path.join(flask.current_app.root_path, "static", "userimages")
         return send_from_directory(image_folder, image_file)
 

@@ -17,6 +17,7 @@ document.getElementById('reg_form').addEventListener('submit', async function (e
 
         if (response.status == "success") {
             localStorage.setItem("uname", senddata["uname"])
+            localStorage.setItem("uid", response.uid)
             window.location.href = "/"
         }
         else {

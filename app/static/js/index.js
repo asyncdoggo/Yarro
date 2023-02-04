@@ -14,8 +14,8 @@ const response = await fetch("/api/login", {
 
     let status = response.status;
     if(status == "success"){
-        let uname = response.uname
-        localStorage.setItem("uname", uname);
+        localStorage.setItem("uname", response.uname);
+        localStorage.setItem("uid", response.uid);
         window.location.reload()
     }
     else{

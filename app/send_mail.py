@@ -3,7 +3,6 @@ import ssl
 import json
 import os
 from email.message import EmailMessage
-
 import flask
 
 

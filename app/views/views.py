@@ -1,12 +1,10 @@
 from functools import wraps
-
 import flask
 import jwt
 from flask import Blueprint
 from flask import current_app
 from flask import request, jsonify, render_template, make_response
 from jwt import ExpiredSignatureError, DecodeError
-
 import app.Database as Data
 
 view_bp = Blueprint("views", __name__)
@@ -28,7 +26,7 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.User.query.filter_by(id=data['id']).first()
+            current_user = Data.Users.query.filter_by(id=data['id']).first()
 
             if not current_user.confirmed:
                 return {"status": "email"}
@@ -61,7 +59,7 @@ def main():
     else:
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.User.query.filter_by(id=data['id']).first()
+            current_user = Data.Users.query.filter_by(id=data['id']).first()
             if current_user.confirmed:
                 return render_template("main.html")
             else:
@@ -76,7 +74,7 @@ def register_render():
     token = request.cookies.get("token")
     try:
         data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.User.query.filter_by(id=data['id']).first()
+        current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
             return flask.redirect("/")
         else:
@@ -93,7 +91,7 @@ def edit_profile():
     try:
         token = request.cookies.get("token")
         data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.User.query.filter_by(id=data['id']).first()
+        current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
             return render_template("editprofile.html")
         else:
@@ -115,18 +113,18 @@ def profile(uname):
     try:
         token = request.cookies.get("token")
         data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.User.query.filter_by(id=data['id']).first()
+        current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
             if current_user.username == uname:
-                return render_template("userprofile.html", visiting=False, login=True)
+                return render_template("userprofile.html", uid=user.id, visiting=False, login=True)
             else:
-                return render_template("userprofile.html", visiting=True, login=True)
+                return render_template("userprofile.html", uid=user.id, visiting=True, login=True)
         else:
             return render_template("confirmemail.html")
     except Exception as e:
         print(repr(e))
 
-    return render_template("userprofile.html", visiting=True, login=False)
+    return render_template("userprofile.html", uid=user.id, visiting=True, login=False)
 
 
 @view_bp.route("/password/reset")

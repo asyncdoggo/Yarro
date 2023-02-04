@@ -1,9 +1,10 @@
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
+let uid = localStorage.getItem("uid");
 let page = 0;
 let bottom = false;
-document.getElementById("u_image").setAttribute("src", `/image/${uname}`);
-document.getElementById("profile-img").setAttribute("src", `/image/${uname}`);
+document.getElementById("u_image").setAttribute("src", `/image/${uid}`);
+document.getElementById("profile-img").setAttribute("src", `/image/${uid}`);
 
 document.getElementById("profile-btn").addEventListener("click", function () {
     window.location.href = `/u/${uname}`;
@@ -117,6 +118,7 @@ async function getPosts() {
         for (i in keys) {
             var post = data[keys[i]];
             let pid = keys[i];
+            let userid = post["uid"];
             let content = linkify(post["content"]);
             let lc = post["lc"];
             let dlc = post["dlc"];
@@ -125,20 +127,20 @@ async function getPosts() {
             let user = post["uname"];
             let date = post["datetime"];
             let fullname = post["fullname"]
-            let d = new Date(`${date} UTC`);
-            d = d.toLocaleString("en-us", options);
+            date = new Date(`${date} UTC`);
+            date = date.toLocaleString("en-us", options);
             section.innerHTML += `<div class="post group flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
         <div class="first-row flex flex-row w-full">
             <div
                 class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
             >
-                <img src="/image/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
+                <img src="/image/${userid}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
             </div>
             <div class="fullname-date flex flex-col w-full">
                 <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
                     <p class="text-lg font-medium ">${fullname}&nbsp;</p>
                     <div class="flex flex-row relative">
-                        <p class="pr-8 text-xs ">${d}</p>
+                        <p class="pr-8 text-xs ">${date}</p>
                     
                         ${uname != user ? "": `<div class="group/options flex flex-row">
                         <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover:block">

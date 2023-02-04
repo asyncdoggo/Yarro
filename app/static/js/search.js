@@ -18,7 +18,7 @@ document.getElementById("searchForm").addEventListener("submit", async function(
                     document.getElementById("user_section").innerHTML += `
                         <a href="/u/${data[i]['username']}" class="flex mt-2 items-center bg-white p-6 rounded-lg shadow">
                           <div class="flex-shrink-0">
-                            <img class="h-12 w-12 rounded-full" src='/image/${data[i]["username"]}' alt="User Avatar">
+                            <img class="h-12 w-12 rounded-full" src='/image/${data[i]["uid"]}' alt="User Avatar">
                           </div>
                           <div class="ml-6">
                             <h2 class="font-bold text-lg">${data[i]["name"]}</h2>

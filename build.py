@@ -29,7 +29,8 @@ module.exports = {
 """)
 
 print("Building tailwind css files")
-cmd = "npx tailwindcss -i ./build_files/app/static/css/input.css -o ./build_files/app/static/css/output.css -c ./build_files/tailwind.config.js"
+cmd = "npx tailwindcss -i ./build_files/app/static/css/input.css -o ./build_files/app/static/css/output.css -c " \
+      "./build_files/tailwind.config.js"
 
 subprocess.run(cmd, shell=True, check=True)
 

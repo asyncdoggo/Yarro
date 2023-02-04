@@ -4,11 +4,10 @@ from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
-
 ph = PasswordHasher()
 
 
-class User(db.Model):
+class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.String(35), primary_key=True, nullable=False)
     username = db.Column(db.String(20), unique=True, nullable=False)
@@ -61,20 +60,20 @@ class Requests(db.Model):
     tstamp = db.Column(db.TIMESTAMP)
 
 
-class Friendship(db.Model):
-    __tablename__ = "friend"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id1 = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
-    user_id2 = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
-    byuserid = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
-
-
 class EmailRequests(db.Model):
     __tablename__ = "emailrequests"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
     guid = db.Column(db.String(255), nullable=False)
     tstamp = db.Column(db.TIMESTAMP)
+
+
+class Friendship(db.Model):
+    __tablename__ = 'friendships'
+    id = db.Column(db.Integer, primary_key=True)
+    user1_id = db.Column(db.String(35), db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    user2_id = db.Column(db.String(35), db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    initiator_id = db.Column(db.String(35), db.ForeignKey('users.id', ondelete="CASCADE"))
 
 
 def update(name, age, gender, mob, dob, uid, bio):
@@ -90,22 +89,20 @@ def update(name, age, gender, mob, dob, uid, bio):
 
 
 def get_fullname_bio(username):
-    user = User.query.filter_by(username=username).one()
+    user = Users.query.filter_by(username=username).one()
     details: Details = Details.query.filter_by(user_id=user.id).one()
-    fullname = details.name
-    bio = details.bio
-    return fullname, bio
+    return details.name, details.bio
 
 
 def getuserdetials(uid):
-    details = Details.query.filter_by(user_id=uid).one()
+    details: Details = Details.query.filter_by(user_id=uid).one()
     return {"name": details.name, "age": details.age, "gender": details.gender,
             "mob": details.mob, "dob": str(details.dob), "bio": details.bio}
 
 
 def update_like(pid, uid, islike):
-    like = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
-    dislike = DisLikes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+    like: Likes = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+    dislike: DisLikes = DisLikes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
     p = {}
     try:
         if islike:
@@ -156,7 +153,7 @@ def update_like(pid, uid, islike):
 
 def check_login(username, password):
     try:
-        user = User.query.filter_by(username=username).one()
+        user: Users = Users.query.filter_by(username=username).one()
         if user:
             pwhash = user.password
             ph.verify(pwhash, password)
@@ -169,12 +166,7 @@ def insert_user(uid, guid, uname, passwd, email):
     try:
         hashpass = ph.hash(passwd)
 
-        user = User()
-        user.username = uname
-        user.id = uid
-        user.password = hashpass
-        user.email = email
-        user.confirmed = False
+        user: Users = Users(username=uname, id=uid, password=hashpass, email=email, confirmed=False)
         db.session.add(user)
         db.session.commit()
         detail = Details()
@@ -184,10 +176,7 @@ def insert_user(uid, guid, uname, passwd, email):
         detail.user_id = uid
         db.session.add(detail)
         guid_hash = ph.hash(guid)
-        request = EmailRequests()
-        request.user_id = uid
-        request.guid = guid_hash
-        request.tstamp = datetime.datetime.now()
+        request: EmailRequests = EmailRequests(user_id=uid, guid=guid_hash, tstamp=datetime.datetime.now())
         db.session.add(request)
         db.session.commit()
         return True
@@ -198,9 +187,9 @@ def insert_user(uid, guid, uname, passwd, email):
 def get_user(username=None, uid=None):
     try:
         if username:
-            user = User.query.filter_by(username=username).one()
+            user = Users.query.filter_by(username=username).one()
         else:
-            user = User.query.filter_by(id=uid).one()
+            user = Users.query.filter_by(id=uid).one()
         return user
     except Exception as e:
         print(repr(e))
@@ -211,7 +200,7 @@ def resetpasswd(uid, pass1, guid):
         req = Requests.query.filter_by(user_id=uid).one()
         if ph.verify(req.guid, guid):
             pwhash = ph.hash(pass1)
-            user = User.query.filter_by(id=uid).one()
+            user = Users.query.filter_by(id=uid).one()
             user.password = pwhash
             db.session.delete(req)
             db.session.commit()
@@ -241,7 +230,7 @@ def getlikedata(user):
 
 def getemail(email):
     try:
-        user = User.query.filter_by(email=email).one()
+        user = Users.query.filter_by(email=email).one()
         return user
     except Exception as e:
         print(repr(e))
@@ -253,10 +242,7 @@ def insert_reset_request(uid, guid):
         req = Requests.query.filter_by(user_id=uid).one_or_none()
         if req:
             db.session.delete(req)
-        req = Requests()
-        req.user_id = uid
-        req.guid = guid_hash
-        req.tstamp = datetime.datetime.now()
+        req = Requests(user_id=uid, guid=guid_hash, tstamp=datetime.datetime.now())
         db.session.add(req)
         db.session.commit()
     except Exception as e:
@@ -274,13 +260,8 @@ def check_reset(guid, uid):
 
 
 def insert_post(uid, cont):
-    post = Posts()
+    post = Posts(user_id=uid, content=cont, l_count=0, dl_count=0, tstamp=datetime.datetime.utcnow())
     try:
-        post.user_id = uid
-        post.content = cont
-        post.l_count = 0
-        post.dl_count = 0
-        post.tstamp = datetime.datetime.utcnow()
         db.session.add(post)
         db.session.commit()
         return True
@@ -289,8 +270,8 @@ def insert_post(uid, cont):
 
 
 def get_posts(uid, page):
-    result = db.session.query(Posts, User, Details).filter(User.id == Posts.user_id,
-                                                           User.id == Details.user_id).order_by(
+    result = db.session.query(Posts, Users, Details).filter(Users.id == Posts.user_id,
+                                                            Users.id == Details.user_id).order_by(
         desc(Posts.post_id)).limit(10).offset(page).all()
 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
@@ -304,46 +285,45 @@ def get_posts(uid, page):
                         "dlc": i.dl_count,
                         "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
                         "uname": j.username,
+                        "uid": j.id,
                         "islike": 1 if (uid, i.post_id) in likes else 0,
                         "isdislike": 1 if (uid, i.post_id) in dislikes else 0,
                         "fullname": k.name}
     return p
 
 
-def friend_request(user1, user2):
-    friend = Friendship()
-    friend.user_id1 = user1
-    friend.user_id2 = user2
-    friend.byuserid = user1
-    db.session.add(friend)
-    db.session.commit()
-
-
-def accept_request(user1, user2):
-    friend = Friendship.query.filter_by(user_id1=user1, user_id2=user2).one_or_none()
-    friend.byuserid = None
-    db.session.commit()
-
-
-def get_friends(user):
-    friends1 = Friendship.query.filter_by(user_id1=user)
-    friends2 = Friendship.query.filter_by(user_id2=user)
-
-    sq = friends1.union(friends2).all()
-    res = []
-
-    for i in sq:
-        user1 = User.query.filter_by(id=i.user_id1).one()
-        user2 = User.query.filter_by(id=i.user_id2).one()
-        user3 = User.query.filter_by(id=i.byuserid).one_or_none()
-
-        res.append({
-            "user1": user1.username,
-            "user2": user2.username,
-            "by": user3.username if user3 else "null"
-        })
-
-    return res
+#
+# def send_friend_request(user1, user2):
+#     friend: Friendship = Friendship(user1_id=user1, user2_id=user2, initiator_id=user1)
+#     db.session.add(friend)
+#     db.session.commit()
+#
+#
+# def accept_friend_request(user1, user2):
+#     friend = Friendship.query.filter_by(user1_id=user1, user2_id=user2).one_or_none()
+#     friend.initiator_id = None
+#     db.session.commit()
+#
+#
+# def get_friends(user):
+#     friends1 = Friendship.query.filter_by(user1_id=user)
+#     friends2 = Friendship.query.filter_by(user2_id=user)
+#
+#     sq = friends1.union(friends2).all()
+#     res = []
+#
+#     for i in sq:
+#         user1 = Users.query.filter_by(id=i.user_id1).one()
+#         user2 = Users.query.filter_by(id=i.user_id2).one()
+#         user3 = Users.query.filter_by(id=i.byuserid).one_or_none()
+#
+#         res.append({
+#             "user1": user1.username,
+#             "user2": user2.username,
+#             "by": user3.username if user3 else "null"
+#         })
+#
+#     return res
 
 
 def confirm_email(guid, uid):
@@ -351,7 +331,7 @@ def confirm_email(guid, uid):
         req = EmailRequests.query.filter_by(user_id=uid).one()
         guidhash = req.guid
         if ph.verify(guidhash, guid):
-            user = User.query.filter_by(id=uid).one()
+            user = Users.query.filter_by(id=uid).one()
             user.confirmed = True
             db.session.delete(req)
             db.session.commit()
@@ -384,12 +364,13 @@ def deletePost(uid, pid):
 
 
 def search(user):
-    result = db.session.query(User, Details).filter(
-        (User.id == Details.user_id) & ((User.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%")))).all()
+    result = db.session.query(Users, Details).filter(
+        (Users.id == Details.user_id) & ((Users.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%")))).all()
     res = []
     for i in result:
         res.append({
             "username": i[0].username,
-            "name": i[1].name
+            "name": i[1].name,
+            "uid": i[0].id
         })
     return res

@@ -1,9 +1,9 @@
 import datetime
+import glob
 import os
 import re
 import uuid
 from functools import wraps
-
 import flask
 import jwt
 from flask import request, jsonify, url_for, send_from_directory
@@ -38,7 +38,7 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.User.query.filter_by(id=data['id']).first()
+            current_user = Data.Users.query.filter_by(id=data['id']).first()
 
             if not current_user.confirmed:
                 return {"status": "email"}
@@ -78,18 +78,19 @@ class FullnameBio(Resource):
 
 class Image(Resource):
     def get(self, path):
-        path = secure_filename(path)
-        image_file = os.path.join(flask.current_app.root_path, "static", "userimages", path)
+        uid = secure_filename(path)
+        image_path = glob.glob(os.path.join(flask.current_app.root_path, "static", "userimages", f"{path}.*"))
+        image_file = image_path[0].split("\\")[-1] if image_path else "default.png"
         image_folder = os.path.join(flask.current_app.root_path, "static", "userimages")
-        if not os.path.exists(image_file):
-            path = "default"
-        return send_from_directory(image_folder, path)
+        return send_from_directory(image_folder, image_file)
 
     @token_required
     def post(self, user):
         try:
             file = request.files["image"]
-            filename = secure_filename(user.username)
+            image_type = file.mimetype
+            image_type = image_type.split("/")[1]
+            filename = secure_filename(f"{user.id}.{image_type}")
 
             file.save(os.path.join(flask.current_app.root_path, "static", "userimages", filename))
             return {"status": "success"}
@@ -190,7 +191,8 @@ class Register(Resource):
 
                 url = url_for("views.confirm_email", id=guid, uid=uid, _external=True)
                 if send_mail(email, username, url, True):
-                    response = flask.make_response({'status': 'success', "uname": flask.escape(username)})
+                    response = flask.make_response(
+                        {'status': 'success', "uname": flask.escape(username), "uid": user.id})
                     response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
                     return response
                 else:
@@ -206,7 +208,7 @@ class Register(Resource):
             token = request.cookies.get("token")
 
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            user = Data.User.query.filter_by(id=data['id']).first()
+            user = Data.Users.query.filter_by(id=data['id']).first()
 
             guid = uuid.uuid4().hex
             Data.resend_request(user.id, guid)
@@ -224,7 +226,7 @@ class Login(Resource):
         try:
             token = request.cookies.get("token")
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.User.query.filter_by(id=data['id']).first()
+            current_user = Data.Users.query.filter_by(id=data['id']).first()
             if current_user.confirmed:
                 if token in active_tokens.values():
                     return {"status": "success"}
@@ -249,7 +251,7 @@ class Login(Resource):
                     current_app.config['SECRET_KEY'], "HS256")
                 active_tokens[user.username] = token
                 response = flask.make_response(
-                    {"status": "success" if user.confirmed else "email", "uname": flask.escape(user.username)})
+                    {"status": "success", "uname": flask.escape(user.username), "uid": user.id})
                 response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
                 return response
             else:
@@ -352,7 +354,7 @@ class Logout(Resource):
 #     data = request.get_json()
 #     try:
 #         userid = data["userid"]
-#         Data.friend_request(user.id, userid)
+#         Data.send_friend_request(user.id, userid)
 #         return {"status": "success"}
 #     except KeyError as e:
 #         print(repr(e))
@@ -365,7 +367,7 @@ class Logout(Resource):
 #     try:
 #         data = request.get_json()
 #         userid = data["userid"]
-#         Data.accept_request(userid.id, userid)
+#         Data.accept_friend_request(userid.id, userid)
 #         return {"status": "success"}
 #     except Exception as e:
 #         print(repr(e))
@@ -381,7 +383,7 @@ class Logout(Resource):
 #     except Exception as e:
 #         print(repr(e))
 #         return {"status": "failure"}
-#
+
 
 def get_years(dob: str) -> int:
     _y, _m, _d = dob[:4], dob[5:7], dob[8:]

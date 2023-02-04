@@ -2,7 +2,6 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = window.location.pathname.split("/")[2]
 let username = localStorage.getItem("uname")
 document.getElementById("pfpimage").setAttribute("src", `/image/${username}`);
-document.getElementById("pfpimage2").setAttribute("src", `/image/${uname}`);
 let page = 0
 document.getElementById("uname").innerHTML = uname
 
@@ -169,6 +168,7 @@ async function getPosts() {
         for (i in keys) {
             var post = data[keys[i]];
             let pid = keys[i];
+            let userid = post["uid"]
             let content = linkify(post["content"]);
             let lc = post["lc"];
             let dlc = post["dlc"];
@@ -177,8 +177,8 @@ async function getPosts() {
             let user = post["uname"];
             let fullname = post["fullname"];
             let date = post["datetime"];
-            let d = new Date(`${date} UTC`);
-            d = d.toLocaleString("en-us", options);
+            date = new Date(`${date} UTC`);
+            date = date.toLocaleString("en-us", options);
 
             if(uname != user){
                 continue;
@@ -195,7 +195,7 @@ async function getPosts() {
                     <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
                         <p class="text-lg font-medium ">${fullname}</p>
                         <div class="flex flex-row relative">
-                            <p class="pr-8 text-xs ">${d}</p>
+                            <p class="pr-8 text-xs ">${date}</p>
                         
                             ${username != user ? "": `<div class="group/options flex flex-row">
                             <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover:block">

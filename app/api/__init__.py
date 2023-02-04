@@ -1,6 +1,5 @@
 from flask import Blueprint
 from flask_restful import Api
-
 from app.api.routes import *
 
 api_bp = Blueprint('api', __name__)

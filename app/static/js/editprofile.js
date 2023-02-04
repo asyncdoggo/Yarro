@@ -1,6 +1,8 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
-document.getElementById("profile_img").setAttribute("src", `/image/${uname}`);
+let uid = localStorage.getItem("uid");
+
+document.getElementById("profile_img").setAttribute("src", `/image/${uid}`);
 
 
 
@@ -76,7 +78,7 @@ async function get_details() {
 
     if (response.status == "success") {
         res = response.data
-        document.getElementById("user_image").setAttribute("src", `/image/${uname}`);
+        document.getElementById("user_image").setAttribute("src", `/image/${uid}`);
         document.getElementById("name").value = res["name"]
         document.getElementById("gender").value = res["gender"]
         document.getElementById("mob").value = res["mob"]

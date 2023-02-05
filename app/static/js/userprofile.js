@@ -170,6 +170,7 @@ async function getPosts() {
             let pid = keys[i];
             let userid = post["uid"]
             let content = linkify(post["content"]);
+            let content_type = post["content_type"]
             let lc = post["lc"];
             let dlc = post["dlc"];
             let islike = post["islike"];
@@ -184,52 +185,52 @@ async function getPosts() {
                 continue;
             }
 
-            section.innerHTML += `<div class="post group flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
-            <div class="first-row flex flex-row w-full">
-                <div
-                    class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
-                >
-                    <img src="/image/${user}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
-                </div>
-                <div class="fullname-date flex flex-col w-full">
-                    <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
-                        <p class="text-lg font-medium ">${fullname}</p>
-                        <div class="flex flex-row relative">
-                            <p class="pr-8 text-xs ">${date}</p>
-                        
-                            ${username != user ? "": `<div class="group/options flex flex-row">
-                            <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover:block">
-                                keyboard_arrow_down
-                            </span>
-                            <div class="group-hover/options:block absolute hidden w-24 top-4 right-1 z-1 shadow-xl">
-                                <p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300" id="profile-btn" onClick=deleteRequest(${pid})>
-                                    Delete
-                                </p>
-                            </div>
-                        </div>`}
+            section.innerHTML += ` <div class="post group flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
+        <div class="first-row flex flex-row w-full">
+            <div
+                class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
+            >
+                <img src="/image/${userid}" alt="pfp" class="min-w-[45px] h-[45px] rounded-full" />
+            </div>
+            <div class="fullname-date flex flex-col w-full">
+                <div class="fullname mb-[-5px] flex flex-row w-full place-content-between">
+                    <p class="text-lg font-medium ">${fullname}&nbsp;</p>
+                    <div class="flex flex-row relative">
+                        <p class="pr-8 text-xs ">${date}</p>
+
+                        ${uname != user ? "": `<div class="group/options flex flex-row">
+                        <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover:block">
+                            keyboard_arrow_down
+                        </span>
+                        <div class="group-hover/options:block absolute hidden w-24 top-4 right-1 z-1 shadow-xl">
+                            <p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300" onClick=deleteRequest(${pid})>
+                                Delete
+                            </p>
                         </div>
+                    </div>`}
                     </div>
-                <div class="username">
-                    <a href="/u/${user}" class="hover:underline underline-offset-1 accent-black font-medium text-gray-500 text-sm" >@${user}</a>
                 </div>
-                </div>
+            <div class="username">
+                <a href="/u/${user}" class="hover:underline underline-offset-1 accent-black font-medium text-gray-500 text-sm" >@${user}</a>
             </div>
-            <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content}</div>
-            <div class="buttons-row flex flex-row">
-                <div class="lc flex flex-row pl-16 pt-4">
-                    <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
-                    islike ? "thumb_up" : "thumb_up_off_alt"
-                }</span>
-                    <p class="pl-2">${lc}</p>
-                </div>
-                <div class="dlc flex flex-row pl-4 pt-4">
-                    <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
-                    isdislike ? "thumb_down" : "thumb_down_off_alt"
-                }</span>
-                    <p class="pl-2">${dlc}</p>
-                </div>
             </div>
-        </div>`;
+        </div>
+        <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content_type=="image" ? `<img src="/post/images/${content}">`: content }</div>
+        <div class="buttons-row flex flex-row">
+            <div class="lc flex flex-row pl-16 pt-4">
+                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
+                islike ? "thumb_up" : "thumb_up_off_alt"
+            }</span>
+                <p class="pl-2">${lc}</p>
+            </div>
+            <div class="dlc flex flex-row pl-4 pt-4">
+                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
+                isdislike ? "thumb_down" : "thumb_down_off_alt"
+            }</span>
+                <p class="pl-2">${dlc}</p>
+            </div>
+        </div>
+    </div>`;
         }
     }
     bottom = false

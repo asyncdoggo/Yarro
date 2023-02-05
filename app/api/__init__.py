@@ -12,6 +12,8 @@ api.add_resource(Register, "/api/register")
 api.add_resource(Like, "/api/like")
 api.add_resource(UserDetails, "/api/user_details")
 api.add_resource(Image, "/api/image", "/image/<path:path>")
+api.add_resource(ImagePost, "/api/post/image", "/post/images/<path:path>")
+
 api.add_resource(FullnameBio, "/api/name")
 api.add_resource(SearchUser, "/api/search")
 api.add_resource(Logout, "/api/logout")

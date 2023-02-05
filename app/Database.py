@@ -1,4 +1,6 @@
 import datetime
+import os
+
 from sqlalchemy import desc
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
@@ -33,6 +35,7 @@ class Posts(db.Model):
     post_id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
     content = db.Column(db.String(255), nullable=False)
+    content_type = db.Column(db.String(20))
     l_count = db.Column(db.Integer)
     dl_count = db.Column(db.Integer)
     tstamp = db.Column(db.TIMESTAMP)
@@ -94,15 +97,15 @@ def get_fullname_bio(username):
     return details.name, details.bio
 
 
-def getuserdetials(uid):
-    details: Details = Details.query.filter_by(user_id=uid).one()
+def getuserdetials(user):
+    details: Details = Details.query.filter_by(user_id=user.id).one()
     return {"name": details.name, "age": details.age, "gender": details.gender,
             "mob": details.mob, "dob": str(details.dob), "bio": details.bio}
 
 
-def update_like(pid, uid, islike):
-    like: Likes = Likes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
-    dislike: DisLikes = DisLikes.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+def update_like(pid, user, islike):
+    like: Likes = Likes.query.filter_by(user_id=user.id, post_id=pid).one_or_none()
+    dislike: DisLikes = DisLikes.query.filter_by(user_id=user.id, post_id=pid).one_or_none()
     p = {}
     try:
         if islike:
@@ -112,7 +115,7 @@ def update_like(pid, uid, islike):
                 post.l_count -= 1
             else:
                 like = Likes()
-                like.user_id = uid
+                like.user_id = user.id
                 like.post_id = pid
                 db.session.add(like)
                 post = Posts.query.filter_by(post_id=pid).one()
@@ -132,7 +135,7 @@ def update_like(pid, uid, islike):
                 post.dl_count -= 1
             else:
                 dislike = DisLikes()
-                dislike.user_id = uid
+                dislike.user_id = user.id
                 dislike.post_id = pid
                 db.session.add(dislike)
                 post = Posts.query.filter_by(post_id=pid).one()
@@ -259,8 +262,9 @@ def check_reset(guid, uid):
         print(repr(e))
 
 
-def insert_post(uid, cont):
-    post = Posts(user_id=uid, content=cont, l_count=0, dl_count=0, tstamp=datetime.datetime.utcnow())
+def insert_post(user, cont):
+    post = Posts(user_id=user.id, content=cont, content_type="text", l_count=0, dl_count=0,
+                 tstamp=datetime.datetime.utcnow())
     try:
         db.session.add(post)
         db.session.commit()
@@ -269,26 +273,29 @@ def insert_post(uid, cont):
         print(repr(e))
 
 
-def get_posts(uid, page):
+def get_posts(user, page):
     result = db.session.query(Posts, Users, Details).filter(Users.id == Posts.user_id,
                                                             Users.id == Details.user_id).order_by(
         desc(Posts.post_id)).limit(10).offset(page).all()
 
-    likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == uid).all()
-    dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == uid).all()
+    likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == user.id).all()
+    dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == user.id).all()
     p = {}
 
     for i, j, k in result:
-        p[i.post_id] = {"post_id": i.post_id,
+        p[i.post_id] = {
+                        "post_id": i.post_id,
                         "content": i.content,
+                        "content_type": i.content_type,
                         "lc": i.l_count,
                         "dlc": i.dl_count,
                         "datetime": i.tstamp.strftime("%Y-%m-%d %H:%M:%S"),
                         "uname": j.username,
                         "uid": j.id,
-                        "islike": 1 if (uid, i.post_id) in likes else 0,
-                        "isdislike": 1 if (uid, i.post_id) in dislikes else 0,
-                        "fullname": k.name}
+                        "islike": 1 if (user.id, i.post_id) in likes else 0,
+                        "isdislike": 1 if (user.id, i.post_id) in dislikes else 0,
+                        "fullname": k.name
+                        }
     return p
 
 
@@ -354,9 +361,12 @@ def resend_request(uid, guid):
         print(repr(e))
 
 
-def deletePost(uid, pid):
+def deletePost(user, pid, path):
     try:
-        res = Posts.query.filter_by(user_id=uid, post_id=pid).one_or_none()
+        res = Posts.query.filter_by(user_id=user.id, post_id=pid).one_or_none()
+        if res and res.content_type == "image":
+            file = res.content
+            os.remove(path + os.sep + file)
         db.session.delete(res)
         db.session.commit()
     except Exception as e:
@@ -374,3 +384,14 @@ def search(user):
             "uid": i[0].id
         })
     return res
+
+
+def insert_post_image(user, filename):
+    try:
+        post: Posts = Posts(user_id=user.id, content=filename, content_type="image", l_count=0, dl_count=0,
+                            tstamp=datetime.datetime.utcnow())
+        db.session.add(post)
+        db.session.commit()
+        return True
+    except Exception as e:
+        return False

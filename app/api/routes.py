@@ -88,8 +88,7 @@ class Image(Resource):
     def post(self, user):
         try:
             file = request.files["image"]
-            image_type = file.mimetype
-            image_type = image_type.split("/")[1]
+            image_type = file.mimetype.split("/")[1]
             filename = secure_filename(f"{user.id}.{image_type}")
 
             file.save(os.path.join(flask.current_app.root_path, "static", "userimages", filename))
@@ -103,7 +102,7 @@ class UserDetails(Resource):
     @token_required
     def get(self, user):
         try:
-            ret = Data.getuserdetials(user.id)
+            ret = Data.getuserdetials(user)
             return {"status": "success", "data": ret}
         except Exception as e:
             print(repr(e))
@@ -155,7 +154,7 @@ class Like(Resource):
             data = request.get_json()
             pid = data["pid"]
             islike = data["islike"]
-            res = Data.update_like(pid=pid, uid=user.id, islike=islike)
+            res = Data.update_like(pid=pid, user=user, islike=islike)
             return {"status": "success", "data": res}
         except Exception as e:
             print(repr(e))
@@ -163,8 +162,7 @@ class Like(Resource):
 
 
 class Register(Resource):
-    @token_required
-    def post(self, user):
+    def post(self):
         try:
             data = request.get_json()
             email = data["email"]
@@ -192,7 +190,7 @@ class Register(Resource):
                 url = url_for("views.confirm_email", id=guid, uid=uid, _external=True)
                 if send_mail(email, username, url, True):
                     response = flask.make_response(
-                        {'status': 'success', "uname": flask.escape(username), "uid": user.id})
+                        {'status': 'success', "uname": flask.escape(username), "uid": uid})
                     response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
                     return response
                 else:
@@ -299,7 +297,7 @@ class Posts(Resource):
     def get(self, user):
         try:
             page = request.args.get("page")
-            res = Data.get_posts(user.id, page)
+            res = Data.get_posts(user, page)
             return {"status": "success", "data": res}
         except KeyError as e:
             print(repr(e))
@@ -311,7 +309,7 @@ class Posts(Resource):
         try:
             content: str = data["content"]
             if content.strip():
-                res = Data.insert_post(uid=user.id, cont=content.strip())
+                res = Data.insert_post(user=user, cont=content.strip())
                 return {"status": "success"} if res else {"status": "failure"}
             else:
                 return {"status": "nocontent"}
@@ -324,11 +322,31 @@ class Posts(Resource):
         data = request.get_json()
         try:
             pid = data["pid"]
-            Data.deletePost(user.id, pid)
+            Data.deletePost(user, pid, os.path.join(flask.current_app.root_path, "static", "images"))
             return {"status": "success"}
         except Exception as e:
             print(e)
             return {"status": "failure"}
+
+
+class ImagePost(Resource):
+    @token_required
+    def get(self, _, path):
+        path = secure_filename(path)
+        image_path = glob.glob(os.path.join(flask.current_app.root_path, "static", "images", path))
+        image_file = image_path[0].split(os.sep)[-1] if image_path else "not_available.png"
+        image_folder = os.path.join(flask.current_app.root_path, "static", "images")
+        return send_from_directory(image_folder, image_file)
+
+    @token_required
+    def post(self, user):
+        file = request.files["image"]
+        image_type = file.mimetype.split("/")[1]
+        filename = secure_filename(f"{uuid.uuid4().hex}.{image_type}")
+        if Data.insert_post_image(user, filename):
+            file.save(os.path.join(flask.current_app.root_path, "static", "images", filename))
+            return {"status": "success"}
+        return {"status": "failure"}
 
 
 class Logout(Resource):

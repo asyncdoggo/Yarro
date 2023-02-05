@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 import app.Database as Data
 from app.send_mail import send_mail
 from flask_restful import Resource
-
+from PIL import Image
 from flask import current_app
 
 active_tokens = {}
@@ -76,7 +76,7 @@ class FullnameBio(Resource):
             return {"status": "failure"}
 
 
-class Image(Resource):
+class ProfileImage(Resource):
     def get(self, path):
         uid = secure_filename(path)
         image_path = glob.glob(os.path.join(flask.current_app.root_path, "static", "userimages", f"{path}.*"))
@@ -88,10 +88,10 @@ class Image(Resource):
     def post(self, user):
         try:
             file = request.files["image"]
+            img = Image.open(file.stream)
             image_type = file.mimetype.split("/")[1]
             filename = secure_filename(f"{user.id}.{image_type}")
-
-            file.save(os.path.join(flask.current_app.root_path, "static", "userimages", filename))
+            img.save(os.path.join(flask.current_app.root_path, "static", "userimages", filename), optimize=True, quality=90)
             return {"status": "success"}
         except KeyError as e:
             print(e)
@@ -341,10 +341,11 @@ class ImagePost(Resource):
     @token_required
     def post(self, user):
         file = request.files["image"]
+        img = Image.open(file.stream)
         image_type = file.mimetype.split("/")[1]
         filename = secure_filename(f"{uuid.uuid4().hex}.{image_type}")
         if Data.insert_post_image(user, filename):
-            file.save(os.path.join(flask.current_app.root_path, "static", "images", filename))
+            img.save(os.path.join(flask.current_app.root_path, "static", "images", filename), optimize=True, quality=90)
             return {"status": "success"}
         return {"status": "failure"}
 

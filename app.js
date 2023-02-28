@@ -1,20 +1,25 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+import express, { json, urlencoded } from 'express';
+import { join } from 'path';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import nunjucks from 'nunjucks';
+import indexRouter from './routes/index.js';
+import usersRouter from './routes/users.js';
 
 var app = express();
 
+nunjucks.configure('views', {
+    autoescape: true,
+    express: app
+});
+
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(json());
+app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('./public'));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-module.exports = app;
+export default app;

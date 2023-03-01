@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- <link rel="stylesheet" href="/static/css/reset.css"> -->
+
+        <script src="/static/js/snackbar.js"></script>
+        <title>Reset Password</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+
+    <body>
+        <main>
+            <div
+                class="root flex flex-row justify-center lg:place-content-evenly mt-[200px]"
+            >
+                <div
+                    class="form-container border rounded-[3rem] flex flex-col px-[50px] py-[70px] border-white bg-white"
+                >
+                    <form
+                        id="reset_form"
+                        class="flex flex-col w-[360px] lg:w-[400px]"
+                        onsubmit="return false;"
+                        >
+                        <div class="phrase-container flex flex-col justify-center">
+                            <p class="phrase text-xl text-center">
+                                Reset Password
+                            </p>
+                             <p class="phrase text-l text-center font-medium">
+                                {{uname}}
+                            </p>
+                        </div>
+                        <input
+                            type="password"
+                            id="newpass1"
+                            name="newpass1"
+                            placeholder="Enter new password"
+                            class="m-[8px] rounded-[1em] h-[35px] pl-[15px] border-2"
+                        />
+                        <input
+                            type="password"
+                            id="newpass2"
+                            name="newpass2"
+                            placeholder="Confirm Password"
+                            class="m-[8px] rounded-[1em] h-[35px] pl-[15px] border-2"
+                        />
+
+                        <input
+                            class="mt-[20px] rounded-full h-[40px] text-white text-m bg-[#7034E4] hover:cursor-pointer disabled:bg-gray-900"
+                            type="submit"
+                            name="reset"
+                            id="resetButton"
+                            value="Reset"
+                        />
+                    </form>
+                </div>
+
+                <div class="image-container hidden lg:block">
+                    <img
+                        src="/static/static_images/forgot.png"
+                        alt="someimg"
+                        class="w-[600px]"
+                    />
+                </div>
+            </div>
+        </main>
+        <script src="/static/js/resetpass.js"></script>
+    </body>
+</html>

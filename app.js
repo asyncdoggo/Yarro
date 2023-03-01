@@ -1,25 +1,38 @@
 import express, { json, urlencoded } from 'express';
-import { join } from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import nunjucks from 'nunjucks';
-import indexRouter from './routes/index.js';
-import usersRouter from './routes/users.js';
-
+import indexRouter from './routes/view/index.js';
+import { config } from 'dotenv';
+import LoginRouter from './routes/api/login.js';
+import mongoose from 'mongoose';
 var app = express();
+config()
+app.set('view engine', 'nunjucks');
 
 nunjucks.configure('views', {
     autoescape: true,
     express: app
 });
 
+mongoose.connect(process.env.DATABASE_URL)
+const db = mongoose.connection
+mongoose.set('strictQuery', false);
+
+db.on("error", (err) => console.error(err))
+
+db.once('open',() => console.log("connected to db"))
+
+
 app.use(logger('dev'));
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static('./public'));
+app.use('/static', express.static('public'));
+
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/login', LoginRouter);
+
 
 export default app;

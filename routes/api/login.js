@@ -11,8 +11,8 @@ var loginRouter = Router();
 // Login
 loginRouter.put('/', async function (req, res) {
     try {
-        const user = await User.find({
-            username: req.username
+        const user = await User.findOne({
+            username: req.body.username
         })
 
         if (user == null) {
@@ -23,12 +23,13 @@ loginRouter.put('/', async function (req, res) {
             return res.status(400).json({ message: "Password is incorrect" })
         }
 
-        const token = generateAccessToken(user.username,user._id);
-        res.header(`Set-Cookie: token=${token}; Secure; HttpOnly; Path=/; SameSite=Strict`)
-        return res.status(201).json({ message: "success"});
+        const token = generateAccessToken(user.username, user._id);
+        res.setHeader(`Set-Cookie`, `token=${token}; Secure; HttpOnly; Path=/; SameSite=Strict`)
+        return res.status(201).json({ message: "success" });
     }
     catch (err) {
-        return res.status(400).json(err.message);
+        console.log(err)
+        return res.status(400).json(err.code);
     }
 });
 
@@ -47,6 +48,7 @@ loginRouter.get('/', async function (req, res) {
 
 // Register
 loginRouter.post('/', async function (req, res) {
+    console.log(req.body)
     try {
         const pwhash = await argon2.hash(req.body.password);
 
@@ -58,12 +60,13 @@ loginRouter.post('/', async function (req, res) {
             confirmed: false
         })
         const newUser = await user.save();
-        let token = generateAccessToken(newUser.username,newUser._id);
+        let token = generateAccessToken(newUser.username, newUser._id);
         res.setHeader(`Set-Cookie`, `token=${token}; Secure; HttpOnly; Path=/; SameSite=Strict`)
-        res.status(201).json({ message: "success" })
+        return res.status(201).json({ message: "success" })
     }
     catch (err) {
-        res.status(400).json({ message: err.message })
+        console.log(err)
+        return res.status(400).json({ message: err.code })
     }
 })
 

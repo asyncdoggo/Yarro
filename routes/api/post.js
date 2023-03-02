@@ -7,20 +7,61 @@ import User from '../../models/user.js';
 var postRouter = Router();
 
 // update like/dislike
-postRouter.put('/', function (req, res) {
+postRouter.put('/', tokenRequired, async function (req, res) {
+
+
+  const post = await Post.findById(req.body.postId);
+  if (!post) {
+    throw new Error('Post not found');
+  }
+
+  const user = await User.findById(req.userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  let updateObj = {};
+  if (req.body.isLike) {
+    if (post.likes.includes(req.userId)) {
+      updateObj = { $pull: { likes: req.userId } };
+    } else {
+      updateObj = {
+        $addToSet: { likes: req.userId },
+        $pull: { dislikes: req.userId },
+      };
+    }
+  } else {
+    if (post.dislikes.includes(req.userId)) {
+      updateObj = { $pull: { dislikes: req.userId } };
+    } else {
+      updateObj = {
+        $addToSet: { dislikes: req.userId },
+        $pull: { likes: req.userId },
+      };
+    }
+  }
+
+  await Post.updateOne({ _id: req.body.postId }, updateObj);
+  await User.updateOne(
+    { _id: req.userId },
+    {
+      $addToSet: { [req.body.isLike ? 'likes' : 'dislikes']: req.body.postId },
+      $pull: { [req.body.isLike ? 'dislikes' : 'likes']: req.body.postId },
+    }
+  );
+
+  return res.json({ message: "success" });
 });
 
 
 // create new post
-postRouter.post('/', tokenRequired, async function (req, res) {
+postRouter.post('/', async function (req, res) {
   try {
     const post = new Post({
       _id: new mongoose.Types.ObjectId(),
       author: req.body.author,
       content: req.body.content,
       content_type: req.body.content_type,
-      likes: 0,
-      dislikes: 0
     })
     await post.save();
 
@@ -39,7 +80,8 @@ postRouter.post('/', tokenRequired, async function (req, res) {
 
 
 // get posts
-postRouter.get('/', tokenRequired, async function (req, res) {
+postRouter.get('/'/*, tokenRequired */, async function (req, res) {
+  req.userId = "6400a7f490edf45186fa9fe5"
   const posts = await Post.aggregate([
     {
       $lookup: {
@@ -71,10 +113,10 @@ postRouter.get('/', tokenRequired, async function (req, res) {
     {
       $addFields: {
         liked: {
-          $in: [mongoose.Types.ObjectId(req.userId), '$likes._id']
+          $in: [new mongoose.Types.ObjectId(req.userId), '$likes._id']
         },
         disliked: {
-          $in: [mongoose.Types.ObjectId(req.userId), '$dislikes._id']
+          $in: [new mongoose.Types.ObjectId(req.userId), '$dislikes._id']
         },
         likeCount: {
           $size: '$likes'
@@ -99,6 +141,11 @@ postRouter.get('/', tokenRequired, async function (req, res) {
       }
     }
   ])
+
+
+
+  return res.status(201).json({ message: "success", data: posts })
+
 })
 
 
@@ -106,9 +153,5 @@ postRouter.get('/', tokenRequired, async function (req, res) {
 postRouter.delete('/', function (req, res) {
 
 })
-
-
-
-
 
 export default postRouter;

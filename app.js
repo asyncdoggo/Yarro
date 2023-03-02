@@ -6,6 +6,7 @@ import indexRouter from './routes/view/index.js';
 import { config } from 'dotenv';
 import LoginRouter from './routes/api/login.js';
 import mongoose from 'mongoose';
+import postRouter from './routes/api/post.js';
 var app = express();
 config()
 app.set('view engine', 'nunjucks');
@@ -21,7 +22,7 @@ mongoose.set('strictQuery', false);
 
 db.on("error", (err) => console.error(err))
 
-db.once('open',() => console.log("connected to db"))
+db.once('open', () => console.log("connected to db"))
 
 
 app.use(logger('dev'));
@@ -30,9 +31,12 @@ app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/static', express.static('public'));
 
-
+// views 
 app.use('/', indexRouter);
-app.use('/api/login', LoginRouter);
 
+
+// apis
+app.use('/api/login', LoginRouter);
+app.use('/api/post', postRouter)
 
 export default app;

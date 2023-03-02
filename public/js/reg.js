@@ -4,9 +4,9 @@ document.getElementById('reg_form').addEventListener('submit', async function (e
     const form = new FormData(e.target);
     const senddata = Object.fromEntries(form.entries());
     // console.log(senddata["passwd1"])
-    if (senddata["passwd1"] == senddata["passwd2"]) {
+    if (senddata["password"] == senddata["password2"]) {
 
-        const response = await fetch("/api/register", {
+        const response = await fetch("/api/login", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -15,18 +15,18 @@ document.getElementById('reg_form').addEventListener('submit', async function (e
             body: JSON.stringify(senddata)
         }).then((response) => response.json())
 
-        if (response.status == "success") {
-            localStorage.setItem("uname", senddata["uname"])
+        if (response.message == "success") {
+            localStorage.setItem("uname", senddata["username"])
             localStorage.setItem("uid", response.uid)
             window.location.href = "/"
         }
         else {
-            Snackbar.show({pos:"bottom-center",text: response.status})
+            Snackbar.show({ pos: "bottom-center", text: response.message })
             document.getElementById("reg").disabled = false
         }
     }
     else {
-        Snackbar.show({pos:"bottom-center",text: "passwords do not match"})
+        Snackbar.show({ pos: "bottom-center", text: "passwords do not match" })
         document.getElementById("reg").disabled = false
     }
 })

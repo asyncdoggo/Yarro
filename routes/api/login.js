@@ -16,11 +16,11 @@ loginRouter.put('/', async function (req, res) {
         })
 
         if (user == null) {
-            return res.status(404).json({ message: "Cannot find user" });
+            return res.status(200).json({ message: "Cannot find user" });
         }
         const pwhash = user.password
         if (!await argon2.verify(pwhash, req.body.password)) {
-            return res.status(400).json({ message: "Password is incorrect" })
+            return res.status(200).json({ message: "Password is incorrect" })
         }
 
         const token = generateAccessToken(user.username, user._id);
@@ -32,18 +32,6 @@ loginRouter.put('/', async function (req, res) {
         return res.status(400).json(err.code);
     }
 });
-
-// Get users
-loginRouter.get('/', async function (req, res) {
-    try {
-        const user = await User.find()
-        res.json(user)
-    }
-    catch (err) {
-        res.status(500).json({ message: err.message })
-    }
-
-})
 
 
 // Register

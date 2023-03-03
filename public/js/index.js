@@ -15,10 +15,10 @@ document.getElementById("login_form").addEventListener("submit", async function 
         })
     }).then((response) => response.json())
 
-    let status = response.status;
+    let status = response.message;
     if (status == "success") {
-        localStorage.setItem("uname", response.uname);
-        localStorage.setItem("uid", response.uid);
+        localStorage.setItem("uname", response.username);
+        localStorage.setItem("uid", response.userId);
         window.location.reload()
     }
     else {

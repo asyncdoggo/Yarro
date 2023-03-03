@@ -25,7 +25,7 @@ loginRouter.put('/', async function (req, res) {
 
         const token = generateAccessToken(user.username, user._id);
         res.setHeader(`Set-Cookie`, `token=${token}; Secure; HttpOnly; Path=/; SameSite=Strict`)
-        return res.status(201).json({ message: "success" });
+        return res.status(201).json({ message: "success", userId: user.userId, username: user.username });
     }
     catch (err) {
         console.log(err)
@@ -62,7 +62,7 @@ loginRouter.post('/', async function (req, res) {
         const newUser = await user.save();
         let token = generateAccessToken(newUser.username, newUser._id);
         res.setHeader(`Set-Cookie`, `token=${token}; Secure; HttpOnly; Path=/; SameSite=Strict`)
-        return res.status(201).json({ message: "success" })
+        return res.status(201).json({ message: "success", userId: user.userId, username: user.username });
     }
     catch (err) {
         console.log(err)

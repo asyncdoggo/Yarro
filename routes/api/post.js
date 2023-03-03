@@ -80,8 +80,10 @@ postRouter.post('/', async function (req, res) {
 
 
 // get posts
-postRouter.get('/'/*, tokenRequired */, async function (req, res) {
-  req.userId = "6400a7f490edf45186fa9fe5"
+postRouter.get('/', tokenRequired, async function (req, res) {
+
+  let skip = parseInt(req.query.page)
+  let limit = parseInt(req.query.size)
   const posts = await Post.aggregate([
     {
       $lookup: {
@@ -134,12 +136,15 @@ postRouter.get('/'/*, tokenRequired */, async function (req, res) {
         },
         content: 1,
         created_at: 1,
+        content_type: 1,
         liked: 1,
         disliked: 1,
         likeCount: 1,
         dislikeCount: 1
       }
-    }
+    },
+    { "$limit": skip + limit },
+    { "$skip": skip }
   ])
 
 

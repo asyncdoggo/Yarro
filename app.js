@@ -7,6 +7,7 @@ import { config } from 'dotenv';
 import LoginRouter from './routes/api/login.js';
 import mongoose from 'mongoose';
 import postRouter from './routes/api/post.js';
+import imageRouter from './routes/api/image.js';
 var app = express();
 config()
 app.set('view engine', 'nunjucks');
@@ -38,5 +39,6 @@ app.use('/', indexRouter);
 // apis
 app.use('/api/login', LoginRouter);
 app.use('/api/post', postRouter)
+app.use('/image', imageRouter)
 
 export default app;

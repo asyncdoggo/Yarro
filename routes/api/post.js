@@ -135,6 +135,7 @@ postRouter.get('/', tokenRequired, async function (req, res) {
           username: 1
         },
         content: 1,
+        name: 1,
         created_at: 1,
         content_type: 1,
         liked: 1,

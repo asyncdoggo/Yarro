@@ -1,21 +1,35 @@
 import { Router } from 'express';
 import jsonwebtoken from 'jsonwebtoken';
+import multer from 'multer';
 import { tokenRequired } from '../../middlewares/jwt.js';
-import User from '../../models/user.js';
+import fs from 'fs';
+import { join } from 'path';
+
+import { __dirname } from '../../app.js'
+
 var imageRouter = Router();
+
+const upload = multer(
+    {
+        dest: 'uploads/'
+    }
+)
+
 
 imageRouter.get('/:id', async function (req, res) {
     const id = req.params.id
-    const path = `/public/userimages/${id}.png`
+    const path = join(__dirname, 'public', 'userimages', `${id}.png`)
     if (fs.existsSync(path)) {
         return res.sendFile(path)
     }
-    return res.sendFile("/public/userimages/default.png")
+    return res.sendFile(join(__dirname, 'public', 'userimages', 'default.png'))
 });
 
-
-imageRouter.post("/", async function (req, res) {
+//TODO: Complete with user profile 
+imageRouter.post("/", tokenRequired, upload.single('uploaded_file'), async function (req, res) {
     const file = req.file
+    console.log(file)
+
 })
 
 

@@ -1,21 +1,21 @@
 import express, { json, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import nunjucks from 'nunjucks';
-import indexRouter from './routes/view/index.js';
 import { config } from 'dotenv';
 import LoginRouter from './routes/api/login.js';
 import mongoose from 'mongoose';
 import postRouter from './routes/api/post.js';
 import imageRouter from './routes/api/image.js';
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+
+
 var app = express();
 config()
-app.set('view engine', 'nunjucks');
-
-nunjucks.configure('views', {
-    autoescape: true,
-    express: app
-});
 
 mongoose.connect(process.env.DATABASE_URL)
 const db = mongoose.connection
@@ -32,13 +32,9 @@ app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/static', express.static('public'));
 
-// views 
-app.use('/', indexRouter);
-
-
 // apis
 app.use('/api/login', LoginRouter);
 app.use('/api/post', postRouter)
 app.use('/image', imageRouter)
 
-export default app;
+export { __dirname, app };

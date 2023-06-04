@@ -8,7 +8,6 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 ph = PasswordHasher()
 
-
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.String(35), primary_key=True, nullable=False)
@@ -21,7 +20,7 @@ class Users(db.Model):
 class Details(db.Model):
     __tablename__ = "details"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
+    user_id = db.Column(db.String(35))
     name = db.Column(db.String(50))
     age = db.Column(db.Integer)
     gender = db.Column(db.String(10))
@@ -33,7 +32,7 @@ class Details(db.Model):
 class Posts(db.Model):
     __tablename__ = "posts"
     post_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
+    user_id = db.Column(db.String(35))
     content = db.Column(db.String(255), nullable=False)
     content_type = db.Column(db.String(20))
     l_count = db.Column(db.Integer)
@@ -44,21 +43,21 @@ class Posts(db.Model):
 class Likes(db.Model):
     __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
-    post_id = db.Column(db.Integer, db.ForeignKey("posts.post_id", ondelete="CASCADE"))
+    user_id = db.Column(db.String(35))
+    post_id = db.Column(db.Integer)
 
 
 class DisLikes(db.Model):
     __tablename__ = "dislikes"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"))
-    post_id = db.Column(db.Integer, db.ForeignKey("posts.post_id", ondelete="CASCADE"))
+    user_id = db.Column(db.String(35))
+    post_id = db.Column(db.Integer)
 
 
 class Requests(db.Model):
     __tablename__ = "requests"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = db.Column(db.String(35), nullable=False)
     guid = db.Column(db.String(255), nullable=False)
     tstamp = db.Column(db.TIMESTAMP)
 
@@ -66,7 +65,7 @@ class Requests(db.Model):
 class EmailRequests(db.Model):
     __tablename__ = "emailrequests"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(35), db.ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = db.Column(db.String(35), unique=True, nullable=False)
     guid = db.Column(db.String(255), nullable=False)
     tstamp = db.Column(db.TIMESTAMP)
 
@@ -74,9 +73,9 @@ class EmailRequests(db.Model):
 class Friendship(db.Model):
     __tablename__ = 'friendships'
     id = db.Column(db.Integer, primary_key=True)
-    user1_id = db.Column(db.String(35), db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
-    user2_id = db.Column(db.String(35), db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
-    initiator_id = db.Column(db.String(35), db.ForeignKey('users.id', ondelete="CASCADE"))
+    user1_id = db.Column(db.String(35), nullable=False)
+    user2_id = db.Column(db.String(35), nullable=False)
+    initiator_id = db.Column(db.String(35))
 
 
 def update(name, age, gender, mob, dob, uid, bio):

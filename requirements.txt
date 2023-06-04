@@ -6,3 +6,4 @@ mysqlclient
 Werkzeug
 flask-restful
 pillow
+python-dotenv

@@ -1,6 +1,13 @@
-import os
-DEBUG = False
-SECRET_KEY = '004f2af45d3a4e161a7dd2d17fdae47f'
-SQLALCHEMY_DATABASE_URI = 'mysql://root:root@127.0.0.1:3306/data'
+from dotenv import dotenv_values
+
+config = dotenv_values(".env")
+
+HOST=config["HOST"]
+USERNAME=config["USERNAME"]
+PASSWORD=config["PASSWORD"]
+DATABASE=config["DATABASE"]
+
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-del os
+DEBUG = False
+SQLALCHEMY_DATABASE_URI = f'mysql://{USERNAME}:{PASSWORD}@{HOST}/{DATABASE}?ssl=true'
+SECRET_KEY = config["SECRET_KEY"]

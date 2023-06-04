@@ -2,7 +2,6 @@ from flask import Flask
 import app.Database as Data
 from app.api import api_bp
 from app.views import view_bp
-
 app = Flask(__name__)
 
 app.config.from_pyfile('appconfig.py')

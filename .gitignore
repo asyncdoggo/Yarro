@@ -6,3 +6,4 @@ __pycache__
 /build_files/
 app/gapw.json
 .env
+.vercel

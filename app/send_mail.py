@@ -4,15 +4,12 @@ import json
 import os
 from email.message import EmailMessage
 import flask
-
+import appconfig
 
 def send_mail(to_email, uname, url, confirm):
     try:
-        jsonfile = os.path.join(flask.current_app.root_path, "gapw.json")
-        with open(jsonfile) as file:
-            data = json.load(file)
-        mailaddr = data["email"]
-        password = data["password"]
+        mailaddr = appconfig.EMAIL
+        password = appconfig.EMAIL_PASSWORD
 
         port = 465  # For SSL
 

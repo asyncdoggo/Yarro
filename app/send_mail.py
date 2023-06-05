@@ -3,13 +3,16 @@ import ssl
 import json
 import os
 from email.message import EmailMessage
+from dotenv import dotenv_values
 import flask
-import appconfig
+
+config = dotenv_values(".env")
+
 
 def send_mail(to_email, uname, url, confirm):
     try:
-        mailaddr = appconfig.EMAIL
-        password = appconfig.EMAIL_PASSWORD
+        mailaddr = config["EMAIL"]
+        password = config["EMAIL_PASSWORD"]
 
         port = 465  # For SSL
 

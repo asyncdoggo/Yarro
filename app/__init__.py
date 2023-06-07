@@ -1,5 +1,5 @@
 from flask import Flask
-import app.Database as Data
+import app.db.classes as Data
 from app.api import api_bp
 from app.views import view_bp
 

@@ -5,7 +5,7 @@ from flask import Blueprint
 from flask import current_app
 from flask import request, jsonify, render_template, make_response
 from jwt import ExpiredSignatureError, DecodeError
-import app.Database as Data
+import app.db as Data
 
 view_bp = Blueprint("views", __name__)
 

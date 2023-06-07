@@ -363,8 +363,11 @@ def deletePost(user, pid, path):
     try:
         res = Posts.query.filter_by(user_id=user.id, post_id=pid).one_or_none()
         if res and res.content_type == "image":
-            file = res.content
-            os.remove(path + os.sep + file)
+            try:
+                file = res.content
+                os.remove(path + os.sep + file)
+            except:
+                pass
         db.session.delete(res)
         db.session.commit()
     except Exception as e:

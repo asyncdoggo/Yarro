@@ -17,14 +17,14 @@ document.getElementById("save_form").addEventListener("submit", async function (
     const response = await fetch("/api/user_details", {
         method: 'PUT',
         headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
+            Accept: "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify(data)
     }).then((response) => response.json())
 
     if (response.status = "success") {
-        Snackbar.show({pos:"bottom-center",text: response.status});
+        Snackbar.show({ pos: "bottom-center", text: response.status });
     }
 
     const file = document.getElementById("image_upload").files[0]
@@ -45,12 +45,15 @@ document.getElementById("homebtn").addEventListener("click", function () {
     window.location.href = "/"
 })
 
-document.getElementById("profile").addEventListener("click", function () {
+document.getElementById("profile-btn").addEventListener("click", function () {
     window.location.href = `/u/${uname}`
 })
 
-document.getElementById("logout").addEventListener("click", async function () {
-    localStorage.clear()
+document.getElementById("logout-btn").addEventListener("click", async function () {
+    let x = localStorage.getItem("theme")
+    localStorage.clear();
+    localStorage.setItem("theme", x)
+
     const response = await fetch("/api/logout", {
         method: 'POST',
         headers: {
@@ -58,7 +61,7 @@ document.getElementById("logout").addEventListener("click", async function () {
             'Content-Type': 'application/json',
         }
     }).then((response) => response.json())
-    if(response.status == "success"){
+    if (response.status == "success") {
         window.location.reload()
     }
 })
@@ -83,6 +86,6 @@ async function get_details() {
         document.getElementById("gender").value = res["gender"]
         document.getElementById("mob").value = res["mob"]
         document.getElementById("dob").value = res["dob"]
-         document.getElementById("bio").value = res["bio"]
+        document.getElementById("bio").value = res["bio"]
     }
 }

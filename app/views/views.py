@@ -142,8 +142,3 @@ def search(user):
     except Exception as e:
         print(repr(e))
         return render_template("404.html")
-
-
-@view_bp.route("/test")
-def test():
-    return render_template("resetpass.html", uname="helll")

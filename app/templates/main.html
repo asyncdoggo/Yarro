@@ -10,57 +10,75 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/js/snackbar.js"></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 
-<body>
+<body class="group data-[checked=true]:bg-[#101010]" data-checked="true" id="parent">
     <header class="header border border-r-0 border-l-0 border-black pb-4 w-full flex flex-row place-content-between">
-        <p class="pl-6 text-xl pt-6 font-bold">Bitter</p>
+        <p class="pl-6 text-xl pt-6 font-bold group-data-[checked=true]:text-white">Bitter</p>
         <div class="navTabs flex gap-x-8">
-            <div class="homeTab hover:cursor-pointer">
+            <div class="homeTab hover:cursor-pointer group-data-[checked=true]:text-white">
                 <p class="material-icons pt-4 mx-2 text-2xl" id="homebtn"> home</p>
                 <p>Home</p>
             </div>
-            <div class="searchTab hover:cursor-pointer" onclick="window.location.href='/search'">
-                <p class="material-icons pt-4 mx-2 text-2xl" id="searchbtn">search</p>
+            <div class="searchTab hover:cursor-pointer group-data-[checked=true]:text-white"
+                onclick="window.location.href='/search'">
+                <p class="material-icons pt-4 mx-2 text-2xl" id="searchbtn">search
+                </p>
                 <p>Search</p>
             </div>
         </div>
-
-        <div class="relative inline-block group ">
-            <div class="profile-container pt-4 pr-8 min-w-[50px] max-w-[50px] min-h-[50px] mr-[5rem]">
-                <img id="profile-img" src="" alt="pfp" class="min-w-[50px] h-[50px] rounded-full" />
-            </div>
-            <div class="navs group-hover:block absolute hidden w-36 right-1 z-1 shadow-xl">
-                <p class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300" id="profile-btn">
-                    Profile
-                </p>
-                <p class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300" id="logout-btn">
-                    Logout
-                </p>
+        <div class="flex items-center">
+            <label for="theme">
+                <span id="theme_button"
+                    class="material-symbols-outlined pt-4 px-4 text-4xl group-data-[checked=true]:text-white select-none hover:cursor-pointer">
+                    dark_mode
+                </span>
+            </label>
+            <input type="checkbox" id="theme" class="hidden">
+            <div class="relative inline-block group/nav ">
+                <div class="profile-container pt-4 pr-8 min-w-[50px] max-w-[50px] min-h-[50px] mr-4">
+                    <img id="profile-img" src="" alt="pfp" class="min-w-[50px] h-[50px] rounded-full" />
+                </div>
+                <div
+                    class="navs group-hover/nav:block absolute hidden w-36 right-1 z-1 shadow-xl group-data-[checked=true]:text-white">
+                    <p class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-900 group-data-[checked=true]:hover:bg-black"
+                        id="profile-btn">
+                        Profile
+                    </p>
+                    <p class="py-2 hover:cursor-pointer pl-2 bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-900 group-data-[checked=true]:hover:bg-black"
+                        id="logout-btn">
+                        Logout
+                    </p>
+                </div>
             </div>
         </div>
     </header>
 
     <main>
-        <div id="text-modal" class="relative z-10" hidden aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+        <div id="text-modal" class="relative z-10 " hidden aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
 
             <div class="fixed inset-0 z-10 overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <div
-                        class="relative mb-[300px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg">
-                        <div class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4 border">
-                            <div class="sm:flex sm:items-start mt-2 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                <p class="text-lg font-medium">New Post</p>
+                        class="relative mb-[300px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg group-data-[checked=true]:bg-gray-900">
+                        <div
+                            class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4 border group-data-[checked=true]:bg-gray-900 group-data-[checked=true]:border-black">
+                            <div class="sm:flex sm:items-start mt-2 text-center sm:mt-0 sm:ml-4 sm:text-left ">
+                                <p class="text-lg font-medium group-data-[checked=true]:text-white ">
+                                    New Post</p>
                             </div>
                         </div>
                         <div>
                             <p>
                                 <textarea name="content" id="postcontent" cols="30" rows="10"
-                                    class="w-full resize-none px-5 py-5 focus:outline-none"></textarea>
+                                    class="w-full resize-none px-5 py-5 focus:outline-none group-data-[checked=true]:bg-black group-data-[checked=true]:text-white"></textarea>
                             </p>
                         </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <div
+                            class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 group-data-[checked=true]:bg-gray-900">
                             <button type="button" id="post_btn"
                                 class="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
                                 Post
@@ -76,29 +94,32 @@
         </div>
 
 
-        <div id="image-modal" class="relative z-10" hidden aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-
+        <div id="image-modal" class="relative z-10" hidden aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
             <div class="fixed inset-0 z-10 overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <div
                         class="relative mb-[300px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg">
-                        <div class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4 border">
-                            <div class="sm:flex sm:items-start mt-2 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <div
+                            class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4 border group-data-[checked=true]:bg-gray-900 group-data-[checked=true]:text-white group-data-[checked=true]:border-black">
+                            <div class="sm:flex sm:items-start mt-2 text-center sm:mt-0 sm:ml-4 sm:text-left ">
                                 <p class="text-lg font-medium">New Post</p>
                             </div>
                         </div>
                         <div>
-                            <div class="post-image-container flex flex-col items-center" >
-                                <img src="" alt="" id="post_image" class=""/>
+                            <div
+                                class="post-image-container flex flex-col items-center group-data-[checked=true]:bg-gray-900">
+                                <img src="" alt="" id="post_image" class="" />
                                 <form id="image_form" method="POST" enctype="multipart/form-data" action="/sendimage">
-                                    <label for="image_upload" class="cursor-pointer" >Upload Image</label>
-                                    <input type="file" id="image_upload" name="image" accept="image/*" class="w-0 h-0" />
+                                    <label for="image_upload"
+                                        class="cursor-pointer group-data-[checked=true]:text-white">Upload Image</label>
+                                    <input type="file" id="image_upload" name="image" accept="image/*"
+                                        class="w-0 h-0" />
                                 </form>
-                                <p id="username" class="font-medium text-xl "></p>
                             </div>
                         </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <div
+                            class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 group-data-[checked=true]:bg-gray-900">
                             <button type="button" id="post_image_btn"
                                 class="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
                                 Post
@@ -121,15 +142,18 @@
                 </div>
                 <div class="input my-4 w-full">
                     <input id="postbox"
-                        class="border border-black w-full rounded-full px-4 h-12 focus:outline-none hover:bg-gray-200 hover:cursor-pointer"
+                        class="border border-black w-full rounded-full px-4 h-12 focus:outline-none hover:bg-gray-200 hover:cursor-pointer group-data-[checked=true]:bg-gray-800 group-data-[checked=true]:hover:bg-black"
                         placeholder="Have a topic that excites you? Post about it" readonly />
                 </div>
-            <span class="material-icons pt-8 ml-4 hover:cursor-pointer" id="image-modal-btn">image</span>
+                <span class="material-icons pt-8 ml-4 hover:cursor-pointer group-data-[checked=true]:text-white"
+                    id="image-modal-btn">image</span>
             </div>
         </div>
         <div class="post-area w-full flex flex-col px-1 md:px-36 lg:px-80" id="post_section"></div>
-        <script src="/static/js/main.js"></script>
+
     </main>
 </body>
+<script src="/static/js/main.js"></script>
+<script src="/static/js/theme.js"></script>
 
 </html>

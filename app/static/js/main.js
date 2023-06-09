@@ -44,16 +44,16 @@ document.getElementById("post_image_btn").addEventListener("click", async functi
             body: formdata
         }).then((response) => response.json())
 
-        if(response.status == "success"){
+        if (response.status == "success") {
             page = 0;
-            document.getElementById("post_image").setAttribute("src","");
+            document.getElementById("post_image").setAttribute("src", "");
             document.getElementById("image_upload").value = ""
             document.getElementById("image-modal").hidden = true;
             document.getElementById("post_section").innerHTML = "";
             getPosts()
 
         }
-    }    
+    }
 })
 
 
@@ -94,7 +94,7 @@ async function onBtnPress(pid, btn) {
 }
 
 document.getElementById("post_btn")
-        .addEventListener("click", async function () {
+    .addEventListener("click", async function () {
         let cont = document.getElementById("postcontent").value;
 
         if (cont.trim().length > 0) {
@@ -104,7 +104,7 @@ document.getElementById("post_btn")
                     Accept: "application/json",
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ content: cont}),
+                body: JSON.stringify({ content: cont }),
             }).then((response) => response.json());
 
             if (response.status == "success") {
@@ -121,7 +121,9 @@ document.getElementById("post_btn")
 document
     .getElementById("logout-btn")
     .addEventListener("click", async function () {
+        let x = localStorage.getItem("theme")
         localStorage.clear();
+        localStorage.setItem("theme", x)
         const response = await fetch("/api/logout", {
             method: "POST",
             headers: {
@@ -136,12 +138,12 @@ document
 
 
 const options = {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-        };
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+};
 
 async function getPosts() {
     let response = await fetch(`/api/posts?page=${page}`, {
@@ -154,9 +156,9 @@ async function getPosts() {
         let keys = Object.keys(data).reverse();
         let i;
 
-        
+
         let section = document.getElementById("post_section")
-        
+
         for (i in keys) {
             var post = data[keys[i]];
             let pid = keys[i];
@@ -172,7 +174,7 @@ async function getPosts() {
             let fullname = post["fullname"]
             date = new Date(`${date} UTC`);
             date = date.toLocaleString("en-us", options);
-            section.innerHTML += ` <div class="post group flex flex-col shadow-md w-full pb-2 mb-2 " id="${pid}">
+            section.innerHTML += ` <div class="post group flex flex-col shadow-md w-full pb-2 mb-2 group-data-[checked=true]:shadow-gray-600 group-data-[checked=true]:text-white" id="${pid}">
         <div class="first-row flex flex-row w-full">
             <div
                 class="pfp-container max-w-[45px] min-w-[45px] min-h-[45px] pt-1 pr-4 mx-2"
@@ -185,12 +187,12 @@ async function getPosts() {
                     <div class="flex flex-row relative">
                         <p class="pr-8 text-xs ">${date}</p>
 
-                        ${uname != user ? "": `<div class="group/options flex flex-row">
+                        ${uname != user ? "" : `<div class="group/options flex flex-row">
                         <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover:block">
                             keyboard_arrow_down
                         </span>
                         <div class="group-hover/options:block absolute hidden w-24 top-4 right-1 z-1 shadow-xl">
-                            <p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300" onClick=deleteRequest(${pid})>
+                            <p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=deleteRequest(${pid})>
                                 Delete
                             </p>
                         </div>
@@ -202,18 +204,16 @@ async function getPosts() {
             </div>
             </div>
         </div>
-        <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content_type=="image" ? `<img src="/post/images/${content}">`: content }</div>
+        <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content_type == "image" ? `<img src="/post/images/${content}">` : content}</div>
         <div class="buttons-row flex flex-row">
             <div class="lc flex flex-row pl-16 pt-4">
-                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
-                islike ? "thumb_up" : "thumb_up_off_alt"
-            }</span>
+                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${islike ? "thumb_up" : "thumb_up_off_alt"
+                }</span>
                 <p class="pl-2">${lc}</p>
             </div>
             <div class="dlc flex flex-row pl-4 pt-4">
-                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${
-                isdislike ? "thumb_down" : "thumb_down_off_alt"
-            }</span>
+                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${isdislike ? "thumb_down" : "thumb_down_off_alt"
+                }</span>
                 <p class="pl-2">${dlc}</p>
             </div>
         </div>
@@ -253,17 +253,17 @@ function linkify(inputText) {
 }
 
 
-let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop
-window.onscroll = function(ev) {
-    var st = window.pageYOffset || document.documentElement.scrollTop;
-    if (st > lastScrollTop && (window.innerHeight + window.scrollY) >= document.body.offsetHeight){
-        getPosts()   
+let lastScrollTop = window.scrollY || document.documentElement.scrollTop
+window.onscroll = function (ev) {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    if (st > lastScrollTop && (window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        getPosts()
     }
     lastScrollTop = st <= 0 ? 0 : st;
 };
 
 
-async function deleteRequest(pid){
+async function deleteRequest(pid) {
     const response = await fetch("/api/posts", {
         method: "DELETE",
         headers: {

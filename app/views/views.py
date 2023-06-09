@@ -5,39 +5,10 @@ from flask import Blueprint
 from flask import current_app
 from flask import request, jsonify, render_template, make_response
 from jwt import ExpiredSignatureError, DecodeError
+from app.api.token_required import token_required
 import app.db as Data
 
 view_bp = Blueprint("views", __name__)
-
-
-def token_required(f):
-    """
-    token_required(f) decorator will validate a token f and return the User Class object defined in
-    modules/Database. token should be sent through HTTP header 'x-access-tokens'
-    """
-
-    @wraps(f)
-    def decorator(*args, **kwargs):
-
-        token = request.cookies.get("token")
-
-        if not token:
-            return jsonify({'message': 'a valid token is missing'})
-
-        try:
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.Users.query.filter_by(id=data['id']).first()
-
-            if not current_user.confirmed:
-                return {"status": "email"}
-        except ExpiredSignatureError:
-            return jsonify({'status': 'expired'})
-        except DecodeError:
-            return jsonify({"status": "invalid"})
-
-        return f(*args, current_user, **kwargs)
-
-    return decorator
 
 
 @view_bp.route("/", methods=["GET"])
@@ -58,7 +29,8 @@ def main():
         return response
     else:
         try:
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(
+                token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.Users.query.filter_by(id=data['id']).first()
             if current_user.confirmed:
                 return render_template("main.html")
@@ -73,7 +45,8 @@ def register_render():
     """Renders register.html"""
     token = request.cookies.get("token")
     try:
-        data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        data = jwt.decode(
+            token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
         current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
             return flask.redirect("/")
@@ -90,7 +63,8 @@ def edit_profile():
     """
     try:
         token = request.cookies.get("token")
-        data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        data = jwt.decode(
+            token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
         current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
             return render_template("editprofile.html")
@@ -112,7 +86,8 @@ def profile(uname):
         return make_response(render_template("404.html", error=f"User {uname} not found"), 404)
     try:
         token = request.cookies.get("token")
-        data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        data = jwt.decode(
+            token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
         current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
             if current_user.username == uname:
@@ -167,3 +142,8 @@ def search(user):
     except Exception as e:
         print(repr(e))
         return render_template("404.html")
+
+
+@view_bp.route("/test")
+def test():
+    return render_template("resetpass.html", uname="helll")

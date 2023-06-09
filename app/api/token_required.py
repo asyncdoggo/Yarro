@@ -8,7 +8,7 @@ from flask import current_app
 def token_required(f):
     """
     token_required(f) decorator will validate a token f and return the User Class object defined in
-    modules/Database. token should be sent through HTTP header 'x-access-tokens'
+    modules/Database. token is accessed from cookie with name token
     """
 
     @wraps(f)

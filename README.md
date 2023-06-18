@@ -2,4 +2,4 @@
 
 ### A spaghetti coded web app made for fun
 Try it out \
-https://subpixel.pythonanywhere.com/
+https://bitter-j9pd.onrender.com

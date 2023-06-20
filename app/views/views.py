@@ -9,6 +9,8 @@ from app.api.token_required import token_required
 import app.db as Data
 
 view_bp = Blueprint("views", __name__)
+nav = [{"name": "Home", "icon": "home", "link": "/"},
+       {"name": "Search", "icon": "search", "link": "/search"}]
 
 
 @view_bp.route("/", methods=["GET"])
@@ -33,7 +35,7 @@ def main():
                 token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.Users.query.filter_by(id=data['id']).first()
             if current_user.confirmed:
-                return render_template("main.html")
+                return render_template("main.html", nav=nav)
             else:
                 return render_template("confirmemail.html")
         except Exception:
@@ -67,7 +69,7 @@ def edit_profile():
             token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
         current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
-            return render_template("editprofile.html")
+            return render_template("editprofile.html", nav=nav)
         else:
             return render_template("index.html")
     except ExpiredSignatureError:
@@ -91,9 +93,9 @@ def profile(uname):
         current_user = Data.Users.query.filter_by(id=data['id']).first()
         if current_user.confirmed:
             if current_user.username == uname:
-                return render_template("userprofile.html", uid=user.id, visiting=False, login=True)
+                return render_template("userprofile.html", uid=user.id, visiting=False, login=True, nav=nav)
             else:
-                return render_template("userprofile.html", uid=user.id, visiting=True, login=True)
+                return render_template("userprofile.html", uid=user.id, visiting=True, login=True, nav=nav)
         else:
             return render_template("confirmemail.html")
     except Exception as e:
@@ -138,7 +140,7 @@ def search(user):
     try:
         search_uname = request.args.get("user")
         users = Data.search(search_uname)
-        return render_template("search.html", users=users, uname=user.username)
+        return render_template("search.html", users=users, uname=user.username, nav=nav)
     except Exception as e:
         print(repr(e))
         return render_template("404.html")

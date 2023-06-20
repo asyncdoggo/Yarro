@@ -2,7 +2,7 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = localStorage.getItem("uname");
 let uid = localStorage.getItem("uid");
 
-document.getElementById("profile_img").setAttribute("src", `/image/${uid}`);
+document.getElementById("profile-img").setAttribute("src", `/image/${uid}`);
 
 
 

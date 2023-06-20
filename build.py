@@ -3,8 +3,11 @@ import shutil
 import os
 import subprocess
 
+subprocess.Popen(["git", "checkout", "build"])
+
 shutil.rmtree("./build_files", True)
-files = ["app", "run.py", "requirements.txt", ".gitignore"]
+files = ["app", "run.py", "requirements.txt", ".gitignore",
+         ".git", ".github", "LICENSE", "README.md"]
 print("Copying files...")
 
 for i in files:
@@ -46,7 +49,7 @@ for i in files:
 
 os.remove("./build_files/app/static/css/input.css")
 os.remove("./build_files/tailwind.config.js")
-os.remove("./build_files/app/gapw.json")
+subprocess.Popen(["git", "checkout", "master"])
 
 print("build done")
 

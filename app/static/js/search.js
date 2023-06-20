@@ -1,5 +1,7 @@
 var uname = localStorage.getItem("uname");
 
+document.getElementById("profile-img").setAttribute("src", `/image/${uname}`)
+
 document.getElementById("searchForm").addEventListener("submit", async function (e) {
     e.preventDefault();
     let user = document.getElementById("searchUsers").value;

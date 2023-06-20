@@ -1,7 +1,8 @@
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 let uname = window.location.pathname.split("/")[2]
 let username = localStorage.getItem("uname")
-document.getElementById("pfpimage").setAttribute("src", `/image/${username}`);
+
+document.getElementById("profile-img").setAttribute("src", `/image/${username}`);
 let page = 0
 document.getElementById("uname").innerHTML = uname
 
@@ -11,15 +12,7 @@ try {
     })
 } catch (e) { }
 
-document.getElementById("homebtn").addEventListener("click", function () {
-    window.location.href = "/"
-})
-
-document.getElementById("searchbtn").addEventListener("click", function () {
-    window.location.href = "/search"
-})
-
-document.getElementById("logout").addEventListener("click", async function () {
+document.getElementById("logout-btn").addEventListener("click", async function () {
     let x = localStorage.getItem("theme")
     localStorage.clear();
     localStorage.setItem("theme", x)
@@ -221,12 +214,12 @@ async function getPosts() {
         <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content_type == "image" ? `<img src="/post/images/${content}">` : content}</div>
         <div class="buttons-row flex flex-row">
             <div class="lc flex flex-row pl-16 pt-4">
-                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${islike ? "thumb_up" : "thumb_up_off_alt"
+                <span class="material-icons w-full h-4 hover:cursor-pointer select-none" onclick="onBtnPress(${pid},this)">${islike ? "thumb_up" : "thumb_up_off_alt"
                 }</span>
                 <p class="pl-2">${lc}</p>
             </div>
             <div class="dlc flex flex-row pl-4 pt-4">
-                <span class="material-icons w-full h-4 hover:cursor-pointer" onclick="onBtnPress(${pid},this)">${isdislike ? "thumb_down" : "thumb_down_off_alt"
+                <span class="material-icons w-full h-4 hover:cursor-pointer select-none" onclick="onBtnPress(${pid},this)">${isdislike ? "thumb_down" : "thumb_down_off_alt"
                 }</span>
                 <p class="pl-2">${dlc}</p>
             </div>

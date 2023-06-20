@@ -1,47 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8" />
-    <title>B-itter</title>
-    <script src="/static/js/snackbar.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-</head>
+{% block body %}
+{% include 'header.html' %}
 
-<body class="group data-[checked=true]:bg-[#101010]" data-checked="true" id="parent">
-    <div class="header w-full flex flex-row items-center place-content-between">
-        <p class="pl-4 text-2xl font-medium mt-4 group-data-[checked=true]:text-white">
-            Bitter
-        </p>
-        <div class="items-center flex">
-            <label for="theme">
-                <span id="theme_button"
-                    class="material-symbols-outlined pt-4 px-4 text-4xl group-data-[checked=true]:text-white select-none hover:cursor-pointer">
-                    dark_mode
-                </span>
-            </label>
-            <input type="checkbox" id="theme" class="hidden">
-        </div>
+<div class="my-10 mx-10 text-center group-data-[checked=true]:text-white">
+    <p class="text-2xl">
+        We have sent you a confirmation email, confirm your email to
+        continue
+    </p>
+    <div class="mt-4 ">
+        <label class="font-bold text-lg">Didn't get the email?
+        </label>
+        &MediumSpace;
+        <a href="#" id="resend" class="text-lg underline underline-offset-1">
+            click here
+        </a>
     </div>
-    <div class="my-10 mx-10 text-center group-data-[checked=true]:text-white">
-        <p class="text-2xl">
-            We have sent you a confirmation email, confirm your email to
-            continue
-        </p>
-        <div class="mt-4 ">
-            <label class="font-bold text-lg">Didn't get the email?
-            </label>
-            &MediumSpace;
-            <a href="#" id="resend" class="text-lg underline underline-offset-1">
-                click here
-            </a>
-        </div>
-    </div>
-    <post-card></post-card>
-</body>
+</div>
+<post-card></post-card>
 <script src="/static/js/resend.js"></script>
-<script src="/static/js/theme.js"></script>
 
-</html>
+{% endblock %}

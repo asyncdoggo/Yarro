@@ -14,6 +14,7 @@ email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 username_regex = r"^\w(?:\w|[.-](?=\w)){3,31}$"
 password_regex = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
 
+
 class Register(Resource):
     def post(self):
         try:
@@ -37,14 +38,17 @@ class Register(Resource):
             guid = uuid.uuid4().hex
             if Data.insert_user(uid=uid, guid=guid, uname=username, passwd=password, email=email):
                 token = jwt.encode(
-                    {'id': uid, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+                    {'id': uid, 'exp': datetime.datetime.utcnow(
+                    ) + datetime.timedelta(minutes=45)},
                     current_app.config['SECRET_KEY'], "HS256")
 
-                url = url_for("views.confirm_email", id=guid, uid=uid, _external=True)
+                url = url_for("views.confirm_email", id=guid,
+                              uid=uid, _external=True)
                 if send_mail(email, username, url, True):
                     response = flask.make_response(
                         {'status': 'success', "uname": flask.escape(username), "uid": uid})
-                    response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
+                    response.set_cookie("token", token, httponly=True, secure=True,
+                                        samesite="Strict", expires=datetime.datetime(month=1))
                     return response
                 else:
                     return {"status": "error"}
@@ -58,16 +62,17 @@ class Register(Resource):
         try:
             token = request.cookies.get("token")
 
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(
+                token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             user = Data.Users.query.filter_by(id=data['id']).first()
 
             guid = uuid.uuid4().hex
             Data.resend_request(user.id, guid)
-            url = url_for("views.confirm_email", id=guid, uid=user.id, _external=True)
+            url = url_for("views.confirm_email", id=guid,
+                          uid=user.id, _external=True)
             send_mail(user.email, user.username, url, True)
 
         except Exception as e:
             pass
 
         return {"status": "success"}
-

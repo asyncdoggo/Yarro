@@ -11,12 +11,12 @@ from app.api.token_required import token_required
 active_tokens = {}
 
 
-
 class Login(Resource):
     def get(self):
         try:
             token = request.cookies.get("token")
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(
+                token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Data.Users.query.filter_by(id=data['id']).first()
             if current_user.confirmed:
                 if token in active_tokens.values():
@@ -38,19 +38,20 @@ class Login(Resource):
             user = Data.check_login(auth.username, auth.password)
             if user:
                 token = jwt.encode(
-                    {'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8000)},
+                    {'id': user.id, 'exp': datetime.datetime.utcnow() +
+                     datetime.timedelta(hours=8000)},
                     current_app.config['SECRET_KEY'], "HS256")
                 active_tokens[user.username] = token
                 response = flask.make_response(
                     {"status": "success", "uname": flask.escape(user.username), "uid": user.id})
-                response.set_cookie("token", token, httponly=True, secure=True, samesite="Strict")
+                response.set_cookie("token", token, httponly=True, secure=True,
+                                    samesite="Strict", expires=datetime.datetime.utcnow() + datetime.timedelta(hours=8000))
                 return response
             else:
                 return jsonify({"status": "username or password is incorrect"})
 
         except Exception:
             return jsonify({"status": "failure"})
-        
 
 
 class Logout(Resource):

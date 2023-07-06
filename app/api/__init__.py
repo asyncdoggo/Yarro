@@ -11,6 +11,7 @@ from app.api.search import SearchUser
 from app.api.text_posts import Posts
 from app.api.user_details import UserDetails
 
+from app.api.admin import Admin
 
 
 api_bp = Blueprint('api', __name__)
@@ -27,3 +28,7 @@ api.add_resource(ImagePost, "/api/post/image", "/post/images/<path:path>")
 api.add_resource(ProfileDetails, "/api/name")
 api.add_resource(SearchUser, "/api/search")
 api.add_resource(Logout, "/api/logout")
+
+
+api.add_resource(Admin, "/api/admin/login")
+

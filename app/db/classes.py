@@ -16,6 +16,7 @@ class Users(db.Model):
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now(),nullable=False)
 
     
 class Details(db.Model):
@@ -80,6 +81,15 @@ class Friendship(db.Model):
 
 
 
+
+
+class Admin(db.Model):
+    __tablename__ = "admin"
+    id = db.Column(db.String(35), primary_key=True, nullable=False)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now(),nullable=False)
 
 
 

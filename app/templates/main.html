@@ -7,7 +7,8 @@
     <div id="text-modal" class="relative z-10 " hidden aria-labelledby="modal-title" role="dialog" aria-modal="true">
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div
+                class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 bg-gray-500 bg-opacity-50">
                 <div
                     class="relative mb-[300px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg group-data-[checked=true]:bg-gray-900">
                     <div
@@ -42,7 +43,8 @@
 
     <div id="image-modal" class="relative z-10" hidden aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div
+                class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 bg-gray-500 bg-opacity-50">
                 <div
                     class="relative mb-[300px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg">
                     <div
@@ -69,6 +71,46 @@
                             Post
                         </button>
                         <button type="button" id="cancle_image_btn"
+                            class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="report_modal" class="relative z-10 " hidden aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <p id="report_post_id" class="hidden"></p>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div
+                class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 bg-gray-500 bg-opacity-50">
+                <div
+                    class="relative mb-[300px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg group-data-[checked=true]:bg-gray-900">
+                    <div
+                        class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4 border group-data-[checked=true]:bg-gray-900 group-data-[checked=true]:border-black">
+                        <div class="sm:flex sm:items-start mt-2 text-center sm:mt-0 sm:ml-4 sm:text-left ">
+                            <p class="text-lg font-medium group-data-[checked=true]:text-white ">
+                                Report Post</p>
+                            <p>Caution: False Report can result to an action</p>
+                        </div>
+                        <p>Enter reason for report:</p>
+                    </div>
+                    <div>
+                        <p>
+                            <textarea name="content" id="report_reason" cols="30" rows="10"
+                                class="w-full resize-none px-5 py-5 focus:outline-none group-data-[checked=true]:bg-black group-data-[checked=true]:text-white"></textarea>
+                        </p>
+                    </div>
+                    <div
+                        class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 group-data-[checked=true]:bg-gray-900">
+                        <button type="button" id="report_btn"
+                            class="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
+                            Report
+                        </button>
+                        <button type="button" id="report_cancle_btn"
                             class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                             Cancel
                         </button>

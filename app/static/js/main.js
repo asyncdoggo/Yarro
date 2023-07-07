@@ -18,6 +18,13 @@ document.getElementById("cancle_image_btn").addEventListener("click", function (
     document.getElementById("image-modal").hidden = true;
 });
 
+
+
+document.getElementById("report_cancle_btn").addEventListener("click", function () {
+    document.getElementById("report_modal").hidden = true;
+});
+
+
 document.getElementById("image_upload").addEventListener("change", function () {
     const file = document.getElementById("image_upload").files[0]
     document.getElementById("post_image").setAttribute("src", URL.createObjectURL(file));
@@ -27,6 +34,9 @@ document.getElementById("image_upload").addEventListener("change", function () {
 document.getElementById("image-modal-btn").addEventListener("click", function () {
     document.getElementById("image-modal").hidden = false;
 });
+
+
+
 
 document.getElementById("postbox").addEventListener("click", function () {
     document.getElementById("text-modal").hidden = false;
@@ -113,10 +123,52 @@ document.getElementById("post_btn")
 
                 page = 0;
                 getPosts();
+                document.getElementById("text-modal").hidden = true;
+            }
+            else {
+                Snackbar.show({ pos: "bottom-center", text: response.status })
             }
         }
-        document.getElementById("text-modal").hidden = true;
+        else {
+            Snackbar.show({ pos: "bottom-center", text: "Post content cannot be blank" })
+        }
     });
+
+document.getElementById("report_btn")
+    .addEventListener("click", async function () {
+        let cont = document.getElementById("report_reason").value;
+        let pid = document.getElementById("report_post_id").value;
+
+
+        if (cont.trim().length > 0) {
+            const response = await fetch("/api/report", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ content: cont, pid: pid }),
+            }).then((response) => response.json());
+
+            if (response.status == "success") {
+                document.getElementById("postcontent").value = "";
+                document.getElementById("post_section").innerHTML = "";
+
+                page = 0;
+                getPosts();
+                document.getElementById("text-modal").hidden = true;
+            }
+            else {
+                Snackbar.show({ pos: "bottom-center", text: response.status })
+            }
+        }
+        else {
+            Snackbar.show({ pos: "bottom-center", text: "Reason for report required" })
+        }
+    });
+
+
+
 
 document
     .getElementById("logout-btn")
@@ -144,6 +196,13 @@ const options = {
     hour: "numeric",
     minute: "numeric",
 };
+
+
+function reportPost(pid) {
+    document.getElementById("report_modal").hidden = false;
+    document.getElementById("report_post_id").innerHTML = pid;
+}
+
 
 async function getPosts() {
     let response = await fetch(`/api/posts?page=${page}`, {
@@ -187,16 +246,22 @@ async function getPosts() {
                     <div class="flex flex-row relative">
                         <p class="pr-8 text-xs ">${date}</p>
 
-                        ${uname != user ? "" : `<div class="group/options flex flex-row">
+                        <div class="group/options flex flex-row">
                         <span class="material-icons right-0 hidden absolute hover:cursor-pointer group-hover/post_${i}:block">
                             keyboard_arrow_down
                         </span>
                         <div class="group-hover/options:block absolute hidden w-24 top-4 right-1 z-1 shadow-xl">
-                            <p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=deleteRequest(${pid})>
+                    ${uname != user ?
+                    `<p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=reportPost(${pid})>
+                                Report
+                    </p>`
+                    :
+                    `<p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=deleteRequest(${pid})>
                                 Delete
-                            </p>
+                    </p>`
+                }
                         </div>
-                    </div>`}
+                    </div>
                     </div>
                 </div>
             <div class="username">

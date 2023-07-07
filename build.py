@@ -3,12 +3,17 @@ import shutil
 import os
 import subprocess
 
-subprocess.Popen(["git", "checkout", "build"])
 
 shutil.rmtree("./build_files", True)
+
+subprocess.Popen(["git", "checkout", "build"])
+subprocess.Popen(["git", "merge", "master"])
+
+
 files = ["app", "run.py", "requirements.txt", ".gitignore",
          ".git", ".github", "LICENSE", "README.md"]
 print("Copying files...")
+
 
 for i in files:
     if not os.path.isfile(i):

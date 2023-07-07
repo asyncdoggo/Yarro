@@ -5,7 +5,7 @@ from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
 
 from app.db.classes import Details, EmailRequests, Users
-from app.db.classes import db,ph
+from app.db.classes import db, ph
 
 
 def check_login(username, password):
@@ -23,17 +23,20 @@ def insert_user(uid, guid, uname, passwd, email):
     try:
         hashpass = ph.hash(passwd)
 
-        user: Users = Users(username=uname, id=uid, password=hashpass, email=email, confirmed=False)
+        user: Users = Users(username=uname, id=uid, password=hashpass,
+                            email=email, confirmed=False, created_at=datetime.datetime.utcnow())
         db.session.add(user)
         db.session.commit()
         detail = Details()
-        detail.name = detail.gender = detail.mob = detail.bio = ""
+        detail.gender = detail.mob = detail.bio = ""
+        detail.name = uname
         detail.age = 0
         detail.dob = datetime.datetime(1000, 1, 1)
         detail.user_id = uid
         db.session.add(detail)
         guid_hash = ph.hash(guid)
-        request: EmailRequests = EmailRequests(user_id=uid, guid=guid_hash, tstamp=datetime.datetime.now())
+        request: EmailRequests = EmailRequests(
+            user_id=uid, guid=guid_hash, tstamp=datetime.datetime.now())
         db.session.add(request)
         db.session.commit()
         return True
@@ -50,6 +53,3 @@ def get_user(username=None, uid=None):
         return user
     except Exception as e:
         print(repr(e))
-
-
-

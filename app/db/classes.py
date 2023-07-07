@@ -3,10 +3,11 @@ import os
 from sqlalchemy import desc
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
+migrate = Migrate()
 ph = PasswordHasher()
-
 
 
 class Users(db.Model):
@@ -16,8 +17,9 @@ class Users(db.Model):
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False)
+    created_at = db.Column(db.TIMESTAMP, nullable=False)
 
-    
+
 class Details(db.Model):
     __tablename__ = "details"
     id = db.Column(db.Integer, primary_key=True)
@@ -79,9 +81,14 @@ class Friendship(db.Model):
     initiator_id = db.Column(db.String(35))
 
 
-
-
-
+class Admin(db.Model):
+    __tablename__ = "admin"
+    id = db.Column(db.String(35), primary_key=True, nullable=False)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    created_at = db.Column(
+        db.DateTime, default=datetime.datetime.now(), nullable=False)
 
 
 #
@@ -116,5 +123,3 @@ class Friendship(db.Model):
 #         })
 #
 #     return res
-
-

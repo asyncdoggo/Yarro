@@ -10,6 +10,7 @@ from app.api.register import Register
 from app.api.search import SearchUser
 from app.api.text_posts import Posts
 from app.api.user_details import UserDetails
+from app.api.report import Report
 
 from app.api.admin import Admin, AdminUsers
 from flask_migrate import Migrate
@@ -30,6 +31,9 @@ api.add_resource(ImagePost, "/api/post/image", "/post/images/<path:path>")
 api.add_resource(ProfileDetails, "/api/name")
 api.add_resource(SearchUser, "/api/search")
 api.add_resource(Logout, "/api/logout")
+
+api.add_resource(Report, "/api/report")
+
 
 api.add_resource(AdminUsers, "/api/admin/users")
 

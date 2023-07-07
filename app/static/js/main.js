@@ -137,8 +137,8 @@ document.getElementById("post_btn")
 document.getElementById("report_btn")
     .addEventListener("click", async function () {
         let cont = document.getElementById("report_reason").value;
-        let pid = document.getElementById("report_post_id").value;
-
+        let pid = document.getElementById("report_post_id").innerHTML;
+        console.log(pid)
 
         if (cont.trim().length > 0) {
             const response = await fetch("/api/report", {
@@ -147,7 +147,7 @@ document.getElementById("report_btn")
                     Accept: "application/json",
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ content: cont, pid: pid }),
+                body: JSON.stringify({ reason: cont, pid: pid }),
             }).then((response) => response.json());
 
             if (response.status == "success") {
@@ -157,6 +157,7 @@ document.getElementById("report_btn")
                 page = 0;
                 getPosts();
                 document.getElementById("text-modal").hidden = true;
+                Snackbar.show({ pos: "bottom-center", text: "reported successfully" })
             }
             else {
                 Snackbar.show({ pos: "bottom-center", text: response.status })

@@ -88,8 +88,16 @@ class Admin(db.Model):
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     created_at = db.Column(
-        db.DateTime, default=datetime.datetime.now(), nullable=False)
+        db.TIMESTAMP, nullable=False)
 
+
+class Reports(db.Model):
+    __tablename__ = "reports"
+    id = db.Column(db.String(35), primary_key=True, nullable=False)
+    post_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    reported_by = db.Column(db.String(35), nullable=False)
+    created_at = db.Column(
+        db.TIMESTAMP, nullable=False)
 
 #
 # def send_friend_request(user1, user2):

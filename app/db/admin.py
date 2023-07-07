@@ -3,14 +3,17 @@ import os
 from sqlalchemy import desc
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
-
-from app.db.classes import Details, DisLikes, Likes, Posts, Users, Requests, EmailRequests,Admin
-from app.db.classes import db
+from app.db.classes import Details, DisLikes, Likes, Posts, Users, Requests, EmailRequests, Admin
+from app.db.classes import db, ph
 from app.db.search import search
 
 
-def get_users(user=""):
-    return search(user)
+def get_users(user="", sort=0):
+    # user = search string
+    # search and sort
+    # sort = 0 users sorted by alphabetical order of username in ascending order
+    # sort = 1 users sorted by number of posts in descending order
+    return search(user, sort)
 
 
 def delete_user(uid):
@@ -39,14 +42,13 @@ def delete_user(uid):
         print(e)
 
 
-def admin_login(username,password):
+def admin_login(username, password):
     try:
         admin = Admin.query.filter_by(username=username).one_or_none()
         if admin:
             pwhash = admin.password
             ph.verify(pwhash, password)
             return admin
-        
 
     except Exception as e:
         print(e)

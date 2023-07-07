@@ -151,12 +151,9 @@ document.getElementById("report_btn")
             }).then((response) => response.json());
 
             if (response.status == "success") {
-                document.getElementById("postcontent").value = "";
-                document.getElementById("post_section").innerHTML = "";
-
-                page = 0;
-                getPosts();
-                document.getElementById("text-modal").hidden = true;
+                document.getElementById("report_reason").value = "";
+                document.getElementById("report_post_id").innerHTML = "";
+                document.getElementById("report_modal").hidden = true;
                 Snackbar.show({ pos: "bottom-center", text: "reported successfully" })
             }
             else {

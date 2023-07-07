@@ -14,5 +14,6 @@ def add_report(pid, uid, reason):
                          reason=reason, created_at=datetime.datetime.utcnow())
         db.session.add(report)
         db.session.commit()
+        return True
     except Exception as e:
-        pass
+        print(e)

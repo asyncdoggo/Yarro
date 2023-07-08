@@ -39,7 +39,7 @@ class Register(Resource):
             if db.insert_user(uid=uid, guid=guid, uname=username, passwd=password, email=email):
                 token = jwt.encode(
                     {'id': uid, 'exp': datetime.datetime.utcnow(
-                    ) + datetime.timedelta(minutes=45)},
+                    ) + datetime.timedelta(days=30)},
                     current_app.config['SECRET_KEY'], "HS256")
 
                 url = url_for("views.confirm_email", id=guid,
@@ -48,7 +48,8 @@ class Register(Resource):
                     response = flask.make_response(
                         {'status': 'success', "uname": flask.escape(username), "uid": uid})
                     response.set_cookie("token", token, httponly=True, secure=True,
-                                        samesite="Strict", expires=datetime.datetime(month=1))
+                                        samesite="Strict", expires=datetime.datetime.utcnow(
+                    ) + datetime.timedelta(days=30))
                     return response
                 else:
                     return {"status": "error"}

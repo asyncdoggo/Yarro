@@ -32,10 +32,8 @@ class Posts(Resource):
             return {"status": "logout"}
 
     @token_required
-    def delete(self, user):
-        data = request.get_json()
+    def delete(self, user,pid):
         try:
-            pid = data["pid"]
             db.deletePost(user, pid, os.path.join(flask.current_app.root_path, "static", "images"))
             return {"status": "success"}
         except Exception as e:

@@ -1,5 +1,7 @@
 import datetime
 import os
+import uuid
+
 from sqlalchemy import desc
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
@@ -8,7 +10,7 @@ from app.db.classes import Details, DisLikes, Likes, Posts, Users
 from app.db.classes import db
 
 def insert_post(user, cont):
-    post = Posts(user_id=user.id, content=cont, content_type="text", l_count=0, dl_count=0,
+    post = Posts(post_id=uuid.uuid4().hex,user_id=user.id, content=cont, content_type="text", l_count=0, dl_count=0,
                  tstamp=datetime.datetime.utcnow())
     try:
         db.session.add(post)
@@ -18,17 +20,17 @@ def insert_post(user, cont):
         print(repr(e))
 
 
-def get_posts(user, page):
+def get_posts(user, page,limit=10):
     result = db.session.query(Posts, Users, Details).filter(Users.id == Posts.user_id,
                                                             Users.id == Details.user_id).order_by(
-        desc(Posts.post_id)).limit(10).offset(page).all()
+        desc(Posts.post_id)).limit(limit).offset(page).all()
 
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == user.id).all()
     dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == user.id).all()
-    p = {}
+    p = []
 
     for i, j, k in result:
-        p[i.post_id] = {
+        p.append({
                         "post_id": i.post_id,
                         "content": flask.escape(i.content),
                         "content_type": i.content_type,
@@ -40,7 +42,7 @@ def get_posts(user, page):
                         "islike": 1 if (user.id, i.post_id) in likes else 0,
                         "isdislike": 1 if (user.id, i.post_id) in dislikes else 0,
                         "fullname": k.name
-                        }
+                        })
     return p
 
 
@@ -63,7 +65,7 @@ def deletePost(user, pid, path):
 
 def insert_post_image(user, filename):
     try:
-        post: Posts = Posts(user_id=user.id, content=filename, content_type="image", l_count=0, dl_count=0,
+        post: Posts = Posts(post_id=uuid.uuid4().hex,user_id=user.id, content=filename, content_type="image", l_count=0, dl_count=0,
                             tstamp=datetime.datetime.utcnow())
         db.session.add(post)
         db.session.commit()

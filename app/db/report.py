@@ -17,3 +17,11 @@ def add_report(pid, uid, reason):
         return True
     except Exception as e:
         print(e)
+
+
+def get_all_reports(limit=10,page=0):
+    try:
+        reports = Reports.query.limit(limit).offset(page).all()
+        return reports
+    except Exception as e:
+        print(e)

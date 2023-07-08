@@ -26,14 +26,8 @@ class UserDetails(Resource):
 
             if not dob:
                 dob = "0000-00-00"
-                age = 0
-            else:
-                age = get_years(dob)
 
-            if not mob:
-                mob = 0
-
-            u = db.update_details(name=name, age=age, gender=gender, mob=mob,
+            u = db.update_details(name=name, gender=gender, mob=mob,
                             dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id, bio=bio)
             if u == mob:
                 return {"status": "mob"}

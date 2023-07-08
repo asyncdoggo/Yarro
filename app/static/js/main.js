@@ -218,7 +218,7 @@ async function getPosts() {
 
         for (i in keys) {
             var post = data[keys[i]];
-            let pid = keys[i];
+            let pid = post["post_id"];
             let userid = post["uid"];
             let content = linkify(post["content"]);
             let content_type = post["content_type"]
@@ -250,11 +250,11 @@ async function getPosts() {
                         </span>
                         <div class="group-hover/options:block absolute hidden w-24 top-4 right-1 z-1 shadow-xl">
                     ${uname != user ?
-                    `<p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=reportPost(${pid})>
+                    `<p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=reportPost('${pid}')>
                                 Report
                     </p>`
                     :
-                    `<p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=deleteRequest(${pid})>
+                    `<p class="py-2 pl-2 hover:cursor-pointer bg-white hover:bg-gray-300 group-data-[checked=true]:bg-gray-600 group-data-[checked=true]:hover:bg-black" onClick=deleteRequest('${pid}')>
                                 Delete
                     </p>`
                 }
@@ -270,13 +270,13 @@ async function getPosts() {
         <div class="content pl-16 pr-2 whitespace-pre-wrap text-lg">${content_type == "image" ? `<img src="/post/images/${content}">` : content}</div>
         <div class="buttons-row flex flex-row">
             <div class="lc flex flex-row pl-16 pt-4">
-                <span class="material-icons w-full h-4 hover:cursor-pointer select-none" onclick="onBtnPress(${pid},this)">${islike ? "thumb_up" : "thumb_up_off_alt"
-                }</span>
+                <span class="material-icons w-full h-4 hover:cursor-pointer select-none" onclick="onBtnPress('${pid}',this)">
+                ${islike ? "thumb_up" : "thumb_up_off_alt"}</span>
                 <p class="pl-2">${lc}</p>
             </div>
             <div class="dlc flex flex-row pl-4 pt-4">
-                <span class="material-icons w-full h-4 hover:cursor-pointer select-none" onclick="onBtnPress(${pid},this)">${isdislike ? "thumb_down" : "thumb_down_off_alt"
-                }</span>
+                <span class="material-icons w-full h-4 hover:cursor-pointer select-none" onclick="onBtnPress('${pid}',this)">
+                ${isdislike ? "thumb_down" : "thumb_down_off_alt"}</span>
                 <p class="pl-2">${dlc}</p>
             </div>
         </div>
@@ -327,19 +327,13 @@ window.onscroll = function (ev) {
 
 
 async function deleteRequest(pid) {
-    const response = await fetch("/api/posts", {
+    const response = await fetch(`/api/posts/delete/${pid}`, {
         method: "DELETE",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pid: pid }),
     }).then((response) => response.json());
     if (response.status == "success") {
         page = 0
         document.getElementById(pid).remove();
     }
 }
-
 
 getPosts()

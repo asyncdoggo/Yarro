@@ -1,11 +1,12 @@
 import datetime
+
 import flask
 import jwt
-from flask import request, jsonify
-import app.db as Data
-from flask_restful import Resource
 from flask import current_app
+from flask import request
+from flask_restful import Resource
 
+import app.db as db
 from app.api.token_required import token_required
 
 active_tokens = {}
@@ -17,14 +18,18 @@ class Login(Resource):
             token = request.cookies.get("token")
             data = jwt.decode(
                 token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.Users.query.filter_by(id=data['id']).first()
-            if current_user.confirmed:
-                if token in active_tokens.values():
-                    return {"status": "success"}
-                else:
-                    return {"status": "false"}
-            else:
+            current_user = db.Users.query.filter_by(id=data['id']).one_or_none()
+
+            if current_user.disabled:
+                return {"status": "disabled"}
+
+            if not current_user.confirmed:
                 return {"status": "email"}
+            if active_tokens[current_user.username] == token:
+                return {"status": "success"}
+
+            return {"status": "false"}
+
         except Exception as e:
             print(repr(e))
             return {"status": "failure"}
@@ -32,10 +37,10 @@ class Login(Resource):
     def post(self):
         auth = request.authorization
         if not auth or not auth.username or not auth.password:
-            return jsonify({"status": "failure"})
+            return {"status": "failure"}
 
         try:
-            user = Data.check_login(auth.username, auth.password)
+            user = db.check_login(auth.username, auth.password)
             if user:
                 token = jwt.encode(
                     {'id': user.id, 'exp': datetime.datetime.utcnow() +
@@ -48,10 +53,10 @@ class Login(Resource):
                                     samesite="Strict", expires=datetime.datetime.utcnow() + datetime.timedelta(hours=8000))
                 return response
             else:
-                return jsonify({"status": "username or password is incorrect"})
+                return {"status": "username or password is incorrect"}
 
         except Exception:
-            return jsonify({"status": "failure"})
+            return {"status": "failure"}
 
 
 class Logout(Resource):

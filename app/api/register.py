@@ -3,8 +3,8 @@ import re
 import uuid
 import flask
 import jwt
-from flask import request, jsonify, url_for
-import app.db as Data
+from flask import request, url_for
+import app.db as db
 from app.util.send_mail import send_mail
 from flask_restful import Resource
 from flask import current_app
@@ -24,7 +24,7 @@ class Register(Resource):
             password = data["passwd1"]
 
             if not re.search(email_regex, email):
-                return jsonify({"status": "Invalid Email"})
+                return {"status": "Invalid Email"}
 
             if not (re.search(username_regex, username)):
                 return {"status": "username should be between 4 to 32 characters without spaces"}
@@ -36,7 +36,7 @@ class Register(Resource):
 
             uid = uuid.uuid4().hex
             guid = uuid.uuid4().hex
-            if Data.insert_user(uid=uid, guid=guid, uname=username, passwd=password, email=email):
+            if db.insert_user(uid=uid, guid=guid, uname=username, passwd=password, email=email):
                 token = jwt.encode(
                     {'id': uid, 'exp': datetime.datetime.utcnow(
                     ) + datetime.timedelta(minutes=45)},
@@ -53,10 +53,10 @@ class Register(Resource):
                 else:
                     return {"status": "error"}
             else:
-                return jsonify({'status': 'user or email already exists'})
+                return {'status': 'user or email already exists'}
         except Exception as e:
             print(repr(e))
-            return jsonify({"status": "error"})
+            return {"status": "error"}
 
     def put(self):
         try:
@@ -64,10 +64,10 @@ class Register(Resource):
 
             data = jwt.decode(
                 token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            user = Data.Users.query.filter_by(id=data['id']).first()
+            user = db.Users.query.filter_by(id=data['id']).first()
 
             guid = uuid.uuid4().hex
-            Data.resend_request(user.id, guid)
+            db.resend_request(user.id, guid)
             url = url_for("views.confirm_email", id=guid,
                           uid=user.id, _external=True)
             send_mail(user.email, user.username, url, True)

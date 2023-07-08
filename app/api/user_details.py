@@ -1,6 +1,6 @@
 import datetime
-from flask import request, jsonify
-import app.db as Data
+from flask import request
+import app.db as db
 from app.api.token_required import token_required
 from flask_restful import Resource
 
@@ -8,11 +8,11 @@ class UserDetails(Resource):
     @token_required
     def get(self, user):
         try:
-            ret = Data.getuserdetials(user)
+            ret = db.getuserdetials(user)
             return {"status": "success", "data": ret}
         except Exception as e:
             print(repr(e))
-            return jsonify({"subject": "failure"})
+            return {"subject": "failure"}
 
     @token_required
     def put(self, user):
@@ -33,7 +33,7 @@ class UserDetails(Resource):
             if not mob:
                 mob = 0
 
-            u = Data.update(name=name, age=age, gender=gender, mob=mob,
+            u = db.update_details(name=name, age=age, gender=gender, mob=mob,
                             dob=datetime.datetime.strptime(dob, "%Y-%m-%d").date(), uid=user.id, bio=bio)
             if u == mob:
                 return {"status": "mob"}

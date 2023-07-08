@@ -1,7 +1,7 @@
 import os
 import flask
 from flask import request
-import app.db as Data
+import app.db as db
 from app.api.token_required import token_required
 from flask_restful import Resource
 
@@ -11,7 +11,7 @@ class Posts(Resource):
     def get(self, user):
         try:
             page = request.args.get("page")
-            res = Data.get_posts(user, page)
+            res = db.get_posts(user, page)
             return {"status": "success", "data": res}
         except KeyError as e:
             print(repr(e))
@@ -23,7 +23,7 @@ class Posts(Resource):
         try:
             content: str = data["content"]
             if content.strip():
-                res = Data.insert_post(user=user, cont=content.strip())
+                res = db.insert_post(user=user, cont=content.strip())
                 return {"status": "success"} if res else {"status": "failure"}
             else:
                 return {"status": "nocontent"}
@@ -36,7 +36,7 @@ class Posts(Resource):
         data = request.get_json()
         try:
             pid = data["pid"]
-            Data.deletePost(user, pid, os.path.join(flask.current_app.root_path, "static", "images"))
+            db.deletePost(user, pid, os.path.join(flask.current_app.root_path, "static", "images"))
             return {"status": "success"}
         except Exception as e:
             print(e)

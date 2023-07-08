@@ -6,7 +6,7 @@ from flask import current_app
 from flask import request, jsonify, render_template, make_response
 from jwt import ExpiredSignatureError, DecodeError
 from app.api.token_required import token_required
-import app.db as Data
+import app.db as db
 
 view_bp = Blueprint("views", __name__)
 nav = [{"name": "Home", "icon": "home", "link": "/"},
@@ -33,11 +33,18 @@ def main():
         try:
             data = jwt.decode(
                 token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Data.Users.query.filter_by(id=data['id']).first()
-            if current_user.confirmed:
-                return render_template("main.html", nav=nav)
-            else:
+            current_user = db.Users.query.filter_by(id=data['id']).one_or_none()
+            if not current_user:
+                admin = db.Admin.query.filter_by(id=data['id']).one_or_none()
+                if admin:
+                    return flask.redirect("/admin")
+
+            if current_user.disabled:
+                return render_template("disabled.html")
+            if not current_user.confirmed:
                 return render_template("confirmemail.html")
+            return render_template("main.html", nav=nav)
+
         except Exception:
             return render_template("index.html")
 
@@ -49,11 +56,17 @@ def register_render():
     try:
         data = jwt.decode(
             token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.Users.query.filter_by(id=data['id']).first()
-        if current_user.confirmed:
-            return flask.redirect("/")
-        else:
+        current_user = db.Users.query.filter_by(id=data['id']).one_or_none()
+        if not current_user:
+            admin = db.Admin.query.filter_by(id=data['id']).one_or_none()
+            if admin:
+                return flask.redirect("/admin")
+        if current_user.disabled:
+            return render_template("disabled.html")
+        if not current_user.confirmed:
             return render_template("confirmemail.html")
+
+        return flask.redirect("/")
     except Exception:
         return render_template("register.html")
 
@@ -67,11 +80,17 @@ def edit_profile():
         token = request.cookies.get("token")
         data = jwt.decode(
             token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.Users.query.filter_by(id=data['id']).first()
+        current_user = db.Users.query.filter_by(id=data['id']).one_or_none()
+        if not current_user:
+            admin = db.Admin.query.filter_by(id=data['id']).one_or_none()
+            if admin:
+                return flask.redirect("/admin")
+        if current_user.disabled:
+            return render_template("disabled.html")
         if current_user.confirmed:
             return render_template("editprofile.html", nav=nav)
-        else:
-            return render_template("index.html")
+
+        return render_template("index.html")
     except ExpiredSignatureError:
         return jsonify({'message': 'expired'})
     except DecodeError:
@@ -83,21 +102,25 @@ def profile(uname):
     """
     renders userprofile.html
     """
-    user = Data.get_user(uname)
+    user = db.get_user(uname)
     if not user:
         return make_response(render_template("404.html", error=f"User {uname} not found"), 404)
     try:
         token = request.cookies.get("token")
         data = jwt.decode(
             token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        current_user = Data.Users.query.filter_by(id=data['id']).first()
+        current_user = db.Users.query.filter_by(id=data['id']).one_or_none()
+        if not current_user:
+            admin = db.Admin.query.filter_by(id=data['id']).one_or_none()
+            if admin:
+                return flask.redirect("/admin")
+        if current_user.disabled:
+            return render_template("disabled.html")
         if current_user.confirmed:
             if current_user.username == uname:
                 return render_template("userprofile.html", uid=user.id, visiting=False, login=True, nav=nav)
-            else:
-                return render_template("userprofile.html", uid=user.id, visiting=True, login=True, nav=nav)
-        else:
-            return render_template("confirmemail.html")
+            return render_template("userprofile.html", uid=user.id, visiting=True, login=True, nav=nav)
+        return render_template("confirmemail.html")
     except Exception as e:
         print(repr(e))
 
@@ -115,10 +138,11 @@ def reset():
     """
     renders the password reset page by checking the GET method args "id" and "uid" for guid and user id
     """
+
     guid = request.args.get("id")
     uid = request.args.get("uid")
-    if Data.check_reset(guid, uid):
-        user = Data.get_user(uid=uid)
+    if db.check_reset(guid, uid):
+        user = db.get_user(uid=uid)
         return render_template("resetpass.html", uname=user.username)
     return render_template("forgotpass.html")
 
@@ -130,7 +154,7 @@ def confirm_email():
     """
     guid = request.args.get("id")
     uid = request.args.get("uid")
-    Data.confirm_email(guid, uid)
+    db.confirm_email(guid, uid)
     return flask.redirect("/")
 
 
@@ -138,9 +162,16 @@ def confirm_email():
 @token_required
 def search(user):
     try:
+        if user.disabled:
+            return render_template("disabled.html")
         search_uname = request.args.get("user")
-        users = Data.search(search_uname)
+        users = db.search(search_uname)
         return render_template("search.html", users=users, uname=user.username, nav=nav)
     except Exception as e:
         print(repr(e))
         return render_template("404.html")
+
+
+@view_bp.route("/admin/login")
+def admin_login():
+    pass

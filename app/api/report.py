@@ -14,6 +14,6 @@ class Report(Resource):
         uid = user.id
         reason = data["reason"]
         if add_report(pid, uid, reason):
-            return flask.jsonify({"status": "success"})
+            return {"status": "success"}
         else:
-            return flask.jsonify({"status": "failure"})
+            return {"status": "failure"}

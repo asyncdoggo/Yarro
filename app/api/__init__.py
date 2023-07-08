@@ -12,7 +12,7 @@ from app.api.text_posts import Posts
 from app.api.user_details import UserDetails
 from app.api.report import Report
 
-from app.api.admin import Admin, AdminUsers
+from app.api.admin import AdminUserList,AdminAuth, AdminUser
 from flask_migrate import Migrate
 
 
@@ -35,6 +35,7 @@ api.add_resource(Logout, "/api/logout")
 api.add_resource(Report, "/api/report")
 
 
-api.add_resource(AdminUsers, "/api/admin/users")
+api.add_resource(AdminUserList, "/api/admin/users")
+api.add_resource(AdminAuth, "/api/admin/login")
+api.add_resource(AdminUser,"/api/admin/users/disable/<string:uid>","/api/admin/user/<string:username>")
 
-api.add_resource(Admin, "/api/admin/login")

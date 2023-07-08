@@ -18,6 +18,7 @@ class Users(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False)
     created_at = db.Column(db.TIMESTAMP, nullable=False)
+    disabled = db.Column(db.Integer, nullable=False)
 
 
 class Details(db.Model):

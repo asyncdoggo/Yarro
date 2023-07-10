@@ -1,7 +1,7 @@
-# B-itter
+# Yarro
+Yarro is a social networking website made in flask
 ## Try it out
-https://bitter-j9pd.onrender.com
-
+[https://yarro.onrender.com](https://yarro.onrender.com)
 
 # Run locally
 
@@ -12,7 +12,7 @@ https://bitter-j9pd.onrender.com
 ## Usage
 - clone the repo
 ```
-git clone https://github.com/asyncdoggo/B-itter.git
+git clone https://github.com/asyncdoggo/Yarro.git
 ```
 - install requirements using pip
 ```
@@ -37,7 +37,7 @@ EMAIL_PASSWORD=password
 HOST=localhost
 USERNAME=example
 PASSWORD=password
-DATABASE=bitterdb
+DATABASE=yarrodb
 ```
 
 - open http://localhost:3000

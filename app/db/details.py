@@ -8,10 +8,9 @@ from app.db.classes import Details, Users
 from app.db.classes import db
 
 
-def update_details(name, age, gender, mob, dob, uid, bio):
+def update_details(name, gender, mob, dob, uid, bio):
     detail = Details.query.filter_by(user_id=uid).one()
     detail.name = name
-    detail.age = age
     detail.gender = gender
     detail.mob = mob
     detail.dob = dob
@@ -28,5 +27,5 @@ def get_fullname_bio(username):
 
 def getuserdetials(user):
     details: Details = Details.query.filter_by(user_id=user.id).one()
-    return {"name": details.name, "age": details.age, "gender": details.gender,
+    return {"name": details.name,"gender": details.gender,
             "mob": details.mob, "dob": str(details.dob), "bio": details.bio}

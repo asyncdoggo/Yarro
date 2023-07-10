@@ -1,5 +1,7 @@
 import datetime
 import os
+import uuid
+
 from sqlalchemy import desc
 from argon2 import PasswordHasher
 from flask_sqlalchemy import SQLAlchemy
@@ -36,8 +38,17 @@ def delete_user(uid):
 
             db.session.commit()
             return True
-        else:
-            return False
+    except Exception as e:
+        print(e)
+
+
+def disable_user(uid):
+    try:
+        user:Users = Users.query.filter_by(id=uid).one_or_none()
+        if user:
+            user.disabled = int(not user.disabled)
+            db.session.commit()
+            return True
     except Exception as e:
         print(e)
 
@@ -52,3 +63,16 @@ def admin_login(username, password):
 
     except Exception as e:
         print(e)
+
+
+def create_admin(username,password,email):
+    hashpass = ph.hash(password)
+
+    admin = Admin(id=uuid.uuid4().hex,username=username,password=hashpass,email=email,created_at=datetime.datetime.utcnow())
+    try:
+        db.session.add(admin)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(e)
+

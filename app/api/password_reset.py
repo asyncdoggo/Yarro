@@ -1,8 +1,10 @@
 import uuid
-from flask import request, jsonify, url_for
-import app.db as Data
-from app.util.send_mail import send_mail
+
+from flask import request, url_for, make_response
 from flask_restful import Resource
+
+import app.db as db
+from app.util.send_mail import send_mail
 
 
 class ResetPassword(Resource):
@@ -11,12 +13,12 @@ class ResetPassword(Resource):
         uid = data["uid"]
         pass1 = data["pass1"]
         guid = data["id"]
-        if Data.resetpasswd(uid, pass1, guid):
-            response = jsonify({'status': 'success'})
+        if db.resetpasswd(uid, pass1, guid):
+            response = make_response({'status': 'success'})
             response.set_cookie("token", "success", httponly=True, secure=True, samesite="Strict")
             return response
         else:
-            response = jsonify({'status': 'failure'})
+            response = make_response({'status': 'failure'})
             response.set_cookie("token", "expired", httponly=True, secure=True, samesite="Strict")
             return response
 
@@ -24,13 +26,13 @@ class ResetPassword(Resource):
     def put(self):
         data = request.get_json()
         email = data["email"]
-        user = Data.getemail(email)
+        user = db.getemail(email)
         if user:
             guid = uuid.uuid4().hex
             url = url_for("views.reset", id=guid, uid=user.id, _external=True)
 
             if send_mail(email, user.username, url, False):
-                Data.insert_reset_request(user.id, guid)
+                db.insert_reset_request(user.id, guid)
                 return {"status": "success"}
             else:
                 return {"status": "noconfig"}

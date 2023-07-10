@@ -24,19 +24,18 @@ def insert_user(uid, guid, uname, passwd, email):
         hashpass = ph.hash(passwd)
 
         user: Users = Users(username=uname, id=uid, password=hashpass,
-                            email=email, confirmed=False, created_at=datetime.datetime.utcnow())
+                            email=email, created_at=datetime.datetime.utcnow())
         db.session.add(user)
         db.session.commit()
         detail = Details()
         detail.gender = detail.mob = detail.bio = ""
         detail.name = uname
-        detail.age = 0
-        detail.dob = datetime.datetime(1000, 1, 1)
+        detail.dob = datetime.datetime(year=1000, month=1, day=1)
         detail.user_id = uid
         db.session.add(detail)
         guid_hash = ph.hash(guid)
         request: EmailRequests = EmailRequests(
-            user_id=uid, guid=guid_hash, tstamp=datetime.datetime.now())
+            user_id=uid, guid=guid_hash, tstamp=datetime.datetime.utcnow())
         db.session.add(request)
         db.session.commit()
         return True

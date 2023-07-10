@@ -54,7 +54,6 @@ for i in files:
 
 os.remove("./build_files/app/static/css/input.css")
 os.remove("./build_files/tailwind.config.js")
-subprocess.Popen(["git", "checkout", "master"])
 
 print("build done")
 

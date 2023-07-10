@@ -6,19 +6,12 @@ import subprocess
 
 files = ["app", "run.py", "build.py", "requirements.txt", ".gitignore", "LICENSE", "README.md"]
 print("Copying files...")
-files2 = [".git", ".github"]
 
 for i in files:
     if not os.path.isfile(i):
         shutil.copytree(i, f"./build_files/{i}")
     else:
         shutil.copy(i, f"./build_files/{i}")
-
-
-subprocess.Popen(["git", "checkout", "build"])
-
-for i in files2:
-    shutil.copytree(i, f"./build_files/{i}")
 
 
 with open("./build_files/app/static/css/input.css", "w") as file:

@@ -23,17 +23,17 @@ def send_mail(to_email, uname, url, confirm):
 
         if not confirm:
             msg.set_content(
-                f"Biitter account reset request\n Your B-itter account username is {uname} \n To reset your password "
+                f"Yarro account reset request\n Your Yarro account username is {uname} \n To reset your password "
                 f"click this link:\n {url}")
 
-            msg['Subject'] = 'B-itter password reset'
+            msg['Subject'] = 'Yarro password reset'
         else:
             msg.set_content(
                 f"""
                 To confirm your email click this link: \n {url}
                 """
             )
-            msg['Subject'] = 'B-itter verify email'
+            msg['Subject'] = 'Yarro verify email'
 
         msg['From'] = mailaddr
         msg['To'] = to_email

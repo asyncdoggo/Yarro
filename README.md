@@ -1,8 +1,7 @@
 # Yarro
 Yarro is a social networking website made in flask
 ## Try it out
-https://bitter-j9pd.onrender.com
-
+[https://yarro.onrender.com](https://yarro.onrender.com)
 
 # Run locally
 

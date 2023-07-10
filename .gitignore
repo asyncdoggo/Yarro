@@ -8,3 +8,6 @@ __pycache__
 .vercel
 tailwind.config.js
 data.db
+node_modules
+package-lock.json
+package.json

@@ -8,18 +8,20 @@ def search(user="", sort=0):
     # result = db.session.query(Users, Details).filter(
     #     (Users.id == Details.user_id) & ((Users.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%"))))
 
-    sq = db.session.query(Posts.user_id, func.count(
-        Posts.post_id).label("count")).group_by(Posts.user_id).subquery()
+    sq = db.session.query(Users.id,Users.username, func.count(Posts.post_id).label("count")).select_from(Users).join(Posts,Users.id==Posts.user_id,isouter=True).group_by(Users.id).subquery()
 
-    sor = db.session.query(Users.username, Details.name, Users.id, sq.c.count).select_from(Users).join(Details, Users.id == Details.user_id)\
-            .join(sq, Details.user_id == sq.c.user_id)
+
+    sor = db.session.query(Users.username, Details.name, Users.id, sq.c.count).join(Details, Users.id == Details.user_id)\
+            .join(sq, Details.user_id == sq.c.id)
     if sort == 0:
         sor = sor.order_by(Users.username.asc())
     elif sort == 1:
         sor = sor.order_by(sq.c.count.desc())
 
     sor = sor.filter((Users.id == Details.user_id) & (
-        (Users.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%"))))
+        (Users.username.like(f"%{user}%")) | (Details.name.like(f"%{user}%")))).all()
+
+
     res = []
     for i in sor:
         res.append({

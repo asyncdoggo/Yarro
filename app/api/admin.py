@@ -5,8 +5,6 @@ import flask
 from flask_restful import Resource
 import jwt
 from app import db
-import app.db as db
-from app.api.token_required import token_required
 
 
 def admin_token_required(f):

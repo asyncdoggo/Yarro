@@ -1,8 +1,9 @@
-from flask import Flask, request
+from flask import Flask, request,current_app
 import app.db.classes as Data
 from app.api import api_bp
 from app.views import view_bp
 import logging
+import os
 
 app = Flask(__name__)
 app.config.from_pyfile('appconfig.py')
@@ -16,7 +17,7 @@ with app.app_context():
 app.register_blueprint(view_bp)
 app.register_blueprint(api_bp)
 
-logging.basicConfig(filename='record.log', level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+logging.basicConfig(filename=os.path.join(app.root_path,'record.log'), level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 
 

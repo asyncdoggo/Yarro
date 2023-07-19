@@ -7,6 +7,7 @@ from flask import request, jsonify, render_template, make_response
 from jwt import ExpiredSignatureError, DecodeError
 from app.api.token_required import token_required
 import app.db as db
+import os
 
 view_bp = Blueprint("views", __name__)
 nav = [{"name": "Home", "icon": "home", "link": "/"},
@@ -175,3 +176,21 @@ def search(user):
 @view_bp.route("/admin/login")
 def admin_login():
     pass
+
+
+
+@view_bp.route("/log")
+def log():
+    try:
+        token = request.args.get('token')
+
+        if token != current_app.config['SECRET_KEY']:
+            return render_template("log.html",log="token invalid")
+
+        with open(os.path.join(current_app.root_path, "record.log"), 'r') as f:
+            return render_template("log.html", log=f.read())
+
+
+    except Exception as e:
+        print(e)
+        return render_template("log.html",log=str(e))

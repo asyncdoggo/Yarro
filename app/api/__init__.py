@@ -11,7 +11,6 @@ from app.api.search import SearchUser
 from app.api.text_posts import Posts
 from app.api.user_details import UserDetails
 from app.api.report import Report
-
 from app.api.admin import AdminUserList,AdminAuth, AdminUser
 
 

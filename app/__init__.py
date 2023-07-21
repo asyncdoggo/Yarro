@@ -4,10 +4,11 @@ from app.api import api_bp
 from app.views import view_bp
 import logging
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config.from_pyfile('appconfig.py')
-
+CORS(app)
 with app.app_context():
     Data.db.init_app(app)
     Data.db.create_all()

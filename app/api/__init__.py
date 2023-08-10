@@ -1,18 +1,18 @@
 from flask import Blueprint
 from flask_restful import Api
-from app.api.image_posts import ImagePost
-from app.api.likes import Like
-from app.api.login import Login, Logout
-from app.api.password_reset import ResetPassword
-from app.api.profile_details import ProfileDetails
-from app.api.profile_image import ProfileImage
-from app.api.register import Register
-from app.api.search import SearchUser
-from app.api.text_posts import Posts
-from app.api.user_details import UserDetails
-from app.api.report import Report
-from app.api.admin import AdminUserList,AdminAuth, AdminUser
-
+from .image_posts import ImagePost
+from .likes import Like
+from .login import Login, Logout
+from .password_reset import ResetPassword
+from .profile_details import ProfileDetails
+from .profile_image import ProfileImage
+from .register import Register
+from .search import SearchUser
+from .text_posts import Posts
+from .user_details import UserDetails
+from .report import Report
+from .admin import AdminUserList,AdminAuth, AdminUser
+from .chat import socketio
 
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)

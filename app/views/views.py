@@ -194,3 +194,14 @@ def log():
     except Exception as e:
         print(e)
         return render_template("log.html",log=str(e))
+    
+
+
+
+
+
+
+
+@view_bp.route("/chat")
+def test():
+    return render_template("chat.html")

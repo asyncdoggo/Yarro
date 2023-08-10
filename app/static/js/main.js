@@ -59,7 +59,7 @@ document.getElementById("post_image_btn").addEventListener("click", async functi
             document.getElementById("post_image").setAttribute("src", "");
             document.getElementById("image_upload").value = ""
             document.getElementById("image-modal").hidden = true;
-            document.getElementById("post_section").innerHTML = "";
+            document.getElementById("post_section").innerText = "";
             getPosts()
 
         }
@@ -98,8 +98,8 @@ async function onBtnPress(pid, btn) {
             buttons.children[1].children[0].innerHTML = "thumb_down_off_alt";
         }
 
-        buttons.children[0].children[1].innerHTML = data["lc"];
-        buttons.children[1].children[1].innerHTML = data["dlc"];
+        buttons.children[0].children[1].innerText = data["lc"];
+        buttons.children[1].children[1].innerTe = data["dlc"];
     }
 }
 

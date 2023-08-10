@@ -107,6 +107,16 @@ class Reports(db.Model):
     resolution_message = db.Column(db.String(255))
     resolved_by = db.Column(db.String(35))
 
+
+
+class Message(db.Model):
+    __tablename__ = "messages"
+    message_id = db.Column(db.String(35), primary_key=True,nullable=False)
+    sender_id = db.Column(db.String(35))
+    reciever_id = db.Column(db.String(35))
+    content = db.Column(db.String(255), nullable=False)
+    tstamp = db.Column(db.TIMESTAMP)
+
 #
 # def send_friend_request(user1, user2):
 #     friend: Friendship = Friendship(user1_id=user1, user2_id=user2, initiator_id=user1)

@@ -66,7 +66,7 @@ app.register_blueprint(log_bp)
 app.register_blueprint(report_api_bp)
 
 # chat view
-# app.register_blueprint(chat_bp)
+app.register_blueprint(chat_bp)
 with app.app_context():
    socketio.init_app(app)
 

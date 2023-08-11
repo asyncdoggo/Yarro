@@ -99,7 +99,7 @@ async function onBtnPress(pid, btn) {
         }
 
         buttons.children[0].children[1].innerText = data["lc"];
-        buttons.children[1].children[1].innerTe = data["dlc"];
+        buttons.children[1].children[1].innerText = data["dlc"];
     }
 }
 

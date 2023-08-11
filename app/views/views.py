@@ -9,13 +9,25 @@ from app.api.token_required import token_required
 import app.db as db
 import os
 
-view_bp = Blueprint("views", __name__)
+root_bp = Blueprint("root", __name__)
+register_bp = Blueprint("register", __name__)
+edit_profile_bp = Blueprint("edit_profile", __name__)
+visit_user_bp = Blueprint("visit_user", __name__)
+reset_password_bp = Blueprint("reset_password", __name__)
+confirm_email_bp = Blueprint("confirm_email", __name__)
+search_bp = Blueprint("search", __name__)
+admin_login_bp = Blueprint("admin_login", __name__)
+log_bp = Blueprint("log", __name__)
+chat_bp = Blueprint("chat", __name__)
+
+
+
 nav = [{"name": "Home", "icon": "home", "link": "/"},
        {"name": "Search", "icon": "search", "link": "/search"},
        {"name": "chat", "icon": "chat", "link": "/chat"}]
 
 
-@view_bp.route("/", methods=["GET"])
+@root_bp.route("/", methods=["GET"])
 def main():
     """
     The root route of the app. will handle rendering of index.html and forgotpass.html
@@ -51,7 +63,7 @@ def main():
             return render_template("index.html")
 
 
-@view_bp.route("/register")
+@register_bp.route("/register")
 def register_render():
     """Renders register.html"""
     token = request.cookies.get("token")
@@ -73,7 +85,7 @@ def register_render():
         return render_template("register.html")
 
 
-@view_bp.route("/profile/edit")
+@edit_profile_bp.route("/profile/edit")
 def edit_profile():
     """
     Render editprofile.html requires token in cookie
@@ -99,7 +111,7 @@ def edit_profile():
         return jsonify({"message": "invalid"})
 
 
-@view_bp.route("/u/<uname>", methods=["GET"])
+@visit_user_bp.route("/u/<uname>", methods=["GET"])
 def profile(uname):
     """
     renders userprofile.html
@@ -129,13 +141,13 @@ def profile(uname):
     return render_template("userprofile.html", uid=user.id, visiting=True, login=False)
 
 
-@view_bp.route("/password/reset")
+@reset_password_bp.route("/password/reset")
 def reset_render():
     """Renders forgotpass.html"""
     return render_template("forgotpass.html")
 
 
-@view_bp.route("/reset", methods=["GET"])
+@reset_password_bp.route("/reset", methods=["GET"])
 def reset():
     """
     renders the password reset page by checking the GET method args "id" and "uid" for guid and user id
@@ -149,10 +161,9 @@ def reset():
     return render_template("forgotpass.html")
 
 
-@view_bp.route("/confirm", methods=["GET"])
+@confirm_email_bp.route("/confirm", methods=["GET"])
 def confirm_email():
     """
-    renders the password reset page by checking the GET method args "id" and "uid" for guid and user id
     """
     guid = request.args.get("id")
     uid = request.args.get("uid")
@@ -160,7 +171,7 @@ def confirm_email():
     return flask.redirect("/")
 
 
-@view_bp.route("/search", methods=["GET"])
+@search_bp.route("/search", methods=["GET"])
 @token_required
 def search(user):
     try:
@@ -174,13 +185,13 @@ def search(user):
         return render_template("404.html")
 
 
-@view_bp.route("/admin/login")
+@admin_login_bp.route("/admin/login")
 def admin_login():
     pass
 
 
 
-@view_bp.route("/log")
+@log_bp.route("/log")
 def log():
     try:
         token = request.args.get('token')
@@ -191,19 +202,12 @@ def log():
         with open(os.path.join(current_app.root_path, "record.log"), 'r') as f:
             return render_template("log.html", log=f.read())
 
-
     except Exception as e:
         print(e)
         return render_template("log.html",log=str(e))
     
 
-
-
-
-
-
-
-@view_bp.route("/chat")
+@chat_bp.route("/chat")
 @token_required
 def chat(user):
     try:

@@ -11,3 +11,4 @@ gunicorn
 Flask-Migrate
 flask-cors
 flask-socketio
+eventlet

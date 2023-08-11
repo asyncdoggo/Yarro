@@ -47,7 +47,7 @@ class Register(Resource):
                 if send_mail(email, username, url, True):
                     response = flask.make_response(
                         {'status': 'success', "uname": flask.escape(username), "uid": uid})
-                    response.set_cookie("token", token, httponly=True, secure=True,
+                    response.set_cookie("token", token, httponly=False, secure=True,
                                         samesite="Strict", expires=datetime.datetime.utcnow(
                     ) + datetime.timedelta(days=30))
                     return response

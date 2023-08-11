@@ -9,3 +9,5 @@ pillow
 python-dotenv
 gunicorn
 Flask-Migrate
+flask-cors
+flask-socketio

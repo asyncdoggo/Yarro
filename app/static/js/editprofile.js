@@ -6,7 +6,7 @@ document.getElementById("profile-img").setAttribute("src", `/image/${uid}`);
 
 
 
-document.getElementById("username").innerHTML = uname
+document.getElementById("username").innerText = uname
 get_details()
 
 document.getElementById("save_form").addEventListener("submit", async function (e) {

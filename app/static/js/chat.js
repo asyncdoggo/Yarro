@@ -17,15 +17,18 @@ async function getUsers(params) {
         if (data.length > 0) {
             for (let i in data) {
                 document.getElementById("chat_list").innerHTML += `
-                        <a href="#" onclick="setChat(this)" class="flex mt-2 items-center bg-white p-6 rounded-lg shadow group-data-[checked=true]:bg-black group-data-[checked=true]:shadow-gray-400" id="${data[i]['uid']}" name="${data[i]["username"]}">
-                            <div class="flex-shrink-0">
-                            <img class="h-12 w-12 rounded-full" src='/image/${data[i]["uid"]}' alt="User Avatar">
-                            </div>
-                            <div class="ml-6">
-                            <h2 class="font-bold text-lg group-data-[checked=true]:text-white">${data[i]["name"]}</h2>
-                            <p class="text-gray-700 group-data-[checked=true]:text-gray-500">@${data[i]["username"]}</p>
-                            </div>
-                        </a>
+
+                        <a onclick="setChat('${data[i]['uid']}','${data[i]['username']}')"
+                        class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none">
+                        <img class="object-cover w-10 h-10 rounded-full"
+                        src='/image/${data[i]["uid"]}' alt="username" />
+                        <div class="w-full pb-2">
+                        <div class="flex justify-between">
+                            <span class="block ml-2 font-semibold text-gray-600">@${data[i]["username"]}</span>
+                        </div>
+                        <span class="block ml-2 text-sm text-gray-600">${data[i]["name"]}</span>
+                        </div>
+                    </a>
                     `
 
             }
@@ -68,15 +71,18 @@ document.getElementById("send").addEventListener("click", () =>{
 })
 
 
-function setChat(e) {
+function setChat(uid,uname) {
     messages = {}
     while(x = req.pop()){
         clearInterval(x)
     }
 
-    to_user_id = e.id
-    to_uname = e.name
-    x = setInterval(get_messages,500)
+    to_user_id = uid
+    to_uname = uname
+    document.getElementById("reciever_profile_img").setAttribute("src",`/image/${uid}`)
+    document.getElementById("reciever_uname").innerText = uname
+
+    x = setInterval(get_messages,100)
     req.push(x)
 }
 
@@ -97,18 +103,20 @@ socket.on("messages", function(data,user_id,room){
             ${
                 messages[i].sender ? 
             `
-                <div class="msg w-1/2 self-end" id="">
-                <p class="self-start px-2">${localStorage.uname}</p>
-                <p class="w-full border px-2 text-right rounded-full">${messages[i].content}</p>
+            <li class="flex justify-end">
+            <div class="relative max-w-xl px-4 py-2 text-gray-700 bg-gray-100 rounded shadow">
+              <span class="block">${messages[i].content}</span>
             </div>
+          </li>
             `
                 :
             `
-            <div class="msg w-1/2 self-start" id="">
-                <p class="self-start px-2">${to_uname}</p>
-                <p class="w-full border px-2 text-right rounded-full">${messages[i].content}</p>
+            <li class="flex justify-start">
+            <div class="relative max-w-xl px-4 py-2 text-gray-700 rounded shadow">
+              <span class="block">${messages[i].content}</span>
             </div>
-`
+          </li>
+            `
             }
         `
 

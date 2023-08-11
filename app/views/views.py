@@ -11,7 +11,8 @@ import os
 
 view_bp = Blueprint("views", __name__)
 nav = [{"name": "Home", "icon": "home", "link": "/"},
-       {"name": "Search", "icon": "search", "link": "/search"}]
+       {"name": "Search", "icon": "search", "link": "/search"},
+       {"name": "chat", "icon": "chat", "link": "/chat"}]
 
 
 @view_bp.route("/", methods=["GET"])
@@ -203,5 +204,12 @@ def log():
 
 
 @view_bp.route("/chat")
-def test():
-    return render_template("chat.html")
+@token_required
+def chat(user):
+    try:
+        if user.disabled:
+            return render_template("disabled.html")
+        return render_template("chat.html", nav=nav)
+    except Exception as e:
+        print(repr(e))
+        return render_template("404.html")

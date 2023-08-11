@@ -46,6 +46,7 @@ let token =  {}
 let to_user_id = ""
 let to_uname = ""
 
+req = []
 
 cookieStore.get("token").then(t => {
     token = t
@@ -68,10 +69,15 @@ document.getElementById("send").addEventListener("click", () =>{
 
 
 function setChat(e) {
+    messages = {}
+    while(x = req.pop()){
+        clearInterval(x)
+    }
+
     to_user_id = e.id
     to_uname = e.name
-    setInterval(get_messages,500)
-    // get_messages()
+    x = setInterval(get_messages,500)
+    req.push(x)
 }
 
 

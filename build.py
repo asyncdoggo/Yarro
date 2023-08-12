@@ -7,6 +7,10 @@ import subprocess
 files = ["app", "run.py", "build.py", "requirements.txt", ".gitignore", "LICENSE", "README.md"]
 print("Copying files...")
 
+
+if os.path.exists("./app/record.log"):
+    os.remove("./app/record.log")
+
 for i in files:
     if not os.path.isfile(i):
         shutil.copytree(i, f"./build_files/{i}")

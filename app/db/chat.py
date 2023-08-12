@@ -28,12 +28,15 @@ def new_message(content, sender,reciever):
 def get_message(sender,reciever,skip,limit):
     msg = Message.query.filter(((Message.sender_id==sender) & (Message.reciever_id==reciever)) | ((Message.sender_id==reciever) & (Message.reciever_id==sender))).order_by(Message.tstamp.desc()).limit(limit).offset(skip).all()
 
+    db.session.close()
+
+
     d = []
     for i in msg:
         d.append(
             {
                 "msg_id":i.message_id,
-                "sender":True if i.sender_id == sender else False,
+                "sender":i.sender_id == sender,
                 "content":i.content
             }
         )

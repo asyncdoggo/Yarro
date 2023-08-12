@@ -45,45 +45,54 @@ async function getUsers(params) {
 }
 
 
-let token =  {}
 let to_user_id = ""
 let to_uname = ""
 
 req = []
 
-cookieStore.get("token").then(t => {
-    token = t
+
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+      while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  }
+  
+  const token =  getCookie("token")
+
+
+const socket = io("/",{
+    auth:{
+        token: token
+    }
 })
-
-getUsers()
-
-function get_messages() {
-    socket.emit("get_messages",{token:token.value,to_user:to_user_id,limit:10,page:0})
+  
+  function get_messages() {
+    socket.emit("get_messages",{token:token,to_user:to_user_id,limit:10,page:0})
 }
 
 
-const socket = io("/")
 
 document.getElementById("send").addEventListener("click", () =>{
     let msg = document.getElementById("msg").value
-    socket.emit("send_message",{token:token.value,message:msg,to_user:to_user_id })
+    socket.emit("send_message",{token:token,message:msg,to_user:to_user_id })
     document.getElementById("msg").value = ""
 })
 
 
 function setChat(uid,uname) {
     messages = {}
-    while(x = req.pop()){
-        clearInterval(x)
-    }
-
+    document.getElementById("msg_list").innerHTML = ""
     to_user_id = uid
     to_uname = uname
     document.getElementById("reciever_profile_img").setAttribute("src",`/image/${uid}`)
     document.getElementById("reciever_uname").innerText = uname
-
-    x = setInterval(get_messages,100)
-    req.push(x)
+    
+    get_messages()
 }
 
 
@@ -109,17 +118,19 @@ socket.on("messages", function(data,user_id,room){
             </div>
           </li>
             `
-                :
+            :
             `
             <li class="flex justify-start">
             <div class="relative max-w-xl px-4 py-2 text-gray-700 rounded shadow">
               <span class="block">${messages[i].content}</span>
-            </div>
+              </div>
           </li>
             `
-            }
+        }
         `
-
+        
         msgs.innerHTML += msg 
     }
 })
+
+getUsers()

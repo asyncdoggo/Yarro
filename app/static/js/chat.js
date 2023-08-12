@@ -2,8 +2,8 @@
 
 let messages = {}
 
-
-document.getElementById("profile-img").setAttribute("src",`/image/${localStorage.uid}`)
+const user_id = localStorage.uid
+document.getElementById("profile-img").setAttribute("src",`/image/${user_id}`)
 
 async function getUsers(params) {
         const response = await fetch(`/api/search?user=`, {
@@ -96,7 +96,14 @@ function setChat(uid,uname) {
 }
 
 
-socket.on("messages", function(data,user_id,room){
+socket.on("messages", function(data){
+
+    if(data["rec"] != to_user_id || data["uid"] != user_id) {
+        return
+    }
+
+    data = data["messages"]
+
     if (_.isEqual(data,messages)){
         return
     }

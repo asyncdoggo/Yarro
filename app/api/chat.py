@@ -40,11 +40,18 @@ def add_message(data):
 
         user = verify_token(token)
         if db.new_message(sender = user.id, content=message,reciever=reciever):
-            data = db.get_message(user.id,reciever,0,10)
             for i,j in users.items():
-                if j == user.id or j == reciever:
+                if j == user.id:
+                    data = db.get_message(user.id,reciever,0,10)
+                    data["uid"] = j
+                    data["rec"] = reciever
                     emit("messages",data,to=i)
-                
+                if j == reciever:
+                    data = db.get_message(reciever,user.id,0,10)
+                    data["uid"] = reciever
+                    data["rec"] = user.id
+                    emit("messages",data,to=i)
+                    
 
         else:
             emit("failure",{"message":"failed to create message"})
@@ -62,6 +69,8 @@ def get_messages(data):
         skip = data["page"]
         user = verify_token(token)
         data = db.get_message(user.id,reciever,skip,limit)
+        data["uid"] = user.id
+        data["rec"] = reciever
 
         return emit("messages",data,sid=flask.request.sid)
 

@@ -41,4 +41,4 @@ def get_message(sender,reciever,skip,limit):
             }
         )
 
-    return d
+    return {"messages":d}

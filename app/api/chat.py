@@ -1,6 +1,6 @@
 from flask import current_app
 from flask_socketio import SocketIO
-from flask_socketio import emit, rooms,join_room,close_room,leave_room
+from flask_socketio import emit
 import jwt
 import app.db as db
 import uuid
@@ -13,10 +13,12 @@ socketio = SocketIO(cors_allowed_origins="*")
 
 
 @socketio.on('connect')
-def test_connect():
+def test_connect(auth):
     session_id = flask.request.sid
-    user_id = 1
-    users[session_id] = user_id
+    token = auth["token"]
+    user = verify_token(token)
+
+    users[session_id] = user.id
 
 
 
@@ -38,9 +40,16 @@ def add_message(data):
 
         user = verify_token(token)
         if db.new_message(sender = user.id, content=message,reciever=reciever):
-            return emit("success",{"status":"message"})
-        emit("failure",{"message":"failed to create message"})
-    except:
+            data = db.get_message(user.id,reciever,0,10)
+            for i,j in users.items():
+                if j == user.id or j == reciever:
+                    emit("messages",data,to=i)
+                
+
+        else:
+            emit("failure",{"message":"failed to create message"})
+    except Exception as e:
+        print(e)
         emit("disconnect")
 
 
@@ -53,7 +62,8 @@ def get_messages(data):
         skip = data["page"]
         user = verify_token(token)
         data = db.get_message(user.id,reciever,skip,limit)
-        return emit("messages",data)
+
+        return emit("messages",data,sid=flask.request.sid)
 
     except Exception as e:
         print(e)

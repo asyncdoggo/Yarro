@@ -1,6 +1,6 @@
 from functools import wraps
 import jwt
-from flask import request, jsonify, redirect
+from flask import request
 from jwt import ExpiredSignatureError, DecodeError
 import app.db as db
 from flask import current_app

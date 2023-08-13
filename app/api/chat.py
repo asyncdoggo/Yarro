@@ -3,7 +3,6 @@ from flask_socketio import SocketIO
 from flask_socketio import emit
 import jwt
 import app.db as db
-import uuid
 import flask
 
 

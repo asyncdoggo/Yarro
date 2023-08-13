@@ -1,4 +1,4 @@
-from flask import Flask, request,current_app
+from flask import Flask, request
 import app.db.classes as Data
 from .api import like_api_bp,post_api_bp,login_api_bp,logout_api_bp,report_api_bp,search_user_api_bp,register_api_bp,image_post_api_bp,admin_auth_api_bp,admin_user_api_bp,user_details_api_bp,profile_image_api_bp,reset_password_api_bp,profile_details_api_bp,admin_user_list_api_bp
 from .views import root_bp,register_bp ,edit_profile_bp,visit_user_bp ,reset_password_bp ,confirm_email_bp ,search_bp ,admin_login_bp ,log_bp,chat_bp

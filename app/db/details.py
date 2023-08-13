@@ -1,8 +1,3 @@
-import datetime
-import os
-from sqlalchemy import desc
-from argon2 import PasswordHasher
-from flask_sqlalchemy import SQLAlchemy
 
 from app.db.classes import Details, Users
 from app.db.classes import db

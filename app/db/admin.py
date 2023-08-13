@@ -1,10 +1,6 @@
 import datetime
-import os
 import uuid
 
-from sqlalchemy import desc
-from argon2 import PasswordHasher
-from flask_sqlalchemy import SQLAlchemy
 from app.db.classes import Details, DisLikes, Likes, Posts, Users, Requests, EmailRequests, Admin, Message
 from app.db.classes import db, ph
 from app.db.search import search

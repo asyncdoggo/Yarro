@@ -1,10 +1,7 @@
 import smtplib
 import ssl
-import json
-import os
 from email.message import EmailMessage
 from dotenv import dotenv_values
-import flask
 
 config = dotenv_values(".env")
 

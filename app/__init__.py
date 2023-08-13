@@ -77,13 +77,13 @@ logging.basicConfig(filename=os.path.join(app.root_path,'record.log'), level=log
 
 @app.before_request
 def log_request_info():
-    app.logger.debug('User-Agent: %s', request.headers.get('User-Agent'))
-    ip = request.headers.get('X-REAL-IP')
-    if not ip:
-       ip = request.headers.get('X-FORWARDED-FOR')
-    if not ip:
-       ip = request.headers.get('RemoteAddr')
-    
-
-    app.logger.debug('IP: %s', ip)
-    app.logger.debug('Data: %s', request.get_data())
+   if not "/static" in request.full_path:
+      app.logger.debug(request.full_path)
+      app.logger.debug('User-Agent: %s', request.headers.get('User-Agent'))
+      ip = request.headers.get('X-REAL-IP')
+      if not ip:
+         ip = request.headers.get('X-FORWARDED-FOR')
+      if not ip:
+         ip = request.headers.get('RemoteAddr')
+      app.logger.debug('IP: %s', ip)
+      app.logger.debug('Data: %s', request.get_data())

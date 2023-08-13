@@ -83,6 +83,8 @@ class AdminUser(Resource):
         if user:
             return {"status":"success","username":user.username,"email":user.email,"confirmed":user.confirmed,"created_at":user.created_at,"id":user.id,"disabled":user.disabled}
         return {"status": "user not found"}
+    
+    
     @admin_token_required
     def delete(self,_, uid):
         if db.disable_user(uid):

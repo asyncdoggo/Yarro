@@ -42,7 +42,7 @@ class Register(Resource):
                     ) + datetime.timedelta(days=30)},
                     current_app.config['SECRET_KEY'], "HS256")
 
-                url = url_for("views.confirm_email", id=guid,
+                url = url_for("confirm_email.confirm_email", id=guid,
                               uid=uid, _external=True)
                 if send_mail(email, username, url, True):
                     response = flask.make_response(

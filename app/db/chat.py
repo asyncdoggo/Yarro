@@ -6,7 +6,8 @@ from app.db.classes import db
 def new_message(content, sender,reciever):
     gid = uuid.uuid4().hex
     tstamp = datetime.datetime.utcnow()
-
+    if len(content) >= 255:
+        return False
     msg: Message = Message(message_id=gid,
                             sender_id=sender,
                             reciever_id=reciever,

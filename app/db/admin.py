@@ -1,11 +1,7 @@
 import datetime
-import os
 import uuid
 
-from sqlalchemy import desc
-from argon2 import PasswordHasher
-from flask_sqlalchemy import SQLAlchemy
-from app.db.classes import Details, DisLikes, Likes, Posts, Users, Requests, EmailRequests, Admin
+from app.db.classes import Details, DisLikes, Likes, Posts, Users, Requests, EmailRequests, Admin, Message
 from app.db.classes import db, ph
 from app.db.search import search
 
@@ -28,13 +24,17 @@ def delete_user(uid):
             pd = Posts.__table__.delete().where(user_id=uid)
             rd = Requests.__table__.delete().where(user_id=uid)
             erd = EmailRequests.__table__.delete().where(user_id=uid)
-
+            md = Message.__table__.delete().where(sender_id=uid)
+            md2 = Message.__table__.delete().where(reciever_id=uid)
+            
             db.session.execute(ld)
             db.session.execute(ud)
             db.session.execute(dld)
             db.session.execute(pd)
             db.session.execute(rd)
             db.session.execute(erd)
+            db.session.execute(md)
+            db.session.execute(md2)
 
             db.session.commit()
             return True

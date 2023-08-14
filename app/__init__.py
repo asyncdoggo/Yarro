@@ -1,5 +1,8 @@
-from flask import Flask, request,current_app
+import datetime
+import uuid
+from flask import Flask, request
 import app.db.classes as Data
+import app.db as db
 from .api import like_api_bp,post_api_bp,login_api_bp,logout_api_bp,report_api_bp,search_user_api_bp,register_api_bp,image_post_api_bp,admin_auth_api_bp,admin_user_api_bp,user_details_api_bp,profile_image_api_bp,reset_password_api_bp,profile_details_api_bp,admin_user_list_api_bp
 from .views import root_bp,register_bp ,edit_profile_bp,visit_user_bp ,reset_password_bp ,confirm_email_bp ,search_bp ,admin_login_bp ,log_bp,chat_bp
 import logging
@@ -16,11 +19,14 @@ with app.app_context():
     Data.db.init_app(app)
     Data.db.create_all()
     Data.migrate.init_app(app, Data.db)
+    username = app.config['ADMIN_USERNAME']
+    password = app.config["ADMIN_PASSWORD"]
+    email = app.config["ADMIN_EMAIL"]
+    db.create_admin(username=username,password=password,email=email)
 
 
 
 # register blueprints for each module
-
 # root view
 app.register_blueprint(root_bp)
 app.register_blueprint(login_api_bp)
@@ -77,13 +83,13 @@ logging.basicConfig(filename=os.path.join(app.root_path,'record.log'), level=log
 
 @app.before_request
 def log_request_info():
-    app.logger.debug('User-Agent: %s', request.headers.get('User-Agent'))
-    ip = request.headers.get('X-REAL-IP')
-    if not ip:
-       ip = request.headers.get('X-FORWARDED-FOR')
-    if not ip:
-       ip = request.headers.get('RemoteAddr')
-    
-
-    app.logger.debug('IP: %s', ip)
-    app.logger.debug('Data: %s', request.get_data())
+    if not "/static" in request.full_path:
+        app.logger.debug(request.full_path)
+        app.logger.debug('User-Agent: %s', request.headers.get('User-Agent'))
+        ip = request.headers.get('X-REAL-IP')
+        if not ip:
+            ip = request.headers.get('X-FORWARDED-FOR')
+        if not ip:
+            ip = request.headers.get('RemoteAddr')
+        app.logger.debug('IP: %s', ip)
+        app.logger.debug('Data: %s', request.get_data())

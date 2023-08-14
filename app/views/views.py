@@ -1,10 +1,10 @@
-from functools import wraps
 import flask
 import jwt
 from flask import Blueprint
 from flask import current_app
 from flask import request, jsonify, render_template, make_response
 from jwt import ExpiredSignatureError, DecodeError
+from app.api.admin import admin_token_required
 from app.api.token_required import token_required
 import app.db as db
 import os
@@ -185,10 +185,6 @@ def search(user):
         return render_template("404.html")
 
 
-@admin_login_bp.route("/admin/login")
-def admin_login():
-    pass
-
 
 
 @log_bp.route("/log")
@@ -217,3 +213,26 @@ def chat(user):
     except Exception as e:
         print(repr(e))
         return render_template("404.html")
+    
+    
+    
+@admin_login_bp.route("/admin")
+def admin_page():
+    token = request.cookies.get("token")
+
+    if not token:
+        return render_template("admin/index.html")
+
+    try:
+        data = jwt.decode(
+            token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        current_user = db.Admin.query.filter_by(id=data['id']).one_or_none()
+        if not current_user:
+            return "unauthorized",403
+    except jwt.ExpiredSignatureError:
+        return {'status': 'expired'},403
+    except jwt.DecodeError:
+        return {"status": "invalid"},403
+    
+    return render_template("admin/admin.html")
+

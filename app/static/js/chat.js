@@ -79,6 +79,10 @@ const socket = io("/",{
 
 document.getElementById("send").addEventListener("click", () =>{
     let msg = document.getElementById("msg").value
+    if(msg.length >= 255){
+        Snackbar.show({ pos: "bottom-center", text: "message should be less than 255 characters" })
+        return
+    }
     socket.emit("send_message",{token:token,message:msg,to_user:to_user_id })
     document.getElementById("msg").value = ""
 })

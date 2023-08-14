@@ -3,7 +3,6 @@ from flask_socketio import SocketIO
 from flask_socketio import emit
 import jwt
 import app.db as db
-import uuid
 import flask
 
 
@@ -52,9 +51,8 @@ def add_message(data):
                     data["rec"] = user.id
                     emit("messages",data,to=i)
                     
-
         else:
-            emit("failure",{"message":"failed to create message"})
+            emit("failure",{"message":"message length exceeds 255 characters"})
     except Exception as e:
         print(e)
         emit("disconnect")

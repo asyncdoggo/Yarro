@@ -18,7 +18,8 @@ class Login(Resource):
             token = request.cookies.get("token")
             data = jwt.decode(
                 token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = db.Users.query.filter_by(id=data['id']).one_or_none()
+            current_user = db.Users.query.filter_by(
+                id=data['id']).one_or_none()
 
             if current_user.disabled:
                 return {"status": "disabled"}
@@ -52,10 +53,11 @@ class Login(Resource):
                 response.set_cookie("token", token, httponly=False, secure=True,
                                     samesite="Strict", expires=datetime.datetime.utcnow() + datetime.timedelta(hours=8000))
                 return response
-            else:
-                return {"status": "username or password is incorrect"}
 
-        except Exception:
+            return {"status": "username or password is incorrect"}
+
+        except Exception as e:
+            print(repr(e))
             return {"status": "failure"}
 
 

@@ -1,18 +1,13 @@
 import datetime
-import os
 import uuid
-from sqlalchemy import or_
-from sqlalchemy import desc
-from argon2 import PasswordHasher
-from flask_sqlalchemy import SQLAlchemy
-import flask
 from app.db.classes import Message
 from app.db.classes import db
 
 def new_message(content, sender,reciever):
     gid = uuid.uuid4().hex
     tstamp = datetime.datetime.utcnow()
-
+    if len(content) >= 255:
+        return False
     msg: Message = Message(message_id=gid,
                             sender_id=sender,
                             reciever_id=reciever,

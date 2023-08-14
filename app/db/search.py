@@ -1,7 +1,7 @@
 
 from app.db.classes import Details, Posts, Users
 from app.db.classes import db
-from sqlalchemy import func, text
+from sqlalchemy import func
 
 
 def search(user="", sort=0):

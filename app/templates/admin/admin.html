@@ -1,30 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block body %}
+
     <header class="p-4 bg-blue-200">
         <h2 class="text-center bg-blue-200 text-white">Admin Page</h2>
     </header>
     <main>
-        <table class="w-full text-center table-fixed border-separate border-spacing-1">
+        <table id="table" class="w-full text-center table-fixed border-separate border-spacing-1">
             <tr class="bg-slate-300">
                 <th>sr.no</th>
                 <th>user id</th>
-                <th>user name</th>
+                <th>username</th>
+                <th>name</th>
+                <th>posts</th>
                 <th>ban</th>
             </tr>
-            <tr class="bg-slate-100 ">
-                <td>1</td>
-                <td>123</td>
-                <td>sammy</td>
-                <td><button class="border-2 w-28 h-8 bg-red-600 text-white hover:bg-red-500 rounded-md">Ban</button></td>
-            </tr>
+           
         </table>
     </main>
-</body>
-</html>
+    <script>
+        const getUsers = async () => {
+            const response = await fetch("/api/admin/users",{
+                method:"GET"
+            }).then(response => response.json())
+
+            const table = document.getElementById("table")
+            for(i in response.users){
+                const data = response.users[i]
+
+                table.innerHTML += `
+                <tr class="bg-slate-100 ">
+                    <td>${parseInt(i)+1}</td>
+                    <td class="overflow-auto">${data['uid']}</td>
+                    <td>${data['username']}</td>
+                    <td>${data['name']}</td>
+                    <td>${data['post_count']}</td>
+                    <td><button class="border-2 w-28 h-8 bg-red-600 text-white hover:bg-red-500 rounded-md">Ban</button></td>
+                </tr>
+                `
+            }
+
+        }
+
+
+        getUsers()
+    </script>
+{% endblock %}

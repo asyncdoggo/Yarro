@@ -19,3 +19,8 @@ elif config["DB_ENGINE"] == "sqlite":
 
 
 SECRET_KEY = config["SECRET_KEY"]
+
+
+ADMIN_USERNAME = config["ADMIN_USERNAME"]
+ADMIN_PASSWORD = config["ADMIN_PASSWORD"]
+ADMIN_EMAIL = config["ADMIN_EMAIL"]

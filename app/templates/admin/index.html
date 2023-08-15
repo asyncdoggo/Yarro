@@ -25,7 +25,7 @@
                 <div id="pass"
                     class="outline outline-0 m-[8px] rounded-lg h-12 pl-3 pr-2 border-2 flex justify-between items-center group-data-[checked=true]:bg-[#3b4148]">
                     <input
-                        class="h-10 border-none w-full outline-none group-data-[checked=true]:text-white group-data-[checked=true]:bg-[#3b4148]"
+                        class="h-10 border-none w-full outline-none group-data-[checked=true]:text-white group-data-[checked=true]:bg-[#3b4148] disabled:bg-gray-900"
                         type="password" name="passwd" placeholder="Password" id="passwd" />
                     <input type="checkbox" id="pw" class="hidden">
                     <label for="pw" id="vis" class="material-symbols-outlined select-none hover:cursor-pointer">
@@ -46,10 +46,11 @@
         </div>
     </div>
 </main>
-<script src="/static/js/index.js"></script>
 <script>
 
 document.getElementById("login_form").addEventListener("submit", async function (e) {
+    document.getElementById("login_btn").disabled = true
+
     e.preventDefault();
     const form = new FormData(e.target);
     const data = Object.fromEntries(form.entries());
@@ -71,6 +72,28 @@ document.getElementById("login_form").addEventListener("submit", async function 
     }
     else {
         Snackbar.show({ pos: "bottom-center", text: response.status })
+    }
+    document.getElementById("login_btn").disabled = false
+})
+
+
+document.getElementById("passwd").addEventListener("focusin", (e) => {
+    document.getElementById("pass").style.outlineWidth = "2px"
+})
+
+document.getElementById("passwd").addEventListener("focusout", (e) => {
+    document.getElementById("pass").style.outlineWidth = "0px"
+})
+
+
+document.getElementById("pw").addEventListener("change", (e) => {
+    if (e.target.checked) {
+        document.getElementById("vis").innerHTML = "visibility_off"
+        document.getElementById("passwd").type = "text"
+    }
+    else {
+        document.getElementById("vis").innerHTML = "visibility"
+        document.getElementById("passwd").type = "password"
     }
 })
 

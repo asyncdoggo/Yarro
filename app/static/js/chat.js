@@ -19,14 +19,14 @@ async function getUsers(params) {
                 document.getElementById("chat_list").innerHTML += `
 
                         <a onclick="setChat('${data[i]['uid']}','${data[i]['username']}')"
-                        class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none">
+                        class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none group-data-[checked=true]:hover:bg-gray-700">
                         <img class="object-cover w-10 h-10 rounded-full"
                         src='/image/${data[i]["uid"]}' alt="username" />
                         <div class="w-full pb-2">
                         <div class="flex justify-between">
-                            <span class="block ml-2 font-semibold text-gray-600">@${data[i]["username"]}</span>
+                            <span class="block ml-2 font-semibold text-gray-600 group-data-[checked=true]:text-white">@${data[i]["username"]}</span>
                         </div>
-                        <span class="block ml-2 text-sm text-gray-600">${data[i]["name"]}</span>
+                        <span class="block ml-2 text-sm text-gray-600 group-data-[checked=true]:text-white">${data[i]["name"]}</span>
                         </div>
                     </a>
                     `
@@ -89,8 +89,10 @@ document.getElementById("send").addEventListener("click", () =>{
 
 
 function setChat(uid,uname) {
+    document.getElementById("message_box").hidden = false
     messages = {}
-    document.getElementById("msg_list").innerHTML = ""
+    document.getElementById("msg_list").innerHTML = `<div class="inline-block  h-8 w-8 animate-spin rounded-full border-4 border-solid border-current group-data-[checked=true]:text-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+    <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span></div>`
     to_user_id = uid
     to_uname = uname
     document.getElementById("reciever_profile_img").setAttribute("src",`/image/${uid}`)
@@ -124,7 +126,7 @@ socket.on("messages", function(data){
                 messages[i].sender ? 
             `
             <li class="flex justify-end">
-            <div class="relative max-w-xl px-4 py-2 text-gray-700 bg-gray-100 rounded shadow">
+            <div class="relative max-w-xl px-4 py-2 text-white bg-pink-400 rounded shadow">
               <span class="block">${messages[i].content}</span>
             </div>
           </li>
@@ -132,7 +134,7 @@ socket.on("messages", function(data){
             :
             `
             <li class="flex justify-start">
-            <div class="relative max-w-xl px-4 py-2 text-gray-700 rounded shadow">
+            <div class="relative max-w-xl px-4 py-2 text-gray-700 group-data-[checked=true]:bg-gray-700 group-data-[checked=true]:text-white rounded shadow">
               <span class="block">${messages[i].content}</span>
               </div>
           </li>

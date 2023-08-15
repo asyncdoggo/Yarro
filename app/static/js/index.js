@@ -1,6 +1,7 @@
 
 
 document.getElementById("login_form").addEventListener("submit", async function (e) {
+    document.getElementById("login_btn").disabled = true
     e.preventDefault();
     const form = new FormData(e.target);
     const data = Object.fromEntries(form.entries());
@@ -23,6 +24,8 @@ document.getElementById("login_form").addEventListener("submit", async function 
     else {
         Snackbar.show({ pos: "bottom-center", text: response.status })
     }
+    document.getElementById("login_btn").disabled = false
+
 })
 
 

@@ -14,7 +14,8 @@ from .api import socketio
 app = Flask(__name__)
 app.config.from_pyfile('appconfig.py')
 
-CORS(app)
+CORS(app, supports_credentials=True)
+
 with app.app_context():
     Data.db.init_app(app)
     Data.db.create_all()

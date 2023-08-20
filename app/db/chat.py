@@ -20,11 +20,8 @@ def new_message(content, sender,reciever):
 
 
 
-def get_message(sender,reciever,skip,limit):
+def get_message(sender,reciever,skip,limit,send=False):
     msg = Message.query.filter(((Message.sender_id==sender) & (Message.reciever_id==reciever)) | ((Message.sender_id==reciever) & (Message.reciever_id==sender))).order_by(Message.tstamp.desc()).limit(limit).offset(skip).all()
-
-    db.session.close()
-
 
     d = []
     for i in msg:
@@ -35,5 +32,22 @@ def get_message(sender,reciever,skip,limit):
                 "content":i.content
             }
         )
+        if i.reciever_id == sender and not send:
+            i.unread = False
+            # db.session.flush()
+        
+    db.session.commit()
 
     return {"messages":d}
+
+
+
+
+def get_unread_messages(rec):
+    msg = Message.query.filter_by(reciever_id=rec, unread=True).all()
+    unread = []
+ 
+    for i in msg:
+        unread.append(i.sender_id)
+        
+    return unread

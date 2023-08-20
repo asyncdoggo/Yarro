@@ -27,7 +27,7 @@ class Login(Resource):
             if not current_user.confirmed:
                 return {"status": "email"}
             if active_tokens[current_user.username] == token:
-                return {"status": "success"}
+                return {"status": "success","uname": current_user.username,"uid": current_user.id}
 
             return {"status": "false"}
 

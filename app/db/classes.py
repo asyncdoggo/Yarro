@@ -113,7 +113,7 @@ class Message(db.Model):
     reciever_id = db.Column(db.String(35))
     content = db.Column(db.String(255), nullable=False)
     tstamp = db.Column(db.TIMESTAMP)
-
+    unread = db.Column(db.Boolean,default=True)
 #
 # def send_friend_request(user1, user2):
 #     friend: Friendship = Friendship(user1_id=user1, user2_id=user2, initiator_id=user1)

@@ -41,12 +41,12 @@ def add_message(data):
         if db.new_message(sender = user.id, content=message,reciever=reciever):
             for i,j in users.items():
                 if j == user.id:
-                    data = db.get_message(user.id,reciever,0,10)
+                    data = db.get_message(user.id,reciever,0,10, send=True)
                     data["uid"] = j
                     data["rec"] = reciever
                     emit("messages",data,to=i)
                 if j == reciever:
-                    data = db.get_message(reciever,user.id,0,10)
+                    data = db.get_message(reciever,user.id,0,10, send=True)
                     data["uid"] = reciever
                     data["rec"] = user.id
                     emit("messages",data,to=i)
@@ -91,3 +91,11 @@ def verify_token(token):
         return emit("disconnect")
     except jwt.DecodeError:
         return emit("disconnect")
+    
+    
+@socketio.on("get_unread")
+def get_unread_messages(data):
+    token = data["token"]
+    user = verify_token(token)
+    unread = db.get_unread_messages(user.id)
+    emit("unread",unread)

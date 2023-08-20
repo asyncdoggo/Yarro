@@ -95,7 +95,7 @@ document.getElementById("send").addEventListener("click", () =>{
 
 function setChat(uid,uname) {
     document.getElementById("message_box").hidden = false
-    // document.getElementById(uid).getElementsByClassName("unread_svg")[0].setAttribute("hidden","")
+    document.getElementById(uid).getElementsByClassName("unread_svg")[0].setAttribute("hidden","")
     messages = {}
     document.getElementById("msg_list").innerHTML = `<div class="inline-block  h-8 w-8 animate-spin rounded-full border-4 border-solid border-current group-data-[checked=true]:text-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
     <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span></div>`
@@ -108,10 +108,17 @@ function setChat(uid,uname) {
 }
 
 
-socket.on("messages", function(data){
 
+socket.on("unread", function(data){
+    for(i in data){
+        document.getElementById(data[i]).getElementsByClassName("unread_svg")[0].removeAttribute("hidden")
+    }
+})
+
+
+socket.on("messages", function(data){
     if(data["rec"] != to_user_id || data["uid"] != user_id) {
-        // document.getElementById(data["rec"]).getElementsByClassName("unread_svg")[0].removeAttribute("hidden")
+        document.getElementById(data["rec"]).getElementsByClassName("unread_svg")[0].removeAttribute("hidden")
         return
     }
 
@@ -154,3 +161,5 @@ socket.on("messages", function(data){
 })
 
 getUsers()
+
+socket.emit("get_unread",{token:token})

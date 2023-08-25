@@ -29,12 +29,11 @@ class ResetPassword(Resource):
         user = db.getemail(email)
         if user:
             guid = uuid.uuid4().hex
-            url = url_for("views.reset", id=guid, uid=user.id, _external=True)
+            url = url_for("reset_password.reset", id=guid, uid=user.id, _external=True)
 
             if send_mail(email, user.username, url, False):
                 db.insert_reset_request(user.id, guid)
                 return {"status": "success"}
-            else:
-                return {"status": "noconfig"}
-        else:
-            return {"status": "noemail"}
+            
+            return {"status": "noconfig"}
+        return {"status": "noemail"}

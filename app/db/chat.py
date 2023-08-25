@@ -51,3 +51,9 @@ def get_unread_messages(rec):
         unread.append(i.sender_id)
         
     return unread
+
+
+
+
+### get message count between 2 users
+# select sender_id,reciever_id,count(content) from messages group by sender_id, reciever_id having count(content) >= 0;

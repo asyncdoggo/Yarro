@@ -51,7 +51,7 @@ class Login(Resource):
                 response = flask.make_response(
                     {"status": "success", "uname": flask.escape(user.username), "uid": user.id})
                 response.set_cookie("token", token, httponly=False, secure=True,
-                                    samesite="Strict", expires=datetime.datetime.utcnow() + datetime.timedelta(hours=8000))
+                                    samesite="None", expires=datetime.datetime.utcnow() + datetime.timedelta(hours=8000))
                 return response
 
             return {"status": "username or password is incorrect"}

@@ -17,10 +17,10 @@ def insert_post(user, cont):
         print(repr(e))
 
 
-def get_posts(user, page,limit=10):
+def get_posts(user, page, limit=10):
     result = db.session.query(Posts, Users, Details).filter(Users.id == Posts.user_id,
-                                                            Users.id == Details.user_id).order_by(Posts.tstamp).limit(limit).offset(page).all()
-
+                                                            Users.id == Details.user_id).order_by(Posts.tstamp.desc()).offset(page*limit).limit(limit).all()
+    
     likes = db.session.query(Likes.user_id, Likes.post_id).filter(Likes.user_id == user.id).all()
     dislikes = db.session.query(DisLikes.user_id, DisLikes.post_id).filter(DisLikes.user_id == user.id).all()
     p = []

@@ -80,12 +80,12 @@ with app.app_context():
 
 
 
-logging.basicConfig(filename=os.path.join(app.root_path,'record.log'), level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+logging.basicConfig(filename=os.path.join(app.root_path,'record.log'), level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 @app.before_request
 def log_request_info():
     if not "/static" in request.full_path:
-        app.logger.debug(request.full_path)
+        app.logger.debug('Method: %s %s', request.method, request.full_path)
         app.logger.debug('User-Agent: %s', request.headers.get('User-Agent'))
         ip = request.headers.get('X-REAL-IP')
         if not ip:
@@ -94,3 +94,7 @@ def log_request_info():
             ip = request.headers.get('RemoteAddr')
         app.logger.debug('IP: %s', ip)
         app.logger.debug('Data: %s', request.get_data())
+        app.logger.debug('Date: %s', datetime.datetime.now())
+        
+        
+        

@@ -11,7 +11,7 @@ class Posts(Resource):
     def get(self, user):
         try:
             page = request.args.get("page")
-            res = db.get_posts(user, page)
+            res = db.get_posts(user, int(page))
             return {"status": "success", "data": res}
         except KeyError as e:
             print(repr(e))

@@ -2,7 +2,7 @@ import datetime
 import uuid
 from app.db.classes import Message
 from app.db.classes import db
-import flask
+from markupsafe import escape
 
 def new_message(content, sender,reciever):
     gid = uuid.uuid4().hex
@@ -30,7 +30,7 @@ def get_message(sender,reciever,skip,limit,send=False):
             {
                 "msg_id":i.message_id,
                 "sender":i.sender_id == sender,
-                "content":flask.escape(i.content)
+                "content":escape(i.content)
             }
         )
         if i.reciever_id == sender and not send:

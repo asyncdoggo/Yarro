@@ -1,7 +1,7 @@
 import datetime
 import os
 import uuid
-
+from markupsafe import escape
 import flask
 from app.db.classes import Details, DisLikes, Likes, Posts, Users
 from app.db.classes import db
@@ -28,7 +28,7 @@ def get_posts(user, page, limit=10):
     for i, j, k in result:
         p.append({
                         "post_id": i.post_id,
-                        "content": flask.escape(i.content),
+                        "content": escape(i.content),
                         "content_type": i.content_type,
                         "lc": i.l_count,
                         "dlc": i.dl_count,

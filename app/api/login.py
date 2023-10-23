@@ -5,6 +5,7 @@ import jwt
 from flask import current_app
 from flask import request
 from flask_restful import Resource
+from markupsafe import escape
 
 import app.db as db
 from app.api.token_required import token_required
@@ -49,7 +50,7 @@ class Login(Resource):
                     current_app.config['SECRET_KEY'], "HS256")
                 active_tokens[user.username] = token
                 response = flask.make_response(
-                    {"status": "success", "uname": flask.escape(user.username), "uid": user.id})
+                    {"status": "success", "uname": escape(user.username), "uid": user.id})
                 response.set_cookie("token", token, httponly=False, secure=True,
                                     samesite="None", expires=datetime.datetime.utcnow() + datetime.timedelta(hours=8000))
                 return response

@@ -5,7 +5,7 @@ import flask
 from flask_restful import Resource
 import jwt
 from app import db
-
+from markupsafe import escape
 
 def admin_token_required(f):
     """
@@ -64,7 +64,7 @@ class AdminAuth(Resource):
                      datetime.timedelta(hours=8000)},
                     current_app.config['SECRET_KEY'], "HS256")
                 response = flask.make_response(
-                    {"status": "success", "uname": flask.escape(admin.username), "uid": admin.id})
+                    {"status": "success", "uname": escape(admin.username), "uid": admin.id})
                 response.set_cookie("token", token, httponly=True, secure=True,
                                     samesite="Strict", expires=datetime.datetime.utcnow() + datetime.timedelta(hours=8000))
                 return response

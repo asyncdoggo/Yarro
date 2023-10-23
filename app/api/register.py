@@ -8,7 +8,7 @@ import app.db as db
 from app.util.send_mail import send_mail
 from flask_restful import Resource
 from flask import current_app
-
+from markupsafe import escape
 
 email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 username_regex = r"^\w(?:\w|[.-](?=\w)){3,31}$"
@@ -46,7 +46,7 @@ class Register(Resource):
                               uid=uid, _external=True)
                 if send_mail(email, username, url, True):
                     response = flask.make_response(
-                        {'status': 'success', "uname": flask.escape(username), "uid": uid})
+                        {'status': 'success', "uname": escape(username), "uid": uid})
                     response.set_cookie("token", token, httponly=False, secure=True,
                                         samesite="None", expires=datetime.datetime.utcnow(
                     ) + datetime.timedelta(days=30))
